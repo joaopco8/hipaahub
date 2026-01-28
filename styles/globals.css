@@ -1,0 +1,620 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    /* HIPAA Guard Colors */
+    --hipaa-dark: 230 35% 10%;
+    --hipaa-green: 150 70% 50%;
+    --hipaa-gray: 220 20% 96%;
+    --hipaa-white: 0 0% 100%;
+  }
+
+  .dark {
+    --background: 230 35% 10%;
+    --foreground: 0 0% 98%;
+    --card: 230 35% 10%;
+    --card-foreground: 0 0% 98%;
+    --popover: 230 35% 10%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 150 70% 50%;
+    --primary-foreground: 230 35% 10%;
+    --secondary: 240 20% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 20% 15%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 20% 15%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 20% 20%;
+    --input: 240 20% 20%;
+    --ring: 150 70% 50%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    /* HIPAA Guard Colors */
+    --hipaa-dark: 230 35% 10%;
+    --hipaa-green: 150 70% 50%;
+    --hipaa-gray: 220 20% 96%;
+    --hipaa-white: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-geologica), sans-serif;
+    font-weight: 200;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+  html {
+    font-family: var(--font-geologica), sans-serif;
+    font-weight: 200;
+  }
+  
+  /* Force extralight typography for text elements only (not structural) */
+  /* Applied to landing page text elements, not dashboard components */
+  h1, h2, h3, h4, h5, h6, p, span, a, li {
+    font-weight: 200;
+    text-transform: none;
+    letter-spacing: normal;
+  }
+  
+  /* Allow components to override with their own font weights */
+  button, input, textarea, select, [class*="font-"] {
+    /* Components can use their own font weights */
+  }
+  
+  /* Ensure all placeholders are always light */
+  ::placeholder {
+    color: rgb(113 113 122) !important; /* zinc-500 */
+    opacity: 1;
+  }
+  
+  /* Select placeholder styling */
+  [data-placeholder] {
+    color: rgb(113 113 122) !important; /* zinc-500 */
+  }
+}
+
+.logo-cloud-container {
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    hsl(var(--background)) 30%,
+    hsl(var(--background)) 70%,
+    transparent 100%
+  );
+}
+
+.logo-cloud {
+  display: flex;
+  width: calc(200% + 10px); /* Adjust based on the number of logos */
+  animation: scroll 10s linear infinite;
+}
+
+.logo-cloud::before,
+.logo-cloud::after {
+  content: '';
+  position: absolute;
+  width: 15%;
+  height: 100%;
+  top: 0;
+  z-index: 1;
+}
+
+.size-full {
+  width: 100%;
+  height: auto;
+}
+
+.icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.small-square {
+  width: 10px;
+  height: 10px;
+  background-color: transparent; /* Removed black */
+  margin-top: 5px; /* Adjust spacing as needed */
+}
+
+/* HIPAA Guard Enterprise Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Page Transition */
+.page-transition {
+  animation: fadeInUp 200ms ease-out;
+}
+
+/* Card Stagger Animation */
+.card-stagger {
+  animation: slideInUp 300ms ease-out backwards;
+}
+
+.card-stagger:nth-child(1) { animation-delay: 0ms; }
+.card-stagger:nth-child(2) { animation-delay: 50ms; }
+.card-stagger:nth-child(3) { animation-delay: 100ms; }
+.card-stagger:nth-child(4) { animation-delay: 150ms; }
+.card-stagger:nth-child(5) { animation-delay: 200ms; }
+.card-stagger:nth-child(6) { animation-delay: 250ms; }
+.card-stagger:nth-child(7) { animation-delay: 300ms; }
+.card-stagger:nth-child(8) { animation-delay: 350ms; }
+
+/* Button Micro-interactions */
+.btn-hover {
+  transition: all 150ms ease-out;
+}
+
+.btn-hover:hover {
+  transform: scale(1.01);
+}
+
+.btn-active {
+  transition: transform 80ms ease-out;
+}
+
+.btn-active:active {
+  transform: scale(0.98);
+}
+
+/* Table Row Hover */
+.table-row-hover {
+  transition: background-color 120ms ease-out;
+}
+
+/* Status Badge Transition */
+.status-transition {
+  transition: color 300ms ease-out, background-color 300ms ease-out;
+}
+
+/* Progress Bar Animation */
+.progress-animated {
+  transition: transform 400ms ease-out;
+}
+
+/* Form Checkmark */
+.checkmark-enter {
+  animation: scaleIn 200ms ease-out;
+}
+
+/* Toast Animation */
+.toast-enter {
+  animation: slideInDown 200ms ease-out;
+}
+
+.toast-exit {
+  animation: fadeIn 200ms ease-out reverse;
+}
+
+/* Smooth Glassmorphism Effect */
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(13, 17, 34, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Premium Loading Animation - Based on sidebar tab style */
+@keyframes shimmerGlow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(26, 208, 122, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(26, 208, 122, 0);
+  }
+}
+
+@keyframes slideInBlur {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes fadeInBlur {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Premium Loading States */
+.loading-premium {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(26, 208, 122, 0.1),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(12, 11, 29, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInBlur 0.3s ease-out;
+}
+
+.loading-spinner-premium {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(26, 208, 122, 0.2);
+  border-top-color: #1ad07a;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  box-shadow: 0 0 20px rgba(26, 208, 122, 0.3);
+  position: relative;
+}
+
+.loading-spinner-premium::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: rgba(26, 208, 122, 0.1);
+  animation: spin 1.2s linear infinite reverse;
+}
+
+/* Premium Card Animations */
+.card-premium {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.card-premium:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 20px rgba(26, 208, 122, 0.1);
+  border-color: rgba(26, 208, 122, 0.2);
+}
+
+.card-premium-enter {
+  animation: slideInBlur 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Premium Button Animations */
+.btn-premium {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-premium:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 15px -3px rgba(26, 208, 122, 0.3),
+    0 4px 6px -2px rgba(26, 208, 122, 0.2);
+}
+
+.btn-premium:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Page Transition Premium - Fast and non-blocking */
+.page-transition-premium {
+  animation: slideInBlur 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+
+/* Stagger Animation for Lists */
+.stagger-item {
+  opacity: 0;
+  animation: slideInBlur 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0ms; }
+.stagger-item:nth-child(2) { animation-delay: 50ms; }
+.stagger-item:nth-child(3) { animation-delay: 100ms; }
+.stagger-item:nth-child(4) { animation-delay: 150ms; }
+.stagger-item:nth-child(5) { animation-delay: 200ms; }
+.stagger-item:nth-child(6) { animation-delay: 250ms; }
+.stagger-item:nth-child(7) { animation-delay: 300ms; }
+.stagger-item:nth-child(8) { animation-delay: 350ms; }
+.stagger-item:nth-child(9) { animation-delay: 400ms; }
+.stagger-item:nth-child(10) { animation-delay: 450ms; }
+
+/* Enhanced Card Hover */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Smooth Scale Animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fade In with Slide */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-slide {
+  animation: fadeInSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* HIPAA Hub Orbit Animations */
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-orbit {
+  animation: orbit var(--orbit-duration, 20s) linear infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Geologica Extralight helper */
+.font-extralight {
+  font-weight: 200;
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+/* Custom Scrollbar - Professional & Clean */
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f5f9;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+  border: 2px solid #f3f5f9;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #94a3b8;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #e2e8f0 #f3f5f9;
+}
+
+/* Dark mode scrollbar (if needed) */
+.dark ::-webkit-scrollbar-track {
+  background: #1a1a2e;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #2d2d44;
+  border: 2px solid #1a1a2e;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3d3d54;
+}
+
+.dark * {
+  scrollbar-color: #2d2d44 #1a1a2e;
+}

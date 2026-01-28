@@ -1,0 +1,194 @@
+-- ============================================================================
+-- CORREÇÃO: Erro "null value in column state"
+-- ============================================================================
+-- Execute este script no Supabase SQL Editor
+-- ============================================================================
+
+-- ============================================================================
+-- PASSO 1: REMOVER FUNÇÃO ATUAL
+-- ============================================================================
+DROP FUNCTION IF EXISTS upsert_organization_jsonb(jsonb) CASCADE;
+
+-- ============================================================================
+-- PASSO 2: CRIAR FUNÇÃO CORRIGIDA (com tratamento de NULL para campos obrigatórios)
+-- ============================================================================
+CREATE OR REPLACE FUNCTION upsert_organization_jsonb(
+  p_data jsonb
+)
+RETURNS TABLE (
+  id uuid,
+  user_id uuid,
+  name text,
+  legal_name text,
+  dba text,
+  type text,
+  state text,
+  address_street text,
+  address_city text,
+  address_state text,
+  address_zip text,
+  security_officer_name text,
+  security_officer_email text,
+  security_officer_role text,
+  privacy_officer_name text,
+  privacy_officer_email text,
+  privacy_officer_role text,
+  employee_count integer,
+  has_employees boolean,
+  uses_contractors boolean,
+  stores_phi_electronically boolean,
+  uses_cloud_services boolean,
+  assessment_date timestamp with time zone,
+  next_review_date timestamp with time zone,
+  created_at timestamp with time zone,
+  updated_at timestamp with time zone
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_user_id uuid;
+  v_org_id uuid;
+  v_now timestamp with time zone;
+  v_assessment_date timestamp with time zone;
+  v_next_review_date timestamp with time zone;
+  v_existing_org_id uuid;
+BEGIN
+  -- ========================================================================
+  -- VALIDAÇÃO DE AUTENTICAÇÃO
+  -- ========================================================================
+  v_user_id := auth.uid();
+  
+  IF v_user_id IS NULL THEN
+    RAISE EXCEPTION 'User must be authenticated';
+  END IF;
+  
+  -- ========================================================================
+  -- PREPARAÇÃO
+  -- ========================================================================
+  v_now := timezone('utc'::text, now());
+  v_assessment_date := v_now;
+  v_next_review_date := v_assessment_date + interval '12 months';
+  
+  -- ========================================================================
+  -- VERIFICAR EXISTÊNCIA
+  -- ========================================================================
+  SELECT o.id INTO v_existing_org_id
+  FROM public.organizations o
+  WHERE o.user_id = v_user_id
+  LIMIT 1;
+  
+  -- ========================================================================
+  -- INSERT OU UPDATE
+  -- ========================================================================
+  IF v_existing_org_id IS NULL THEN
+    -- INSERT - Usar COALESCE para campos obrigatórios
+    INSERT INTO public.organizations (
+      id, user_id, name, legal_name, dba, type, state,
+      address_street, address_city, address_state, address_zip,
+      security_officer_name, security_officer_email, security_officer_role,
+      privacy_officer_name, privacy_officer_email, privacy_officer_role,
+      employee_count, has_employees, uses_contractors,
+      stores_phi_electronically, uses_cloud_services,
+      assessment_date, next_review_date, created_at, updated_at
+    )
+    VALUES (
+      gen_random_uuid(),
+      v_user_id,
+      COALESCE(NULLIF(p_data->>'name', ''), 'Unnamed Organization'),  -- name é NOT NULL
+      COALESCE(NULLIF(p_data->>'legal_name', ''), p_data->>'name', 'Unnamed Organization'),  -- legal_name pode usar name como fallback
+      NULLIF(p_data->>'dba', ''),  -- dba pode ser NULL
+      COALESCE(NULLIF(p_data->>'type', ''), 'medical'),  -- type é NOT NULL, default 'medical'
+      COALESCE(NULLIF(p_data->>'state', ''), NULLIF(p_data->>'address_state', ''), 'CA'),  -- state é NOT NULL, usa address_state como fallback ou 'CA'
+      p_data->>'address_street',
+      p_data->>'address_city',
+      p_data->>'address_state',
+      p_data->>'address_zip',
+      p_data->>'security_officer_name',
+      p_data->>'security_officer_email',
+      p_data->>'security_officer_role',
+      p_data->>'privacy_officer_name',
+      p_data->>'privacy_officer_email',
+      p_data->>'privacy_officer_role',
+      COALESCE((p_data->>'employee_count')::integer, 1),  -- employee_count é NOT NULL, default 1
+      COALESCE((p_data->>'has_employees')::boolean, true),
+      COALESCE((p_data->>'uses_contractors')::boolean, false),
+      COALESCE((p_data->>'stores_phi_electronically')::boolean, true),
+      COALESCE((p_data->>'uses_cloud_services')::boolean, false),
+      v_assessment_date,
+      v_next_review_date,
+      v_now,
+      v_now
+    )
+    RETURNING public.organizations.id INTO v_org_id;
+  ELSE
+    -- UPDATE - Preservar valores existentes se novos forem NULL
+    UPDATE public.organizations o
+    SET
+      name = COALESCE(NULLIF(p_data->>'name', ''), o.name),
+      legal_name = COALESCE(NULLIF(p_data->>'legal_name', ''), p_data->>'name', o.legal_name),
+      dba = COALESCE(NULLIF(p_data->>'dba', ''), o.dba),
+      type = COALESCE(NULLIF(p_data->>'type', ''), o.type),
+      state = COALESCE(NULLIF(p_data->>'state', ''), NULLIF(p_data->>'address_state', ''), o.state),  -- state é NOT NULL, preserva existente se novo for NULL
+      address_street = COALESCE(NULLIF(p_data->>'address_street', ''), o.address_street),
+      address_city = COALESCE(NULLIF(p_data->>'address_city', ''), o.address_city),
+      address_state = COALESCE(NULLIF(p_data->>'address_state', ''), o.address_state),
+      address_zip = COALESCE(NULLIF(p_data->>'address_zip', ''), o.address_zip),
+      security_officer_name = COALESCE(NULLIF(p_data->>'security_officer_name', ''), o.security_officer_name),
+      security_officer_email = COALESCE(NULLIF(p_data->>'security_officer_email', ''), o.security_officer_email),
+      security_officer_role = COALESCE(NULLIF(p_data->>'security_officer_role', ''), o.security_officer_role),
+      privacy_officer_name = COALESCE(NULLIF(p_data->>'privacy_officer_name', ''), o.privacy_officer_name),
+      privacy_officer_email = COALESCE(NULLIF(p_data->>'privacy_officer_email', ''), o.privacy_officer_email),
+      privacy_officer_role = COALESCE(NULLIF(p_data->>'privacy_officer_role', ''), o.privacy_officer_role),
+      employee_count = COALESCE((p_data->>'employee_count')::integer, o.employee_count),
+      has_employees = COALESCE((p_data->>'has_employees')::boolean, o.has_employees),
+      uses_contractors = COALESCE((p_data->>'uses_contractors')::boolean, o.uses_contractors),
+      stores_phi_electronically = COALESCE((p_data->>'stores_phi_electronically')::boolean, o.stores_phi_electronically),
+      uses_cloud_services = COALESCE((p_data->>'uses_cloud_services')::boolean, o.uses_cloud_services),
+      assessment_date = COALESCE(o.assessment_date, v_assessment_date),
+      next_review_date = COALESCE(o.next_review_date, v_next_review_date),
+      updated_at = v_now
+    WHERE o.user_id = v_user_id
+    RETURNING o.id INTO v_org_id;
+  END IF;
+  
+  -- ========================================================================
+  -- RETORNAR
+  -- ========================================================================
+  RETURN QUERY
+  SELECT 
+    o.id, o.user_id, o.name, o.legal_name, o.dba,
+    o.type, o.state, o.address_street, o.address_city,
+    o.address_state, o.address_zip, o.security_officer_name,
+    o.security_officer_email, o.security_officer_role,
+    o.privacy_officer_name, o.privacy_officer_email,
+    o.privacy_officer_role, o.employee_count, o.has_employees,
+    o.uses_contractors, o.stores_phi_electronically,
+    o.uses_cloud_services, o.assessment_date, o.next_review_date,
+    o.created_at, o.updated_at
+  FROM public.organizations o
+  WHERE o.id = v_org_id;
+END;
+$$;
+
+-- ============================================================================
+-- PASSO 3: PERMISSÕES
+-- ============================================================================
+GRANT EXECUTE ON FUNCTION upsert_organization_jsonb(jsonb) TO authenticated;
+GRANT EXECUTE ON FUNCTION upsert_organization_jsonb(jsonb) TO anon;
+
+-- ============================================================================
+-- PASSO 4: FORÇAR REFRESH DO CACHE
+-- ============================================================================
+NOTIFY pgrst, 'reload schema';
+
+-- ============================================================================
+-- VERIFICAÇÃO
+-- ============================================================================
+SELECT 
+  '✅ Função criada' as status,
+  proname,
+  pg_get_function_arguments(oid) as arguments
+FROM pg_proc
+WHERE proname = 'upsert_organization_jsonb';

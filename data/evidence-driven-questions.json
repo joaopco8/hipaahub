@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "total_questions": 112,
+    "version": "2.0",
+    "date": "2026-01-13",
+    "system_type": "Evidence-Driven Compliance System",
+    "legal_authority": "45 CFR Part 160 & 164, HITECH Act, NIST 800-53 Rev 5"
+  },
+  "questions": [
+    {
+      "question_id": "ADM-001",
+      "sequence": 1,
+      "original_question": "Has your organization formally designated a Security Officer with documented responsibility for developing, implementing, and maintaining HIPAA security policies and procedures?",
+      "rewritten_compliance_question": "[EVIDENCE-DRIVEN] Has your organization formally designated a Security Officer with documented responsibility for developing, implementing, and maintaining HIPAA security policies and procedures?",
+      "hipaa_citation": "45 CFR §164.308(a)(2)",
+      "nist_control": "AC-1, CA-1, PM-1",
+      "risk_domain": "Confidentiality, Integrity, Availability",
+      "severity": 5,
+      "category": "administrative",
+      "evidence_required": true,
+      "evidence_type": ["document", "attestation"],
+      "evidence_instructions_for_user": "DOCUMENT: Upload formal policy, procedure, or documentation (PDF, DOCX, DOC) | ATTESTATION: Legally binding checkbox with signer name and date (Digital signature)",
+      "backend_field_definition": {
+        "evidence_required": true,
+        "evidence_type": ["document", "attestation"],
+        "required_if": "answer == 'yes' or answer == 'partially compliant'",
+        "retention": "7 years minimum",
+        "legal_weight": "OCR defensible - litigation grade",
+        "audit_trail": true,
+        "timestamp_required": true,
+        "signer_required": true
+      }
+    }
+  ]
+}
