@@ -97,15 +97,15 @@ export default async function PoliciesPage() {
   const totalCount = policies.length;
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6 max-w-[1600px] mx-auto page-transition-premium">
-      <div className="flex items-center justify-between">
+    <div className="flex w-full flex-col gap-6 page-transition-premium">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Policies & Templates</h1>
           <p className="text-zinc-600 text-base">
             Professional HIPAA policy templates ready to use
           </p>
         </div>
-        <div className="text-right">
+        <div className="text-left sm:text-right">
           <div className="text-2xl font-bold text-zinc-900">{completedCount}/{totalCount}</div>
           <div className="text-sm text-zinc-600">Policies Complete</div>
         </div>
@@ -115,7 +115,7 @@ export default async function PoliciesPage() {
         {policies.map((policy, index) => (
           <Card key={policy.id} className="card-premium-enter stagger-item" style={{ animationDelay: `${index * 50}ms` }}>
             <CardHeader>
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <FileText className="h-5 w-5 text-primary" />
@@ -124,12 +124,12 @@ export default async function PoliciesPage() {
                   <CardDescription>{policy.description}</CardDescription>
                 </div>
                 {policy.status === 'completed' ? (
-                  <Badge className="bg-green-100 text-green-800 border-green-200">
+                  <Badge className="bg-green-100 text-green-800 border-green-200 w-fit">
                     <CheckCircle2 className="h-3 w-3 mr-1" />
                     Complete
                   </Badge>
                 ) : (
-                  <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+                  <Badge className="bg-amber-100 text-amber-800 border-amber-200 w-fit">
                     Pending
                   </Badge>
                 )}

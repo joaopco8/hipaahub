@@ -136,7 +136,7 @@ export interface CreateEvidenceInput {
  * Get all compliance evidence for the current user's organization
  */
 export async function getAllComplianceEvidence(): Promise<ComplianceEvidence[]> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -160,7 +160,8 @@ export async function getAllComplianceEvidence(): Promise<ComplianceEvidence[]> 
     'server';
 
   // Load all evidence (excluding soft-deleted)
-  const { data: evidence, error } = await supabase
+  // Note: compliance_evidence table exists but may not be in TypeScript types yet
+  const { data: evidence, error } = await (supabase as any)
     .from('compliance_evidence')
     .select('*')
     .eq('organization_id', organization.id)
@@ -179,7 +180,7 @@ export async function getAllComplianceEvidence(): Promise<ComplianceEvidence[]> 
  * Get evidence by ID
  */
 export async function getEvidenceById(evidenceId: string): Promise<ComplianceEvidence | null> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -219,7 +220,7 @@ export async function getEvidenceById(evidenceId: string): Promise<ComplianceEvi
 export async function createComplianceEvidence(
   input: CreateEvidenceInput
 ): Promise<{ success: boolean; evidence_id?: string; error?: string }> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -351,7 +352,7 @@ export async function updateComplianceEvidence(
   evidenceId: string,
   updates: Partial<CreateEvidenceInput>
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -393,7 +394,7 @@ export async function updateComplianceEvidence(
 export async function deleteComplianceEvidence(
   evidenceId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -434,7 +435,7 @@ export async function getEvidenceByDocumentId(
   documentId: string
 ): Promise<ComplianceEvidence[]> {
   console.log('🔍 getEvidenceByDocumentId called with documentId:', documentId);
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -466,7 +467,7 @@ export async function getEvidenceByDocumentId(
     console.error('Error loading evidence mappings:', mappingError);
   }
 
-  const mappedEvidenceIds = mappings?.map(m => m.evidence_id) || [];
+  const mappedEvidenceIds = mappings?.map((m: any) => m.evidence_id) || [];
   console.log(`📋 Found ${mappedEvidenceIds.length} evidence IDs from mapping table for document ${documentId}`);
 
   // Method 2: Get evidence where documentId is in related_document_ids array
@@ -496,7 +497,7 @@ export async function getEvidenceByDocumentId(
   
   if (!allError && allEvidence) {
     // Filter manually in JavaScript (more reliable)
-    const manuallyFiltered = allEvidence.filter(ev => {
+    const manuallyFiltered = allEvidence.filter((ev: any) => {
       if (!ev.related_document_ids || !Array.isArray(ev.related_document_ids)) {
         return false;
       }
@@ -505,8 +506,8 @@ export async function getEvidenceByDocumentId(
     
     console.log(`📊 Manual filter found ${manuallyFiltered.length} evidence items with documentId ${documentId}`);
     if (manuallyFiltered.length > 0) {
-      console.log('Evidence titles (manual):', manuallyFiltered.map(e => e.title));
-      console.log('Evidence related_document_ids (manual):', manuallyFiltered.map(e => e.related_document_ids));
+      console.log('Evidence titles (manual):', manuallyFiltered.map((e: any) => e.title));
+      console.log('Evidence related_document_ids (manual):', manuallyFiltered.map((e: any) => e.related_document_ids));
     }
     
     // Use manual filter result (more reliable)
@@ -525,7 +526,7 @@ export async function getEvidenceByDocumentId(
     console.log(`⚠️ No evidence found for document ${documentId}. Checking all evidence in organization...`);
     if (allEvidence) {
       console.log(`Total evidence in organization: ${allEvidence.length}`);
-      console.log('Sample evidence related_document_ids:', allEvidence.slice(0, 3).map(e => ({
+      console.log('Sample evidence related_document_ids:', allEvidence.slice(0, 3).map((e: any) => ({
         title: e.title,
         related_document_ids: e.related_document_ids
       })));
@@ -539,7 +540,7 @@ export async function getEvidenceByDocumentId(
 
   // If we have mapped evidence IDs that aren't already in directEvidence, fetch them
   let mappedEvidence: ComplianceEvidence[] = [];
-  const missingIds = Array.from(allEvidenceIds).filter(id => !directEvidenceIds.includes(id));
+  const missingIds = Array.from(allEvidenceIds).filter((id: any) => !directEvidenceIds.includes(id));
   
   if (missingIds.length > 0) {
     const { data: evidence, error } = await supabase
@@ -590,7 +591,7 @@ export async function getEvidenceByDocumentId(
 export async function getEvidenceByFieldId(
   fieldId: string
 ): Promise<ComplianceEvidence[]> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -631,7 +632,7 @@ export async function getEvidenceByFieldId(
 export async function getEvidenceByQuestionId(
   questionId: string
 ): Promise<ComplianceEvidence[]> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -659,7 +660,7 @@ export async function getEvidenceByQuestionId(
     return [];
   }
 
-  const evidenceIds = mappings.map(m => m.evidence_id);
+  const evidenceIds = mappings.map((m: any) => m.evidence_id);
 
   const { data: evidence, error } = await supabase
     .from('compliance_evidence')
@@ -684,7 +685,7 @@ export async function getEvidenceByQuestionId(
 export async function getEvidenceBySafeguard(
   safeguardCode: string
 ): Promise<ComplianceEvidence[]> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -712,7 +713,7 @@ export async function getEvidenceBySafeguard(
     return [];
   }
 
-  const evidenceIds = mappings.map(m => m.evidence_id);
+  const evidenceIds = mappings.map((m: any) => m.evidence_id);
 
   const { data: evidence, error } = await supabase
     .from('compliance_evidence')
@@ -742,7 +743,7 @@ export async function getEvidenceStatistics(): Promise<{
   expiring_soon: number; // Within 30 days
   requires_review: number;
 }> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
@@ -846,7 +847,7 @@ export async function getEvidenceStatistics(): Promise<{
 export async function signEvidenceAttestation(
   evidenceId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createClient();
+  const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {

@@ -48,6 +48,23 @@ export interface OrganizationData {
   accreditation_status?: string;
   types_of_services?: string;
   insurance_coverage?: string;
+  // Additional metadata fields
+  practice_type_primary?: string;
+  specialties?: string[];
+  number_of_locations?: number;
+  multi_state_operations?: boolean;
+  remote_workforce?: boolean;
+  ehr_system?: string;
+  email_provider?: string;
+  cloud_storage_provider?: string;
+  uses_vpn?: boolean;
+  vpn_provider?: string;
+  device_types?: string[];
+  security_officer_role_other?: string;
+  privacy_officer_role_other?: string;
+  primary_contact_name?: string;
+  compliance_contact_email?: string;
+  compliance_contact_phone?: string;
 }
 
 export interface RiskAssessmentData {
@@ -220,7 +237,8 @@ export async function autoSaveOrganizationData(data: Partial<OrganizationData & 
 
   try {
     // Use RPC function which handles RLS properly
-    const { data: result, error: rpcError } = await supabase
+    // Note: RPC function exists but may not be in TypeScript types yet
+    const { data: result, error: rpcError } = await (supabase as any)
       .rpc('upsert_organization_jsonb', {
         p_data: jsonData
       })
@@ -262,7 +280,7 @@ export async function loadSavedOrganizationData() {
   }
 
   // Extract metadata if it exists
-  const metadata = (organization.onboarding_metadata as any) || {};
+  const metadata = ((organization as any).onboarding_metadata) || {};
 
   return {
     name: organization.name || '',
@@ -286,27 +304,27 @@ export async function loadSavedOrganizationData() {
     stores_phi_electronically: organization.stores_phi_electronically ?? true,
     uses_cloud_services: organization.uses_cloud_services ?? false,
     // US HIPAA Required Legal Identifiers
-    ein: organization.ein || '',
-    npi: organization.npi || '',
-    state_license_number: organization.state_license_number || '',
-    state_tax_id: organization.state_tax_id || '',
+    ein: (organization as any).ein || '',
+    npi: (organization as any).npi || '',
+    state_license_number: (organization as any).state_license_number || '',
+    state_tax_id: (organization as any).state_tax_id || '',
     // Authorized Representative / CEO
-    authorized_representative_name: organization.authorized_representative_name || '',
-    authorized_representative_title: organization.authorized_representative_title || '',
-    ceo_name: organization.ceo_name || '',
-    ceo_title: organization.ceo_title || '',
+    authorized_representative_name: (organization as any).authorized_representative_name || '',
+    authorized_representative_title: (organization as any).authorized_representative_title || '',
+    ceo_name: (organization as any).ceo_name || '',
+    ceo_title: (organization as any).ceo_title || '',
     // Conditional Fields
-    performs_laboratory_tests: organization.performs_laboratory_tests ?? false,
-    clia_certificate_number: organization.clia_certificate_number || '',
-    serves_medicare_patients: organization.serves_medicare_patients ?? false,
-    medicare_provider_number: organization.medicare_provider_number || '',
+    performs_laboratory_tests: (organization as any).performs_laboratory_tests ?? false,
+    clia_certificate_number: (organization as any).clia_certificate_number || '',
+    serves_medicare_patients: (organization as any).serves_medicare_patients ?? false,
+    medicare_provider_number: (organization as any).medicare_provider_number || '',
     // Optional but Recommended
-    phone_number: organization.phone_number || '',
-    email_address: organization.email_address || '',
-    website: organization.website || '',
-    accreditation_status: organization.accreditation_status || '',
-    types_of_services: organization.types_of_services || '',
-    insurance_coverage: organization.insurance_coverage || '',
+    phone_number: (organization as any).phone_number || '',
+    email_address: (organization as any).email_address || '',
+    website: (organization as any).website || '',
+    accreditation_status: (organization as any).accreditation_status || '',
+    types_of_services: (organization as any).types_of_services || '',
+    insurance_coverage: (organization as any).insurance_coverage || '',
     // Metadata fields
     practice_type_primary: metadata.practice_type_primary || organization.type || '',
     specialties: metadata.specialties || [],
@@ -410,7 +428,8 @@ export async function saveOrganization(data: OrganizationData) {
   console.log('🔄 Saving organization via RPC function...');
   console.log('📦 Data being sent:', JSON.stringify(jsonData, null, 2));
   
-  const { data: result, error: rpcError } = await supabase
+  // Note: RPC function exists but may not be in TypeScript types yet
+  const { data: result, error: rpcError } = await (supabase as any)
     .rpc('upsert_organization_jsonb', {
       p_data: jsonData
     });
@@ -465,7 +484,7 @@ export async function autoSaveRiskAssessmentAnswers(answers: Record<string, stri
   let tableName = 'onboarding_risk_assessments';
   
   const { data: onboardingData, error: onboardingError } = await supabase
-    .from('onboarding_risk_assessments')
+    .from('onboarding_risk_assessments' as any)
     .select('id')
     .eq('user_id', user.id)
     .maybeSingle();
@@ -500,7 +519,8 @@ export async function autoSaveRiskAssessmentAnswers(answers: Record<string, stri
   let result;
   if (existingRiskAssessment?.id) {
     // UPDATE
-    const { data, error } = await supabase
+    // Note: tableName may reference a table that's not in TypeScript types yet
+    const { data, error } = await (supabase as any)
       .from(tableName)
       .update(riskAssessmentData)
       .eq('user_id', user.id)
@@ -520,7 +540,8 @@ export async function autoSaveRiskAssessmentAnswers(answers: Record<string, stri
     riskAssessmentData.max_possible_score = 0;
     riskAssessmentData.risk_percentage = 0;
     
-    const { data, error } = await supabase
+    // Note: tableName may reference a table that's not in TypeScript types yet
+    const { data, error } = await (supabase as any)
       .from(tableName)
       .insert(riskAssessmentData)
       .select()
@@ -549,7 +570,7 @@ export async function loadSavedRiskAssessmentAnswers() {
   let riskAssessment = null;
   
   const { data: onboardingData, error: onboardingError } = await supabase
-    .from('onboarding_risk_assessments')
+    .from('onboarding_risk_assessments' as any)
     .select('id, answers')
     .eq('user_id', user.id)
     .maybeSingle();
@@ -603,7 +624,7 @@ export async function loadRiskAssessmentEvidence(riskAssessmentId?: string) {
   let assessmentId = riskAssessmentId;
   if (!assessmentId) {
     const { data: assessment } = await supabase
-      .from('onboarding_risk_assessments')
+      .from('onboarding_risk_assessments' as any)
       .select('id')
       .eq('user_id', user.id)
       .maybeSingle();
@@ -618,7 +639,8 @@ export async function loadRiskAssessmentEvidence(riskAssessmentId?: string) {
   }
 
   // Load evidence records
-  const { data: evidenceRecords, error } = await supabase
+  // Note: risk_assessment_evidence table exists but may not be in TypeScript types yet
+  const { data: evidenceRecords, error } = await (supabase as any)
     .from('risk_assessment_evidence')
     .select('question_id, evidence_data, uploaded_at, uploaded_by, uploaded_ip')
     .eq('risk_assessment_id', assessmentId)
@@ -707,7 +729,7 @@ export async function saveRiskAssessment(data: RiskAssessmentData) {
 
   // Verificar se já existe uma risk assessment para este usuário
   const { data: existingRiskAssessment } = await supabase
-    .from('onboarding_risk_assessments')
+    .from('onboarding_risk_assessments' as any)
     .select('id')
     .eq('user_id', user.id)
     .single();
@@ -729,7 +751,7 @@ export async function saveRiskAssessment(data: RiskAssessmentData) {
   if (existingRiskAssessment?.id) {
     // UPDATE
     const { data: updated, error: updateError } = await supabase
-      .from('onboarding_risk_assessments')
+      .from('onboarding_risk_assessments' as any)
       .update(riskAssessmentData)
       .eq('user_id', user.id)
       .eq('id', existingRiskAssessment.id)
@@ -740,7 +762,7 @@ export async function saveRiskAssessment(data: RiskAssessmentData) {
   } else {
     // INSERT
     const { data: inserted, error: insertError } = await supabase
-      .from('onboarding_risk_assessments')
+      .from('onboarding_risk_assessments' as any)
       .insert(riskAssessmentData)
       .select()
       .single();
@@ -1005,7 +1027,7 @@ export async function generateAndSaveActionItems() {
 
   // Get risk assessment from onboarding_risk_assessments table
   const { data: riskAssessment, error: riskError } = await supabase
-    .from('onboarding_risk_assessments')
+    .from('onboarding_risk_assessments' as any)
     .select('*')
     .eq('user_id', user.id)
     .maybeSingle();
@@ -1048,7 +1070,8 @@ export async function generateAndSaveActionItems() {
     status: 'pending'
   }));
 
-  const { data: savedItems, error } = await supabase
+  // Note: action_items table exists but may have type mismatches
+  const { data: savedItems, error } = await (supabase as any)
     .from('action_items')
     .insert(itemsToInsert)
     .select();

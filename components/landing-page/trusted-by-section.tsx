@@ -45,7 +45,7 @@ const companyLogos = [
 
 export default function TrustedBySection() {
   return (
-    <section className="w-full relative bg-gradient-to-b from-white via-[#f3f5f9] to-white py-16 md:py-24 font-extralight overflow-hidden">
+    <section className="w-full relative bg-gradient-to-b from-white via-[#f3f5f9] to-white py-16 md:py-20 lg:py-24 font-extralight overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#1ad07a]/5 rounded-full blur-3xl" />

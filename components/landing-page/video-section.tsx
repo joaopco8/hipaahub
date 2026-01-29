@@ -42,7 +42,7 @@ export default function VideoSection({
   const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0`;
 
   return (
-    <section className="relative w-full py-24 md:py-32 bg-gradient-to-b from-white via-[#f3f5f9] to-white overflow-hidden">
+    <section className="relative w-full py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white via-[#f3f5f9] to-white overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         {/* Section Header */}
         <motion.div

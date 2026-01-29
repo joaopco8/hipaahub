@@ -60,10 +60,20 @@ export default function FooterPrimary() {
               The institutional standard for healthcare compliance and audit defense.
             </p>
             <div className="flex items-center gap-4">
-              <a href="#" className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white/80 hover:bg-[#1acb77] hover:text-[#0d0d1f] transition-all border border-white/10">
+              <a 
+                href="https://www.instagram.com/hipaahub/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white/80 hover:bg-[#1acb77] hover:text-[#0d0d1f] transition-all border border-white/10"
+              >
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white/80 hover:bg-[#1acb77] hover:text-[#0d0d1f] transition-all border border-white/10">
+              <a 
+                href="https://www.linkedin.com/company/hipaahub" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white/80 hover:bg-[#1acb77] hover:text-[#0d0d1f] transition-all border border-white/10"
+              >
                 <Linkedin className="w-5 h-5" />
               </a>
             </div>

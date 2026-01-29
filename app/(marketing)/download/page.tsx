@@ -35,7 +35,8 @@ export default function DownloadPage() {
       const supabase = createClient();
       
       // Update lead record to mark as downloaded (most recent one for this email)
-      const { data: latestLead } = await supabase
+      // Note: leads table exists but may not be in TypeScript types yet
+      const { data: latestLead } = await (supabase as any)
         .from('leads')
         .select('id')
         .eq('email', email)
@@ -44,7 +45,7 @@ export default function DownloadPage() {
         .single();
 
       if (latestLead) {
-        await supabase
+        await (supabase as any)
           .from('leads')
           .update({
             material_downloaded: true,

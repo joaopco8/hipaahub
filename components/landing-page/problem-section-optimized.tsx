@@ -8,7 +8,7 @@ import { SectionCTA } from './section-cta';
 
 export default function ProblemSectionOptimized() {
   return (
-    <section className="w-full relative bg-gradient-to-b from-[#0c0b1d] via-[#1a1a2e] to-[#0c0b1d] py-32 md:py-40 font-extralight overflow-hidden">
+    <section className="w-full relative bg-gradient-to-b from-[#0c0b1d] via-[#1a1a2e] to-[#0c0b1d] py-16 md:py-20 lg:py-24 font-extralight overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Gradient orbs */}
@@ -279,7 +279,7 @@ export default function ProblemSectionOptimized() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.8 }}
+                transition={{ duration: 0.6, delay: 3.5 }}
               >
                 <div className="relative bg-white/5 backdrop-blur-sm rounded-lg p-8 md:p-10 border border-white/20">
                   {/* Left border accent - professional legal style */}

@@ -154,12 +154,12 @@ export default async function DashboardPage() {
   ] = await Promise.all([
     // Evidence Center (real uploads + attestations)
     (supabase as any)
-      .from('compliance_evidence')
+      .from('compliance_evidence' as any)
       .select('evidence_field_id,status,attestation_signed,upload_date,updated_at')
       .eq('organization_id', organization.id)
       .is('deleted_at', null),
     (supabase as any)
-      .from('compliance_evidence')
+      .from('compliance_evidence' as any)
       .select('upload_date,updated_at')
       .eq('organization_id', organization.id)
       .is('deleted_at', null)
@@ -355,9 +355,9 @@ export default async function DashboardPage() {
   ].filter((gap) => gap.show);
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6">
+    <div className="flex w-full flex-col gap-6">
       {/* Professional Header */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
         <div>
           <h1 className="text-2xl font-semibold text-zinc-900">{greeting}, {userName}</h1>
           <p className="text-sm text-zinc-600 mt-1">Here's your compliance overview.</p>

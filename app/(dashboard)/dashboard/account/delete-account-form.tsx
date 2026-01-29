@@ -42,9 +42,10 @@ export function DeleteAccountForm() {
       if (user) {
         setUserEmail(user.email || '');
         // Check if OAuth user (no password or has Google provider)
-        const oauthCheck = user.app_metadata?.provider === 'google' || 
-                          user.identities?.some((identity: any) => identity.provider === 'google') ||
-                          !user.encrypted_password;
+        const hasOAuthIdentity = user.identities?.some((identity: any) => 
+          identity.provider && identity.provider !== 'email'
+        );
+        const oauthCheck = user.app_metadata?.provider === 'google' || hasOAuthIdentity || false;
         setIsOAuthUser(oauthCheck);
         if (oauthCheck) {
           // Pre-fill email for OAuth users

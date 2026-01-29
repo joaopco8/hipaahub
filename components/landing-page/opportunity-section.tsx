@@ -23,7 +23,7 @@ const opportunities = [
 
 export default function OpportunitySection() {
   return (
-    <section className="w-full relative bg-gradient-to-b from-[#f3f5f9] via-white to-[#f3f5f9] py-24 md:py-32 font-extralight overflow-hidden">
+    <section className="w-full relative bg-gradient-to-b from-[#f3f5f9] via-white to-[#f3f5f9] py-16 md:py-20 lg:py-24 font-extralight overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-48 w-96 h-96 bg-[#1ad07a]/5 rounded-full blur-3xl" />

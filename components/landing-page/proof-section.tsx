@@ -27,7 +27,7 @@ const testimonials = [
 
 export default function ProofSection() {
   return (
-    <section className="w-full relative bg-white py-24 md:py-32 font-extralight overflow-hidden">
+    <section className="w-full relative bg-white py-16 md:py-20 lg:py-24 font-extralight overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
           
           <FadeIn>

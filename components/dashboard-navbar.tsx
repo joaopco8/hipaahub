@@ -14,7 +14,8 @@ import { Input } from '@/components/ui/input';
 
 import { UserAccountNav } from '@/components/user-account-nav';
 import Link from 'next/link';
-import { Package2, Search, Settings, Menu } from 'lucide-react';
+import Image from 'next/image';
+import { Search, Settings, Menu } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -45,16 +46,25 @@ export function Navbar({
             <Menu className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="sm:max-w-xs">
-          <nav className="grid gap-6 text-lg font-medium">
-            <Link
-              href="#"
-              className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
-              prefetch={false}
-            >
-              <Package2 className="h-5 w-5 transition-all group-hover:scale-110" />
-              <span className="sr-only">Acme Inc</span>
+        <SheetContent
+          side="left"
+          className="sm:max-w-xs p-0 bg-[#0c0b1d] text-white border-white/10"
+        >
+          {/* Mobile Sidebar Header (Logo) */}
+          <div className="px-5 py-5 border-b border-white/10">
+            <Link href="/dashboard" className="flex items-center gap-3" prefetch={false}>
+              <Image
+                src="/images/logohipa.png"
+                alt="HIPAA Hub"
+                width={150}
+                height={50}
+                className="object-contain"
+                priority
+              />
             </Link>
+          </div>
+
+          <nav className="grid gap-2 px-3 py-4 text-base font-medium">
             {navConfig.map(
               (
                 item: {
@@ -69,7 +79,10 @@ export function Navbar({
                   <Link
                     key={index}
                     href={item.href}
-                    className={`flex items-center gap-4 px-2.5 ${currentPathname === item.href ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                    className={[
+                      'flex items-center gap-3 rounded-lg px-3 py-2 transition-colors',
+                      currentPathname === item.href ? 'bg-white/10 text-white' : 'text-white/70 hover:text-white hover:bg-white/5',
+                    ].join(' ')}
                     prefetch={false}
                   >
                     <IconComponent className="h-5 w-5" />
@@ -79,8 +92,8 @@ export function Navbar({
               }
             )}
             <Link
-              href="#"
-              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+              href="/dashboard/account"
+              className="mt-2 flex items-center gap-3 rounded-lg px-3 py-2 text-white/70 hover:text-white hover:bg-white/5 transition-colors"
               prefetch={false}
             >
               <Settings className="h-5 w-5" />

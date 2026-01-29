@@ -1020,7 +1020,7 @@ export default function BreachNotificationsPage() {
           {/* Patient Notification Letter */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <CardTitle className="text-lg">Patient Notification Letter</CardTitle>
                   <CardDescription>
@@ -1049,7 +1049,7 @@ export default function BreachNotificationsPage() {
           {letters.hhs && (
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <CardTitle className="text-lg">HHS OCR Notification Letter</CardTitle>
                     <CardDescription>
@@ -1079,7 +1079,7 @@ export default function BreachNotificationsPage() {
           {letters.media && (
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <CardTitle className="text-lg">Media Notification Letter</CardTitle>
                     <CardDescription>

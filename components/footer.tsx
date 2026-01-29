@@ -90,10 +90,22 @@ export default function Footer() {
             <Link href="#" className="text-white" prefetch={false}>
               <FacebookIcon className="w-6 h-6" />
             </Link>
-            <Link href="#" className="text-white" prefetch={false}>
+            <Link 
+              href="https://www.instagram.com/hipaahub/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white" 
+              prefetch={false}
+            >
               <InstagramIcon className="w-6 h-6" />
             </Link>
-            <Link href="#" className="text-white" prefetch={false}>
+            <Link 
+              href="https://www.linkedin.com/company/hipaahub" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-white" 
+              prefetch={false}
+            >
               <LinkedinIcon className="w-6 h-6" />
             </Link>
           </div>

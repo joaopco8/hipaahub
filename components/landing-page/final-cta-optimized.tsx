@@ -9,7 +9,7 @@ import { TextHighlight } from './text-highlight';
 
 export default function FinalCTAOptimized() {
   return (
-    <section className="relative w-full bg-gradient-to-b from-[#0c0b1d] to-[#1a1a2e] py-24 md:py-32 font-extralight overflow-hidden">
+    <section className="relative w-full bg-gradient-to-b from-[#0c0b1d] to-[#1a1a2e] py-16 md:py-20 lg:py-24 font-extralight overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-[#1ad07a]/10 rounded-full blur-3xl" />

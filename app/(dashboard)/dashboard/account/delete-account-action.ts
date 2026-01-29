@@ -20,9 +20,10 @@ export async function deleteAccount(formData: FormData) {
 
   // Check if user is authenticated via OAuth (Google, etc.)
   // OAuth users don't have passwords, so we check identities or app_metadata
-  const isOAuthUser = user.app_metadata?.provider === 'google' || 
-                      user.identities?.some((identity: any) => identity.provider === 'google') ||
-                      !user.encrypted_password;
+  const hasOAuthIdentity = user.identities?.some((identity: any) => 
+    identity.provider && identity.provider !== 'email'
+  );
+  const isOAuthUser = user.app_metadata?.provider === 'google' || hasOAuthIdentity || false;
 
   if (isOAuthUser) {
     // For OAuth users, we use email confirmation instead of password
@@ -101,7 +102,7 @@ export async function deleteAccount(formData: FormData) {
     
     // 2. Delete risk assessments
     await supabase.from('risk_assessments').delete().eq('user_id', user.id);
-    await supabase.from('onboarding_risk_assessments').delete().eq('user_id', user.id);
+    // Note: onboarding_risk_assessments will be deleted automatically via CASCADE when user is deleted
     
     // 3. Delete staff members
     await supabase.from('staff_members').delete().eq('user_id', user.id);

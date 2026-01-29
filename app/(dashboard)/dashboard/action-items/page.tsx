@@ -55,7 +55,7 @@ export default async function ActionItemsPage() {
   const completedItems = actionItems.filter(item => item.status === 'completed');
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6 max-w-[1600px] mx-auto page-transition-premium">
+    <div className="flex w-full flex-col gap-6 page-transition-premium">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Action Items</h1>
         <p className="text-zinc-600">

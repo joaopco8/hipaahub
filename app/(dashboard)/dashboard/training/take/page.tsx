@@ -895,11 +895,12 @@ export default function TakeTrainingPage() {
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Button
           variant="outline"
           onClick={handlePrevious}
           disabled={currentSection === 0}
+          className="w-full sm:w-auto"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Previous
@@ -907,6 +908,7 @@ export default function TakeTrainingPage() {
         <Button
           onClick={handleNext}
           disabled={!canProceed || isSubmitting}
+          className="w-full sm:w-auto"
         >
           {isSubmitting ? (
             'Submitting...'

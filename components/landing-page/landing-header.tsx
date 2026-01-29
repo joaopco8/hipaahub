@@ -39,9 +39,12 @@ export default function LandingHeader() {
   const navLinks = [
     { href: "/#features", label: "Features" },
     { href: "/#how-it-works", label: "How it works" },
+    { href: "/#problem", label: "Problem" },
+    { href: "/#proof", label: "Proof" },
     { href: "/docs", label: "Docs" },
     { href: "/blog", label: "Blog" },
     { href: "/#pricing", label: "Pricing" },
+    { href: "/#faq", label: "FAQ" },
   ];
 
   return (
@@ -49,16 +52,16 @@ export default function LandingHeader() {
       <header className={cn(
         "fixed top-0 left-0 right-0 w-full z-50 transition-all duration-300",
         scrolled || mobileMenuOpen
-          ? "bg-white/90 backdrop-blur-md border-b border-zinc-200 py-4 shadow-sm" 
-          : "bg-white/60 backdrop-blur-md border-b border-white/30 py-6"
+          ? "bg-[#0c0b1d]/95 backdrop-blur-md border-b border-[#0c0b1d]/20 py-3 sm:py-4 shadow-lg" 
+          : "bg-[#0c0b1d]/90 backdrop-blur-md border-b border-[#0c0b1d]/30 py-3 sm:py-4 md:py-6"
       )}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group relative z-[60]">
-              <div className="relative w-32 md:w-40 h-8 md:h-10 transition-transform group-hover:scale-105">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 group relative z-[60]">
+              <div className="relative w-24 sm:w-32 md:w-40 h-6 sm:h-8 md:h-10 transition-transform group-hover:scale-105">
                 <Image 
-                  src="/images/logoescura.png" 
+                  src="/logohipa.png" 
                   alt="HIPAA Hub" 
                   fill
                   priority
@@ -68,9 +71,9 @@ export default function LandingHeader() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-10 text-[#0d0d1f] text-sm">
+            <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-white text-sm font-medium">
               {navLinks.map((link) => (
-                <Link key={link.href} href={link.href} className="hover:text-[#1acb77] transition-colors">
+                <Link key={link.href} href={link.href} className="hover:text-[#1ad07a] transition-colors whitespace-nowrap">
                   {link.label}
                 </Link>
               ))}
@@ -81,7 +84,7 @@ export default function LandingHeader() {
               {user ? (
                 <Link href="/dashboard">
                   <Button
-                    className="bg-[#0d0d1f] text-white hover:bg-[#0d0d1f]/90 rounded-lg px-6"
+                    className="bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90 rounded-lg px-6 font-medium"
                   >
                     Go to Dashboard
                   </Button>
@@ -91,14 +94,14 @@ export default function LandingHeader() {
                   <Link href="/signin">
                     <Button
                       variant="ghost"
-                      className="text-[#0d0d1f] hover:text-[#1acb77] hover:bg-transparent text-sm"
+                      className="text-white hover:text-[#1ad07a] hover:bg-white/10 text-sm"
                     >
                       Log in
                     </Button>
                   </Link>
                   <Link href="/signup">
                     <Button
-                      className="bg-[#1acb77] text-[#0d0d1f] hover:bg-[#1acb77]/90 rounded-lg px-6 shadow-md hover:shadow-lg transition-all"
+                      className="bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90 rounded-lg px-6 shadow-md hover:shadow-lg transition-all font-medium"
                     >
                       Get Started
                     </Button>
@@ -109,56 +112,85 @@ export default function LandingHeader() {
 
             {/* Mobile Menu Toggle */}
             <button 
-              className="md:hidden relative z-[60] p-2 text-[#0d0d1f]"
+              className="md:hidden relative z-[60] p-2 text-white"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Navigation Overlay */}
-        <div className={cn(
-          "fixed inset-0 bg-white/80 backdrop-blur-lg z-50 md:hidden transition-all duration-500 flex flex-col p-6 pt-24 gap-6",
-          mobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
-        )}>
-          <nav className="flex flex-col gap-4 text-base font-light text-[#0d0d1f]">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.href} 
-                href={link.href} 
-                onClick={() => setMobileMenuOpen(false)}
-                className="hover:text-[#1acb77] transition-colors py-2"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+      {/* Mobile Navigation Overlay - Full Screen (Outside Header) */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-[100] md:hidden" 
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100vw',
+            height: '100vh'
+          }}
+        >
+          {/* Full screen background - Dark solid with blur */}
+          <div className="absolute inset-0 bg-[#0c0b1d] backdrop-blur-xl" />
+          <div className="absolute inset-0 bg-[#0c0b1d]/95" />
           
-          <div className="mt-auto flex flex-col gap-3">
-            {user ? (
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="w-full bg-[#0d0d1f] text-white h-12 rounded-lg text-base">
-                  Go to Dashboard
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/signin" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full border-2 border-[#0d0d1f] text-[#0d0d1f] h-12 rounded-lg text-base">
-                    Log in
+          {/* Content container - Full height and width */}
+          <div className="relative z-10 flex flex-col min-h-screen w-full p-6 pt-24 gap-6">
+            {/* Close button at top */}
+            <div className="flex justify-end mb-2">
+              <button 
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-3 text-white hover:text-[#1ad07a] transition-colors rounded-lg hover:bg-white/10"
+              >
+                <X className="w-7 h-7" />
+              </button>
+            </div>
+
+            {/* Navigation Links */}
+            <nav className="flex flex-col gap-1 text-lg font-light text-white">
+              {navLinks.map((link) => (
+                <Link 
+                  key={link.href} 
+                  href={link.href} 
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="hover:text-[#1ad07a] transition-colors py-4 px-4 rounded-lg hover:bg-white/10 active:bg-white/5"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+            
+            {/* CTA Buttons at bottom */}
+            <div className="mt-auto flex flex-col gap-3 pb-8 pt-6">
+              {user ? (
+                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                  <Button className="w-full bg-[#1ad07a] text-[#0c0b1d] h-14 rounded-lg text-base font-medium shadow-lg hover:bg-[#1ad07a]/90">
+                    Go to Dashboard
                   </Button>
                 </Link>
-                <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full bg-[#1acb77] text-[#0d0d1f] h-12 rounded-lg text-base">
-                    Get Started
-                  </Button>
-                </Link>
-              </>
-            )}
+              ) : (
+                <>
+                  <Link href="/signin" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full border-2 border-white/30 text-white hover:bg-white/10 h-14 rounded-lg text-base backdrop-blur-sm">
+                      Log in
+                    </Button>
+                  </Link>
+                  <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                    <Button className="w-full bg-[#1ad07a] text-[#0c0b1d] h-14 rounded-lg text-base font-medium shadow-lg hover:bg-[#1ad07a]/90">
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </header>
+      )}
     </>
   );
 }

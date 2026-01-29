@@ -39,8 +39,8 @@ export default async function IncidentsPage() {
   ];
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6 max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+    <div className="flex w-full flex-col gap-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Incident Reporting</h1>
           <p className="text-zinc-600 text-base">
@@ -75,7 +75,7 @@ export default async function IncidentsPage() {
           {incidents.map((incident) => (
             <Card key={incident.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <AlertCircle className="h-5 w-5 text-primary" />

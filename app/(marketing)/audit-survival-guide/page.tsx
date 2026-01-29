@@ -50,7 +50,8 @@ export default function AuditSurvivalGuidePage() {
       const supabase = createClient();
       
       // Save lead to database
-      const { error } = await supabase
+      // Note: leads table exists but may not be in TypeScript types yet
+      const { error } = await (supabase as any)
         .from('leads')
         .insert([
           {

@@ -43,15 +43,15 @@ export default async function TrainingPage() {
   );
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6 max-w-[1600px] mx-auto page-transition-premium">
-      <div className="flex items-center justify-between">
+    <div className="flex w-full flex-col gap-6 page-transition-premium">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Training & Employees</h1>
           <p className="text-zinc-600 text-base">
             Manage HIPAA training for all staff members
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <TrainingExportButton />
           <Link href="/dashboard/training/take">
             <Button variant={hasCompletedTraining ? "outline" : "default"}>
@@ -157,16 +157,19 @@ export default async function TrainingPage() {
                 return (
                   <Card key={record.id} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <GraduationCap className="h-5 w-5 text-primary" />
-                            <div>
-                              <div className="font-semibold">{record.full_name}</div>
-                              <div className="text-sm text-muted-foreground">
+                      <div className="flex flex-col gap-4">
+                        {/* Header: Employee Info and Status */}
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-3 flex-1 min-w-0">
+                            <GraduationCap className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-zinc-900">{record.full_name}</div>
+                              <div className="text-sm text-muted-foreground mt-0.5">
                                 {record.email} • {record.role_title}
                               </div>
                             </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
                             {isCurrent && (
                               <Badge className="bg-green-100 text-green-800 border-green-200">
                                 <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -192,35 +195,39 @@ export default async function TrainingPage() {
                               </Badge>
                             )}
                           </div>
-                          <div className="text-sm text-muted-foreground space-y-1 mt-2">
+                        </div>
+
+                        {/* Training Details */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2 text-sm text-muted-foreground">
+                          <div>
+                            <strong className="text-zinc-700">Training Type:</strong> {record.training_type.charAt(0).toUpperCase() + record.training_type.slice(1)}
+                          </div>
+                          <div>
+                            <strong className="text-zinc-700">Completed:</strong> {new Date(record.training_date).toLocaleDateString()}
+                          </div>
+                          <div>
+                            <strong className="text-zinc-700">Expires:</strong> {expDate.toLocaleDateString()}
+                          </div>
+                          {record.quiz_score !== null && (
                             <div>
-                              <strong>Training Type:</strong> {record.training_type.charAt(0).toUpperCase() + record.training_type.slice(1)}
+                              <strong className="text-zinc-700">Quiz Score:</strong> {record.quiz_score}%
                             </div>
+                          )}
+                          {record.acknowledgement_ip && (
                             <div>
-                              <strong>Completed:</strong> {new Date(record.training_date).toLocaleDateString()}
+                              <strong className="text-zinc-700">IP Address:</strong> <span className="font-mono text-xs">{record.acknowledgement_ip}</span>
                             </div>
-                            <div>
-                              <strong>Expires:</strong> {expDate.toLocaleDateString()}
-                            </div>
-                            {record.quiz_score !== null && (
-                              <div>
-                                <strong>Quiz Score:</strong> {record.quiz_score}%
-                              </div>
-                            )}
-                            {record.acknowledgement_ip && (
-                              <div>
-                                <strong>IP Address:</strong> <span className="font-mono text-xs">{record.acknowledgement_ip}</span>
-                              </div>
-                            )}
-                            <div>
-                              <strong>Recorded:</strong> {new Date(record.record_timestamp).toLocaleString()}
-                            </div>
+                          )}
+                          <div className="sm:col-span-2 lg:col-span-1">
+                            <strong className="text-zinc-700">Recorded:</strong> {new Date(record.record_timestamp).toLocaleString()}
                           </div>
                         </div>
-                        <div className="flex gap-2">
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
                           {record.completion_status === 'completed' && (
                             <Link href={`/dashboard/training/${record.id}/evidence`}>
-                              <Button size="sm" variant="outline">
+                              <Button size="sm" variant="outline" className="h-9">
                                 <FileText className="mr-2 h-4 w-4" />
                                 View Evidence
                               </Button>
@@ -228,14 +235,14 @@ export default async function TrainingPage() {
                           )}
                           {isExpired && (
                             <Link href="/dashboard/training/take">
-                              <Button size="sm">
+                              <Button size="sm" className="h-9">
                                 Renew Training
                               </Button>
                             </Link>
                           )}
                           {record.completion_status === 'pending' && (
                             <Link href="/dashboard/training/take">
-                              <Button size="sm">
+                              <Button size="sm" className="h-9">
                                 Complete Training
                               </Button>
                             </Link>

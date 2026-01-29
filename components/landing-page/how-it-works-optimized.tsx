@@ -65,7 +65,7 @@ const steps = [
 
 export default function HowItWorksOptimized() {
   return (
-    <section id="how-it-works" className="w-full bg-white py-24 md:py-32 font-extralight">
+    <section id="how-it-works" className="w-full bg-white py-16 md:py-20 lg:py-24 font-extralight">
       <div className="max-w-7xl mx-auto px-6">
         <div className="space-y-20">
           

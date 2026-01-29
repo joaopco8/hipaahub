@@ -216,10 +216,10 @@ export default async function DocumentPreviewPage({
   processedContent = processedContent.replace(/\n\s*\n\s*\n+/g, '\n\n');
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6 max-w-[1600px] mx-auto p-6">
+    <div className="flex w-full flex-col gap-6 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-4">
           <Link href="/dashboard/policies">
             <Button variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -235,12 +235,14 @@ export default async function DocumentPreviewPage({
             </p>
           </div>
         </div>
-        <DocumentActions 
+        <div className="sm:shrink-0">
+          <DocumentActions 
           documentTitle={document.name}
           documentContent={processedContent}
           organizationName={organization.name}
           policyId={document.policyId}
-        />
+          />
+        </div>
       </div>
 
       {/* Document Viewer */}

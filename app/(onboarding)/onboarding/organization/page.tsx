@@ -190,15 +190,15 @@ export default function OrganizationPage() {
         if (saved.state) setState(saved.state);
         if (saved.address_state) setAddressState(saved.address_state);
         if (saved.address_zip) setAddressZip(saved.address_zip);
-        if (saved.security_officer_role_type || saved.security_officer_role) {
-          setSecurityOfficerRole(saved.security_officer_role_type || saved.security_officer_role || 'hipaa-security-officer');
+        if (saved.security_officer_role) {
+          setSecurityOfficerRole(saved.security_officer_role || 'hipaa-security-officer');
         }
         if (saved.security_officer_role_other) setSecurityOfficerRoleOther(saved.security_officer_role_other);
-        if (saved.privacy_officer_role_type || saved.privacy_officer_role) {
-          setPrivacyOfficerRole(saved.privacy_officer_role_type || saved.privacy_officer_role || 'hipaa-privacy-officer');
+        if (saved.privacy_officer_role) {
+          setPrivacyOfficerRole(saved.privacy_officer_role || 'hipaa-privacy-officer');
         }
         if (saved.privacy_officer_role_other) setPrivacyOfficerRoleOther(saved.privacy_officer_role_other);
-        if (saved.employee_count) setEmployeeCount(saved.employee_count);
+        if (saved.employeeCount) setEmployeeCount(saved.employeeCount);
         if (saved.number_of_locations) setNumberOfLocations(saved.number_of_locations);
         if (saved.multi_state_operations) setMultiStateOperations(saved.multi_state_operations);
         if (saved.remote_workforce) setRemoteWorkforce(saved.remote_workforce);

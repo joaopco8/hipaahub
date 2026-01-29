@@ -64,9 +64,9 @@ export default async function EvidencePage() {
   const userName = userDetails?.full_name || user.email?.split('@')[0] || 'User';
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6 max-w-[1600px] mx-auto page-transition-premium">
+    <div className="flex w-full flex-col gap-6 page-transition-premium">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Evidence Center</h1>
           <p className="text-zinc-600 text-base mt-1">
@@ -158,7 +158,7 @@ export default async function EvidencePage() {
 
       {/* Evidence Fields Grid - All 48 Fields */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Evidence Upload Fields</h2>
             <p className="text-zinc-600 text-base mt-1">
@@ -184,7 +184,7 @@ export default async function EvidencePage() {
 
       {/* Existing Evidence List */}
       <div className="space-y-6 mt-12">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Uploaded Evidence</h2>
         </div>
         <EvidenceCenterClient 

@@ -413,8 +413,8 @@ export default function TrainingEvidencePage() {
   const quizAnswers = trainingRecord.quiz_answers || {};
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6 max-w-[1600px] mx-auto px-4 py-8">
-      <div className="flex items-center justify-between">
+    <div className="flex w-full flex-col gap-6 px-4 py-6 sm:px-0 sm:py-0">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <Button variant="ghost" onClick={() => router.back()} className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -425,7 +425,7 @@ export default function TrainingEvidencePage() {
             Legal evidence and audit trail for {trainingRecord.full_name}
           </p>
         </div>
-        <Button onClick={generateCertificate}>
+        <Button onClick={generateCertificate} className="w-full sm:w-auto">
           <Download className="mr-2 h-4 w-4" />
           Download Certificate
         </Button>

@@ -41,7 +41,8 @@ export async function getAllEvidenceDocuments(): Promise<EvidenceDocument[]> {
   }
 
   // Get all risk assessment IDs for this user
-  const { data: assessments } = await supabase
+  // Note: onboarding_risk_assessments table exists but may not be in TypeScript types yet
+  const { data: assessments } = await (supabase as any)
     .from('onboarding_risk_assessments')
     .select('id')
     .eq('user_id', user.id);
@@ -50,10 +51,11 @@ export async function getAllEvidenceDocuments(): Promise<EvidenceDocument[]> {
     return [];
   }
 
-  const assessmentIds = assessments.map(a => a.id);
+  const assessmentIds = assessments?.map((a: any) => a.id) || [];
 
   // Load all evidence records
-  const { data: evidenceRecords, error } = await supabase
+  // Note: risk_assessment_evidence table exists but may not be in TypeScript types yet
+  const { data: evidenceRecords, error } = await (supabase as any)
     .from('risk_assessment_evidence')
     .select('id, question_id, evidence_data, uploaded_at, uploaded_by, evidence_type')
     .eq('organization_id', organization.id)
