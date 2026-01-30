@@ -9,8 +9,17 @@ const config = {
   reactStrictMode: true,
   swcMinify: true,
   
+  // Exclude rules folder from being processed
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  
   // Webpack configuration to handle node: protocol
   webpack: (config, { isServer }) => {
+    // Ignore rules folder during build
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/node_modules/**', '**/rules/**'],
+    };
+    
     // Resolve node: protocol imports
     if (isServer) {
       // Server-side: resolve to native Node.js modules
