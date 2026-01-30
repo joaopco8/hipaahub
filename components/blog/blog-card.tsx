@@ -5,7 +5,7 @@ import Image from 'next/image';
 import type { InferPageType } from 'fumadocs-core/source';
 
 interface BlogCardProps {
-  post: InferPageType<typeof import('@/app/source').blog>;
+  post: InferPageType<typeof import('@/utils/source').blog>;
   getCategoryColor: (category: string) => string;
 }
 
