@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
 
     // Upsert evidence record
     const { data: existingEvidence } = await supabase
-      .from('risk_assessment_evidence')
+      .from('risk_assessment_evidence' as any)
       .select('id, evidence_data')
       .eq('risk_assessment_id', riskAssessmentId)
       .eq('question_id', questionId)
@@ -220,7 +220,7 @@ export async function POST(request: NextRequest) {
     if (existingEvidence) {
       // Update existing
       const { data, error } = await supabase
-        .from('risk_assessment_evidence')
+        .from('risk_assessment_evidence' as any)
         .update(evidenceRecord)
         .eq('id', existingEvidence.id)
         .select()
@@ -231,7 +231,7 @@ export async function POST(request: NextRequest) {
     } else {
       // Insert new
       const { data, error } = await supabase
-        .from('risk_assessment_evidence')
+        .from('risk_assessment_evidence' as any)
         .insert(evidenceRecord)
         .select()
         .single();

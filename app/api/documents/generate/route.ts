@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
       
       // Get risk assessment ID
       const { data: assessment, error: assessmentError } = await supabase
-        .from('onboarding_risk_assessments')
+        .from('onboarding_risk_assessments' as any)
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle();
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
       // Strategy 1: Try with risk_assessment_id if assessment exists
       if (assessment) {
         const { data: evidenceWithId, error: errorWithId } = await supabase
-          .from('risk_assessment_evidence')
+          .from('risk_assessment_evidence' as any)
           .select('question_id, evidence_data, uploaded_at, uploaded_by, uploaded_ip')
           .eq('risk_assessment_id', assessment.id)
           .eq('organization_id', organization.id);
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
       // Strategy 2: If no records found, try by user_id and organization_id only
       if (!evidenceRecords || evidenceRecords.length === 0) {
         const { data: evidenceByUser, error: errorByUser } = await supabase
-          .from('risk_assessment_evidence')
+          .from('risk_assessment_evidence' as any)
           .select('question_id, evidence_data, uploaded_at, uploaded_by, uploaded_ip')
           .eq('user_id', user.id)
           .eq('organization_id', organization.id);
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
       // Strategy 3: Last resort - try by user_id only
       if (!evidenceRecords || evidenceRecords.length === 0) {
         const { data: evidenceByUserOnly, error: errorByUserOnly } = await supabase
-          .from('risk_assessment_evidence')
+          .from('risk_assessment_evidence' as any)
           .select('question_id, evidence_data, uploaded_at, uploaded_by, uploaded_ip')
           .eq('user_id', user.id);
 
@@ -305,7 +305,7 @@ export async function POST(request: NextRequest) {
           
           console.log(`📦 Final evidence data loaded:`, {
             questionsWithEvidence: Object.keys(finalEvidenceData).length,
-            totalFiles: Object.values(finalEvidenceData).reduce((sum, ev) => sum + (ev.files?.length || 0), 0)
+            totalFiles: Object.values(finalEvidenceData).reduce((sum: number, ev: any) => sum + (ev.files?.length || 0), 0)
           });
         } else {
           console.log('⚠️ No evidence records found in database');
@@ -367,23 +367,23 @@ export async function POST(request: NextRequest) {
       assessment_date: new Date().toISOString(),
       next_review_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       ein: organization.ein,
-      npi: organization.npi,
-      state_license_number: organization.state_license_number,
-      clia_certificate_number: organization.clia_certificate_number,
-      medicare_provider_number: organization.medicare_provider_number,
-      state_tax_id: organization.state_tax_id,
-      authorized_representative_name: organization.authorized_representative_name,
-      authorized_representative_title: organization.authorized_representative_title,
-      ceo_name: organization.ceo_name,
-      ceo_title: organization.ceo_title,
-      phone_number: organization.phone_number,
-      email_address: organization.email_address,
-      website: organization.website,
-      accreditation_status: organization.accreditation_status,
-      types_of_services: organization.types_of_services,
-      insurance_coverage: organization.insurance_coverage,
-      performs_laboratory_tests: organization.performs_laboratory_tests,
-      serves_medicare_patients: organization.serves_medicare_patients,
+      npi: (organization as any).npi,
+      state_license_number: (organization as any).state_license_number,
+      clia_certificate_number: (organization as any).clia_certificate_number,
+      medicare_provider_number: (organization as any).medicare_provider_number,
+      state_tax_id: (organization as any).state_tax_id,
+      authorized_representative_name: (organization as any).authorized_representative_name,
+      authorized_representative_title: (organization as any).authorized_representative_title,
+      ceo_name: (organization as any).ceo_name,
+      ceo_title: (organization as any).ceo_title,
+      phone_number: (organization as any).phone_number,
+      email_address: (organization as any).email_address,
+      website: (organization as any).website,
+      accreditation_status: (organization as any).accreditation_status,
+      types_of_services: (organization as any).types_of_services,
+      insurance_coverage: (organization as any).insurance_coverage,
+      performs_laboratory_tests: (organization as any).performs_laboratory_tests,
+      serves_medicare_patients: (organization as any).serves_medicare_patients,
     };
 
     // Generate the requested document

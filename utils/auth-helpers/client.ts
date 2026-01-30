@@ -65,7 +65,7 @@ export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
   const currentPath = window.location.pathname;
   
   // Validate provider
-  if (!provider || provider === '') {
+  if (!provider) {
     console.error('Provider is missing or empty');
     const errorMessage = 'Provider is required. Please try again.';
     const errorUrl = redirectParam === 'checkout'

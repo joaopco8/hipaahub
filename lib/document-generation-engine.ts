@@ -195,7 +195,7 @@ export function generateDocumentFields(
         document.fields[field_name] = {
           field_name,
           value: legalStatement,
-          compliance_status,
+          compliance_status: complianceStatus,
           risk_level: getRiskLevel(complianceStatus, 0),
           source_questions: [answer.question_id],
           evidence_files: answer.evidence_files,
@@ -226,7 +226,7 @@ export function generateDocumentFields(
   }>> = new Map();
 
   // Collect all evidence and attestations by document
-  for (const document of documents.values()) {
+  for (const document of Array.from(documents.values())) {
     for (const field of Object.values(document.fields)) {
       if (field.evidence_files.length > 0) {
         if (!evidenceByDocument.has(document.document_name)) {
@@ -262,7 +262,7 @@ export function generateDocumentFields(
   }
 
   // Add evidence and attestation statements to document fields
-  for (const document of documents.values()) {
+  for (const document of Array.from(documents.values())) {
     const documentEvidence = evidenceByDocument.get(document.document_name) || [];
     const documentAttestations = attestationsByDocument.get(document.document_name) || [];
     

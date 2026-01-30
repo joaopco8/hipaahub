@@ -30,10 +30,10 @@ function getServiceRoleKey(): string | undefined {
         const envContent = fs.readFileSync(envLocalPath, 'utf8');
         const match = envContent.match(/^SUPABASE_SERVICE_ROLE_KEY=(.+)$/m);
         if (match && match[1]) {
-          key = match[1].trim();
+          key = match[1]?.trim();
           // Remove quotes if present
-          if ((key.startsWith('"') && key.endsWith('"')) || 
-              (key.startsWith("'") && key.endsWith("'"))) {
+          if (key && ((key.startsWith('"') && key.endsWith('"')) ||
+              (key.startsWith("'") && key.endsWith("'")))) {
             key = key.slice(1, -1);
           }
           console.log('⚠️  Loaded SUPABASE_SERVICE_ROLE_KEY directly from .env.local (fallback)');

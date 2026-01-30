@@ -435,8 +435,8 @@ export function injectEvidenceIntoPolicy(
     for (const injectionPoint of allInjections) {
       // Find matching evidence
       const matchingEvidence = availableEvidence.find(
-        ev => 
-          ev.field_id === injectionPoint.evidence_id ||
+        (ev: any) =>
+          (ev as any).field_id === injectionPoint.evidence_id ||
           ev.title.toLowerCase() === injectionPoint.evidence_name.toLowerCase()
       );
 
@@ -577,7 +577,7 @@ export function generateEvidenceSummarySection(
     for (const injectionPoint of section.evidence_injections) {
       const evidence = availableEvidence.find(
         ev => 
-          ev.field_id === injectionPoint.evidence_id ||
+          (ev as any).field_id === injectionPoint.evidence_id ||
           ev.title.toLowerCase() === injectionPoint.evidence_name.toLowerCase()
       );
 
@@ -669,7 +669,7 @@ export function validateEvidenceForPolicy(
 
       const evidence = availableEvidence.find(
         ev => 
-          ev.field_id === injectionPoint.evidence_id ||
+          (ev as any).field_id === injectionPoint.evidence_id ||
           ev.title.toLowerCase() === injectionPoint.evidence_name.toLowerCase()
       );
 

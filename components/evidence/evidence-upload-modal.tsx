@@ -57,7 +57,7 @@ const FILE_FORMATS: { value: EvidenceCaptureType; label: string }[] = [
   { value: 'system_generated', label: 'System-Generated Report' },
 ];
 
-import { type EvidenceFieldConfig } from '@/lib/evidence-fields-config';
+// EvidenceFieldConfig already imported above
 
 interface EvidenceUploadModalProps {
   open?: boolean;

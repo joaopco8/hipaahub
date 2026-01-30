@@ -40,7 +40,7 @@ export function LeadMagnetCapture({
 
     try {
       // Save email to database
-      const { error } = await supabase.from('user_email_list').insert([
+      const { error } = await (supabase as any).from('user_email_list').insert([
         { email, source: 'lead_magnet', lead_magnet_name: fileName }
       ]);
 

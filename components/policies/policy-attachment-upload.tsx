@@ -99,7 +99,7 @@ export function PolicyAttachmentUpload({ policyId, policyName }: PolicyAttachmen
 
   const handleDownload = async (attachment: PolicyAttachment) => {
     try {
-      const url = await getFileDownloadUrl(attachment.storage_path, attachment.storage_bucket || 'documents');
+      const url = await getFileDownloadUrl(attachment.storage_path, (attachment as any).storage_bucket || 'documents');
       if (url) {
         window.open(url, '_blank');
       } else {

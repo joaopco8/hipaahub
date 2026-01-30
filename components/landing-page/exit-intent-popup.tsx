@@ -80,7 +80,7 @@ export default function ExitIntentPopup() {
       
       // Save lead to database
       const { error } = await supabase
-        .from('leads')
+        .from('leads' as any)
         .insert([
           {
             name: formData.name.trim(),

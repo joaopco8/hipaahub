@@ -201,9 +201,9 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                                     {ev.file_name}
                                   </p>
                                 )}
-                                {ev.external_link && (
+                                {(ev as any).external_link && (
                                   <p className="text-[10px] text-zinc-500 truncate">
-                                    {ev.external_link}
+                                    {(ev as any).external_link}
                                   </p>
                                 )}
                               </div>
@@ -310,12 +310,12 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                                     </Button>
                                   </>
                                 )}
-                                {ev.external_link && (
+                                {(ev as any).external_link && (
                                   <Button
                                     variant="ghost"
                                     size="sm"
                                     className="h-7 w-7 p-0 hover:bg-zinc-200"
-                                    onClick={() => window.open(ev.external_link, '_blank')}
+                                    onClick={() => window.open((ev as any).external_link, '_blank')}
                                     title="Open Link"
                                   >
                                     <LinkIcon className="h-3.5 w-3.5 text-zinc-600" />

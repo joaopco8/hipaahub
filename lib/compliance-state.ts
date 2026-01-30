@@ -328,8 +328,8 @@ export function normalizeComplianceState(
     })(),
 
     // Systems & Vendors
-    ehr_system: getAnswer('ehr-system', null) || null,
-    ehr_vendor: getAnswer('ehr-vendor', null) || null,
+    ehr_system: getAnswer('ehr-system', undefined) || null,
+    ehr_vendor: getAnswer('ehr-vendor', undefined) || null,
     cloud_provider: (() => {
       const cloudAnswer = getAnswer('cloud-services', 'no');
       if (cloudAnswer === 'yes') {

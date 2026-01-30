@@ -123,7 +123,7 @@ export default function RiskAssessmentPage() {
       // NOTE: `onboarding_risk_assessments` is not currently present in `types/db.ts`.
       // Use an untyped query here to avoid TS build failures while still fetching real data.
       const { data: onboardingData } = await (supabase as any)
-        .from('onboarding_risk_assessments')
+        .from('onboarding_risk_assessments' as any)
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle();

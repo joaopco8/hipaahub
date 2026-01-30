@@ -72,9 +72,9 @@ export async function GET(request: NextRequest) {
       },
       organization: {
         legal_name: organization.legal_name || organization.name,
-        ein: organization.ein,
-        npi: organization.npi,
-        state_license_number: organization.state_license_number,
+        ein: (organization as any).ein,
+        npi: (organization as any).npi,
+        state_license_number: (organization as any).state_license_number,
         address: {
           street: organization.address_street,
           city: organization.address_city,

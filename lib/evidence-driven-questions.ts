@@ -13,6 +13,8 @@ import { EvidenceQuestionMetadata, EvidenceType } from '@/types/evidence';
 // Import the JSON data (you'll need to place the JSON file in the public folder or import it)
 // For now, we'll create a function that loads it dynamically
 
+let evidenceQuestionsCache: any[] | null = null;
+
 export async function getEvidenceQuestionMetadata(questionId: string): Promise<EvidenceQuestionMetadata | null> {
   // In production, this would load from the JSON file or database
   // For now, we'll create a lookup map from the JSON structure
@@ -21,13 +23,13 @@ export async function getEvidenceQuestionMetadata(questionId: string): Promise<E
   const evidenceQuestions = await import('@/data/evidence-driven-questions.json');
   
   const question = evidenceQuestions.default.questions.find(
-    (q: EvidenceQuestionMetadata) => q.question_id === questionId
-  );
+    (q: any) => q.question_id === questionId
+  ) as EvidenceQuestionMetadata | undefined;
   
   return question || null;
 }
 
-export async function getAllEvidenceQuestions(): Promise<EvidenceQuestionMetadata[]> {
+export async function getAllEvidenceQuestions(): Promise<any[]> {
   if (!evidenceQuestionsCache) {
     try {
       const evidenceQuestions = await import('@/data/evidence-driven-questions.json');

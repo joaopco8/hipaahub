@@ -563,7 +563,7 @@ export default function TakeTrainingPage() {
         // NOTE: `training_records` is not currently present in `types/db.ts`.
         // Use an untyped query here to avoid TS build failures while still fetching real data.
         await (supabase as any)
-          .from('training_records')
+          .from('training_records' as any)
           .update({ completion_status: 'expired' })
           .eq('staff_member_id', staffMemberId)
           .eq('training_type', 'initial')

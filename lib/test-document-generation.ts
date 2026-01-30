@@ -122,7 +122,7 @@ export function generateTestDocuments() {
 export function getDocumentFieldSummary(documents: Map<string, any>) {
   const summary: Record<string, any> = {};
 
-  for (const [docName, docData] of documents.entries()) {
+  for (const [docName, docData] of Array.from(documents.entries())) {
     summary[docName] = {
       fieldCount: Object.keys(docData.fields).length,
       fields: Object.keys(docData.fields),
@@ -146,7 +146,7 @@ export function validateDocumentGeneration(result: ReturnType<typeof generateTes
 
   // Check that at least some fields were populated
   let totalFields = 0;
-  for (const doc of result.documents.values()) {
+  for (const doc of Array.from(result.documents.values())) {
     totalFields += Object.keys(doc.fields).length;
   }
 

@@ -153,7 +153,7 @@ export async function signInWithPassword(formData: FormData) {
     if (redirectParam === 'checkout') {
       // Verify subscription status BEFORE redirecting to checkout
       const { getSubscription } = await import('@/utils/supabase/queries');
-      const subscription = await getSubscription(supabase, data.user.id);
+      const subscription = data.user ? await getSubscription(supabase, data.user.id) : null;
       
       if (process.env.NODE_ENV === 'development') {
         console.log('signInWithPassword: Checking subscription for user:', data.user.id);
@@ -176,7 +176,7 @@ export async function signInWithPassword(formData: FormData) {
     } else {
       // ALWAYS verify subscription status FIRST before allowing any access
       const { getSubscription } = await import('@/utils/supabase/queries');
-      const subscription = await getSubscription(supabase, data.user.id);
+      const subscription = data.user ? await getSubscription(supabase, data.user.id) : null;
       
       if (process.env.NODE_ENV === 'development') {
         console.log('signInWithPassword: Checking subscription for user:', data.user.id);
@@ -270,10 +270,10 @@ export async function signUp(formData: FormData) {
     if (redirectParam === 'checkout') {
       // Verify subscription status BEFORE redirecting to checkout
       const { getSubscription } = await import('@/utils/supabase/queries');
-      const subscription = await getSubscription(supabase, data.user.id);
+      const subscription = data.user ? await getSubscription(supabase, data.user.id) : null;
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('signUp: Checking subscription for user:', data.user.id);
+        console.log('signUp: Checking subscription for user:', data.user?.id);
         console.log('signUp: Subscription found:', subscription ? 'YES' : 'NO');
       }
       
@@ -293,10 +293,10 @@ export async function signUp(formData: FormData) {
     } else {
       // ALWAYS verify subscription status FIRST before allowing any access
       const { getSubscription } = await import('@/utils/supabase/queries');
-      const subscription = await getSubscription(supabase, data.user.id);
+      const subscription = data.user ? await getSubscription(supabase, data.user.id) : null;
       
       if (process.env.NODE_ENV === 'development') {
-        console.log('signUp: Checking subscription for user:', data.user.id);
+        console.log('signUp: Checking subscription for user:', data.user?.id);
         console.log('signUp: Subscription found:', subscription ? 'YES' : 'NO');
       }
       

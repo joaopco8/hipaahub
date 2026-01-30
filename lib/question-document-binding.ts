@@ -505,6 +505,7 @@ export const QUESTION_DOCUMENT_BINDINGS: QuestionBinding[] = [
     ],
     legal_statements: {
       COMPLIANT: 'The organization provides all patients with a Notice of Privacy Practices (NPP) that informs them of their rights regarding their PHI, as required by the Privacy Rule.',
+      PARTIAL: 'The organization has partially implemented a Notice of Privacy Practices but may need improvements to fully comply with 45 CFR §164.520.',
       NON_COMPLIANT: 'The organization has identified the absence of a Notice of Privacy Practices. The organization has formally committed to developing and providing an NPP to all patients within 30 days, as required by 45 CFR §164.520.',
     },
   },
@@ -980,6 +981,7 @@ export const QUESTION_DOCUMENT_BINDINGS: QuestionBinding[] = [
     ],
     legal_statements: {
       COMPLIANT: 'The organization uses cloud services and has appropriate BAAs and security configurations in place.',
+      PARTIAL: 'The organization uses cloud services but may need improvements to BAAs or security configurations.',
       NON_COMPLIANT: 'The organization does not use cloud services for PHI storage or processing.',
     },
   },

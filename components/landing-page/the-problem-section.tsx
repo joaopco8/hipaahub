@@ -169,12 +169,6 @@ export default function TheProblemSection() {
                         rotate: doc.rotation 
                       }}
                       viewport={{ once: true }}
-                      transition={{ 
-                        duration: 0.8, 
-                        delay: doc.delay,
-                        type: "spring",
-                        stiffness: 100
-                      }}
                       animate={{
                         y: [0, -10, 0],
                         rotate: [doc.rotation, doc.rotation + 5, doc.rotation]

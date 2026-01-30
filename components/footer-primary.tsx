@@ -26,7 +26,7 @@ export default function FooterPrimary() {
     e.preventDefault()
     try {
       const { error } = await supabase
-        .from('user_email_list')
+        .from('user_email_list' as any)
         .insert([{ email }])
       
       if (error) throw error

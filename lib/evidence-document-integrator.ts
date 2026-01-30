@@ -155,7 +155,7 @@ export async function getPolicyEvidenceRequirements(
 
   // Fetch available evidence
   const availableEvidence = await fetchOrganizationEvidence(supabase, organizationId);
-  const availableIds = new Set(availableEvidence.map(ev => ev.field_id));
+  const availableIds = new Set(availableEvidence.map((ev: any) => ev.field_id));
 
   // Build requirements list
   const required = requiredEvidenceIds.map(evidenceId => {

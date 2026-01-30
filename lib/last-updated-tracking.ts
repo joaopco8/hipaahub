@@ -119,7 +119,7 @@ export function checkIfOutdated(
   return {
     last_updated: lastUpdated,
     is_outdated: isOutdated,
-    outdated_reason,
+    outdated_reason: outdatedReason,
     days_since_update: daysSinceUpdate,
     next_review_date: nextReviewDate
   };

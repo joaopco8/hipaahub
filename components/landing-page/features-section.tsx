@@ -91,7 +91,7 @@ export default function FeaturesSection() {
                   )}
                 >
                   <CardContent className="p-6">
-                    {feature.icon && (
+                    {feature.icon && typeof feature.icon !== 'undefined' && (
                       <div className="mb-4">
                         <div className={cn(
                           'w-12 h-12 rounded-xl flex items-center justify-center',

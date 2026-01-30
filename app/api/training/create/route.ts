@@ -203,7 +203,7 @@ export async function POST(request: Request) {
     // Approach 3: Use Supabase client directly (might work if schema cache is updated on server)
     try {
       const { data: insertData, error: insertError } = await supabase
-        .from('training_records')
+        .from('training_records' as any)
         .insert({
           user_id: user.id,
           organization_id: org?.id || null,

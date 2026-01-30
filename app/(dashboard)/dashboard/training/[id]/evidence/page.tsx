@@ -35,7 +35,7 @@ export default function TrainingEvidencePage() {
         // NOTE: `training_records` is not currently present in `types/db.ts`.
         // Use an untyped query here to avoid TS build failures while still fetching real data.
         const { data, error } = await (supabase as any)
-          .from('training_records')
+          .from('training_records' as any)
           .select('*')
           .eq('id', params.id)
           .single();

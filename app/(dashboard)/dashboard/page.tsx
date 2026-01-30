@@ -168,11 +168,11 @@ export default async function DashboardPage() {
       .maybeSingle(),
     // Training Records (real staff attestations/training logs)
     (supabase as any)
-      .from('training_records')
+      .from('training_records' as any)
       .select('email,completion_status,expiration_date,record_timestamp')
       .eq('user_id', user.id),
     (supabase as any)
-      .from('training_records')
+      .from('training_records' as any)
       .select('record_timestamp')
       .eq('user_id', user.id)
       .order('record_timestamp', { ascending: false })
@@ -180,7 +180,7 @@ export default async function DashboardPage() {
       .maybeSingle(),
     // Evidence-driven risk assessment uploads (when used)
     (supabase as any)
-      .from('risk_assessment_evidence')
+      .from('risk_assessment_evidence' as any)
       .select('uploaded_at,updated_at')
       .eq('user_id', user.id)
       .eq('organization_id', organization.id)
