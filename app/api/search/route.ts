@@ -1,4 +1,4 @@
-import { blog } from '@/app/source';
+import { blog } from '@/utils/source';
 import { createSearchAPI } from 'fumadocs-core/search/server';
 
 // Get pages from blog loader
