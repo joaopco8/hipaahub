@@ -1,0 +1,3 @@
+# Build version marker
+# This file is updated to force Vercel to rebuild without cache
+version: 2024-12-20-final-build-fix
