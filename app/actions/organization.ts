@@ -79,8 +79,7 @@ export interface OrganizationFormData {
   // Backward compatibility fields
   type?: 'medical' | 'dental' | 'mental-health' | 'therapy'; // Deprecated, use practice_type_primary
   uses_cloud_services?: boolean; // Deprecated, use cloud_storage_provider
-  security_officer_role?: string; // Deprecated, use security_officer_role_type
-  privacy_officer_role?: string; // Deprecated, use privacy_officer_role_type
+  // Note: security_officer_role and privacy_officer_role are already defined above, not duplicated here
 }
 
 export async function updateOrganization(data: OrganizationFormData) {
@@ -169,7 +168,8 @@ export async function updateOrganization(data: OrganizationFormData) {
 
   // Call RPC function with ONLY p_data
   // The function uses auth.uid() internally for security
-  const { data: rpcResult, error: rpcError } = await supabase.rpc('upsert_organization_jsonb', {
+  // Note: RPC function exists but may not be in TypeScript types yet
+  const { data: rpcResult, error: rpcError } = await (supabase as any).rpc('upsert_organization_jsonb', {
     p_data: jsonData
   });
 
@@ -216,46 +216,46 @@ export async function getOrganizationData() {
 
   // Parse JSON fields if they come as strings
   // Handle specialties (can be array, JSON string, or null)
-  if (organization.specialties) {
-    if (typeof organization.specialties === 'string') {
+  if ((organization as any).specialties) {
+    if (typeof (organization as any).specialties === 'string') {
       try {
-        organization.specialties = JSON.parse(organization.specialties);
+        (organization as any).specialties = JSON.parse((organization as any).specialties);
       } catch (e) {
         // If parsing fails, try to split by comma or keep as is
-        organization.specialties = organization.specialties.includes(',') 
-          ? organization.specialties.split(',').map(s => s.trim())
-          : [organization.specialties];
+        (organization as any).specialties = (organization as any).specialties.includes(',') 
+          ? (organization as any).specialties.split(',').map((s: string) => s.trim())
+          : [(organization as any).specialties];
       }
     }
   } else {
-    organization.specialties = [];
+    (organization as any).specialties = [];
   }
 
   // Handle device_types (can be array, JSON string, or null)
-  if (organization.device_types) {
-    if (typeof organization.device_types === 'string') {
+  if ((organization as any).device_types) {
+    if (typeof (organization as any).device_types === 'string') {
       try {
-        organization.device_types = JSON.parse(organization.device_types);
+        (organization as any).device_types = JSON.parse((organization as any).device_types);
       } catch (e) {
         // If parsing fails, try to split by comma or keep as is
-        organization.device_types = organization.device_types.includes(',')
-          ? organization.device_types.split(',').map(d => d.trim())
-          : [organization.device_types];
+        (organization as any).device_types = (organization as any).device_types.includes(',')
+          ? (organization as any).device_types.split(',').map((d: string) => d.trim())
+          : [(organization as any).device_types];
       }
     }
   } else {
-    organization.device_types = [];
+    (organization as any).device_types = [];
   }
 
   // Extract metadata from onboarding_metadata JSONB column if it exists
-  const metadata = (organization.onboarding_metadata as any) || {};
-  
+  const metadata = ((organization as any).onboarding_metadata) || {};
+
   // Merge metadata fields into organization object
-  if (metadata.specialties && (!organization.specialties || organization.specialties.length === 0)) {
-    organization.specialties = Array.isArray(metadata.specialties) ? metadata.specialties : [];
+  if (metadata.specialties && (!(organization as any).specialties || (organization as any).specialties.length === 0)) {
+    (organization as any).specialties = Array.isArray(metadata.specialties) ? metadata.specialties : [];
   }
-  if (metadata.device_types && (!organization.device_types || organization.device_types.length === 0)) {
-    organization.device_types = Array.isArray(metadata.device_types) ? metadata.device_types : [];
+  if (metadata.device_types && (!(organization as any).device_types || (organization as any).device_types.length === 0)) {
+    (organization as any).device_types = Array.isArray(metadata.device_types) ? metadata.device_types : [];
   }
   if (metadata.primary_contact_name && !organization.primary_contact_name) {
     organization.primary_contact_name = metadata.primary_contact_name;
@@ -276,8 +276,8 @@ export async function getOrganizationData() {
       has_address: !!organization.address_street,
       has_security_officer: !!organization.security_officer_name,
       has_privacy_officer: !!organization.privacy_officer_name,
-      specialties: organization.specialties,
-      device_types: organization.device_types,
+      specialties: (organization as any).specialties,
+      device_types: (organization as any).device_types,
       primary_contact_name: organization.primary_contact_name,
       compliance_contact_email: organization.compliance_contact_email,
       compliance_contact_phone: organization.compliance_contact_phone
@@ -299,7 +299,8 @@ export async function getComplianceState() {
   }
 
   // Get risk assessment from onboarding_risk_assessments table
-  const { data: riskAssessment, error } = await supabase
+  // Note: onboarding_risk_assessments table exists but may not be in TypeScript types yet
+  const { data: riskAssessment, error } = await (supabase as any)
     .from('onboarding_risk_assessments')
     .select('answers')
     .eq('user_id', user.id)

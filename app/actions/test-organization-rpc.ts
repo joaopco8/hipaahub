@@ -124,7 +124,8 @@ export async function testOrganizationRPC(): Promise<TestResult> {
     log(`   - NÃO enviando user_id no payload (correto)`);
 
     const rpcStartTime = Date.now();
-    const { data: rpcResult, error: rpcError } = await supabase.rpc('upsert_organization_jsonb', {
+    // Note: RPC function exists but may not be in TypeScript types yet
+    const { data: rpcResult, error: rpcError } = await (supabase as any).rpc('upsert_organization_jsonb', {
       p_data: testPayload
     });
     const rpcEndTime = Date.now();

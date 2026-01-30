@@ -29,7 +29,7 @@ export async function getTrainingRecords() {
   }
 
   const { data: records, error } = await supabase
-    .from('training_records')
+    .from('training_records' as any)
     .select('*')
     .eq('user_id', user.id)
     .order('training_date', { ascending: false });
@@ -71,7 +71,7 @@ export async function getTrainingStats() {
   }
 
   const { data: records, error } = await supabase
-    .from('training_records')
+    .from('training_records' as any)
     .select('completion_status, expiration_date')
     .eq('user_id', user.id);
 
@@ -180,7 +180,7 @@ export async function exportTrainingReport() {
   }
 
   const { data: records, error } = await supabase
-    .from('training_records')
+    .from('training_records' as any)
     .select('*')
     .eq('user_id', user.id)
     .order('training_date', { ascending: false });

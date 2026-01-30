@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     // Get risk assessment
     const { data: riskAssessment } = await supabase
-      .from('onboarding_risk_assessments')
+      .from('onboarding_risk_assessments' as any)
       .select('*')
       .eq('user_id', user.id)
       .single();
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     // Get all evidence records
     const { data: evidenceRecords, error: evidenceError } = await supabase
-      .from('risk_assessment_evidence')
+      .from('risk_assessment_evidence' as any)
       .select('*')
       .eq('risk_assessment_id', riskAssessment.id)
       .order('question_sequence', { ascending: true });

@@ -62,8 +62,9 @@ export async function getPolicyAttachments(policyId: number): Promise<PolicyAtta
     throw new Error('Organization not found');
   }
 
-  const { data, error } = await supabase
-    .from('policy_attachments')
+  // Note: policy_attachments table exists but may not be in TypeScript types yet
+  const { data, error } = await (supabase as any)
+    .from('policy_attachments' as any)
     .select('*')
     .eq('organization_id', organization.id)
     .eq('policy_id', policyId)
@@ -135,7 +136,7 @@ export async function uploadPolicyAttachment(
 
   // Save metadata to database
   const { data: attachment, error: dbError } = await supabase
-    .from('policy_attachments')
+    .from('policy_attachments' as any)
     .insert({
       organization_id: organization.id,
       policy_id: policyId,
@@ -174,7 +175,7 @@ export async function deletePolicyAttachment(attachmentId: string): Promise<void
 
   // Get attachment to delete file from storage
   const { data: attachment, error: fetchError } = await supabase
-    .from('policy_attachments')
+    .from('policy_attachments' as any)
     .select('storage_path, storage_bucket')
     .eq('id', attachmentId)
     .single();
@@ -185,7 +186,7 @@ export async function deletePolicyAttachment(attachmentId: string): Promise<void
 
   // Soft delete in database
   const { error: deleteError } = await supabase
-    .from('policy_attachments')
+    .from('policy_attachments' as any)
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', attachmentId);
 
@@ -224,7 +225,7 @@ export async function getAdditionalDocuments(): Promise<AdditionalDocument[]> {
   }
 
   const { data, error } = await supabase
-    .from('additional_documents')
+    .from('additional_documents' as any)
     .select('*')
     .eq('organization_id', organization.id)
     .is('deleted_at', null)
@@ -297,7 +298,7 @@ export async function uploadAdditionalDocument(
 
   // Save metadata to database
   const { data: document, error: dbError } = await supabase
-    .from('additional_documents')
+    .from('additional_documents' as any)
     .insert({
       organization_id: organization.id,
       name,
@@ -338,7 +339,7 @@ export async function deleteAdditionalDocument(documentId: string): Promise<void
 
   // Get document to delete file from storage
   const { data: document, error: fetchError } = await supabase
-    .from('additional_documents')
+    .from('additional_documents' as any)
     .select('storage_path, storage_bucket')
     .eq('id', documentId)
     .single();
@@ -349,7 +350,7 @@ export async function deleteAdditionalDocument(documentId: string): Promise<void
 
   // Soft delete in database
   const { error: deleteError } = await supabase
-    .from('additional_documents')
+    .from('additional_documents' as any)
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', documentId);
 
