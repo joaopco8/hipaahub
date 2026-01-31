@@ -1,12 +1,19 @@
 import Stripe from 'stripe';
 import { stripe } from '@/utils/stripe/config';
-import {
-  upsertProductRecord,
-  upsertPriceRecord,
-  manageSubscriptionStatusChange,
-  deleteProductRecord,
-  deletePriceRecord
-} from '@/utils/supabase/admin';
+
+// Force dynamic rendering to prevent Next.js from executing this during build
+export const dynamic = 'force-dynamic';
+
+// Import admin functions lazily to prevent top-level execution during build
+const getAdminFunctions = () => {
+  return import('@/utils/supabase/admin').then(module => ({
+    upsertProductRecord: module.upsertProductRecord,
+    upsertPriceRecord: module.upsertPriceRecord,
+    manageSubscriptionStatusChange: module.manageSubscriptionStatusChange,
+    deleteProductRecord: module.deleteProductRecord,
+    deletePriceRecord: module.deletePriceRecord
+  }));
+};
 
 const relevantEvents = new Set([
   'product.created',
@@ -57,6 +64,16 @@ export async function POST(req: Request) {
 
   if (relevantEvents.has(event.type)) {
     console.log(`✅ Processing relevant event: ${event.type}`);
+    
+    // Lazy load admin functions only when needed (at runtime, not during build)
+    const {
+      upsertProductRecord,
+      upsertPriceRecord,
+      manageSubscriptionStatusChange,
+      deleteProductRecord,
+      deletePriceRecord
+    } = await getAdminFunctions();
+    
     try {
       switch (event.type) {
         case 'product.created':

@@ -235,13 +235,14 @@ const supabase = new Proxy({} as ReturnType<typeof getAdminSupabaseClient>, {
 });
 
 const upsertProductRecord = async (product: Stripe.Product, serviceKey?: string) => {
-  // CRITICAL: Must have service_role key for admin operations
-  if (!serviceKey) {
+  // Get service role key from parameter or environment
+  const key = serviceKey || getServiceRoleKey();
+  if (!key) {
     throw new Error('Service role key is required for upsertProductRecord');
   }
   
-  // Use admin client with service_role key
-  const adminSupabase = getAdminSupabaseClient(serviceKey);
+  // Use admin client with service_role key (created inside function, not at top-level)
+  const adminSupabase = getAdminSupabaseClient(key);
   
   const productData: Product = {
     id: product.id,
@@ -286,8 +287,14 @@ const upsertPriceRecord = async (
   maxRetries = 3,
   serviceKey?: string
 ) => {
-  // Use admin client with service_role key
-  const adminSupabase = getAdminSupabaseClient(serviceKey);
+  // Get service role key from parameter or environment
+  const key = serviceKey || getServiceRoleKey();
+  if (!key) {
+    throw new Error('Service role key is required for upsertPriceRecord');
+  }
+  
+  // Use admin client with service_role key (created inside function, not at top-level)
+  const adminSupabase = getAdminSupabaseClient(key);
   
   const priceData: Price = {
     id: price.id,
@@ -327,7 +334,14 @@ const upsertPriceRecord = async (
 };
 
 const deleteProductRecord = async (product: Stripe.Product) => {
-  const { error: deletionError } = await supabase
+  // Get service role key and create client inside function (not at top-level)
+  const key = getServiceRoleKey();
+  if (!key) {
+    throw new Error('Service role key is required for deleteProductRecord');
+  }
+  const adminSupabase = getAdminSupabaseClient(key);
+  
+  const { error: deletionError } = await adminSupabase
     .from('products')
     .delete()
     .eq('id', product.id);
@@ -338,7 +352,14 @@ const deleteProductRecord = async (product: Stripe.Product) => {
 };
 
 const deletePriceRecord = async (price: Stripe.Price) => {
-  const { error: deletionError } = await supabase
+  // Get service role key and create client inside function (not at top-level)
+  const key = getServiceRoleKey();
+  if (!key) {
+    throw new Error('Service role key is required for deletePriceRecord');
+  }
+  const adminSupabase = getAdminSupabaseClient(key);
+  
+  const { error: deletionError } = await adminSupabase
     .from('prices')
     .delete()
     .eq('id', price.id);
@@ -663,13 +684,20 @@ const copyBillingDetailsToCustomer = async (
   uuid: string,
   payment_method: Stripe.PaymentMethod
 ) => {
+  // Get service role key and create client inside function (not at top-level)
+  const key = getServiceRoleKey();
+  if (!key) {
+    throw new Error('Service role key is required for copyBillingDetailsToCustomer');
+  }
+  const adminSupabase = getAdminSupabaseClient(key);
+  
   //Todo: check this assertion
   const customer = payment_method.customer as string;
   const { name, phone, address } = payment_method.billing_details;
   if (!name || !phone || !address) return;
   //@ts-ignore
   await stripe.customers.update(customer, { name, phone, address });
-  const { error: updateError } = await supabase
+  const { error: updateError } = await adminSupabase
     .from('users')
     .update({
       billing_address: { ...address },
@@ -687,8 +715,15 @@ const manageSubscriptionStatusChange = async (
   customerId: string,
   createAction = false
 ) => {
+  // Get service role key and create client inside function (not at top-level)
+  const key = getServiceRoleKey();
+  if (!key) {
+    throw new Error('Service role key is required for manageSubscriptionStatusChange');
+  }
+  const adminSupabase = getAdminSupabaseClient(key);
+  
   // Get customer's UUID from mapping table.
-  const { data: customerData, error: noCustomerError } = await supabase
+  const { data: customerData, error: noCustomerError } = await adminSupabase
     .from('customers')
     .select('id')
     .eq('stripe_customer_id', customerId)
@@ -739,7 +774,7 @@ const manageSubscriptionStatusChange = async (
       : null
   };
 
-  const { error: upsertError } = await supabase
+  const { error: upsertError } = await adminSupabase
     .from('subscriptions')
     .upsert([subscriptionData]);
   if (upsertError) {
