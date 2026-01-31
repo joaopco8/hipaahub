@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to prevent build-time prerendering errors with useSearchParams
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';

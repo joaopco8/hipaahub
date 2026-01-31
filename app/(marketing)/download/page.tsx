@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to prevent build-time prerendering errors with useSearchParams
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
