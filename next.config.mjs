@@ -89,7 +89,8 @@ const config = {
   // Performance optimizations
   experimental: {
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react', '@supabase/supabase-js'],
-    optimizeCss: true,
+    // Temporarily disabled optimizeCss to fix build errors with error pages
+    // optimizeCss: true,
   },
   
   images: {
