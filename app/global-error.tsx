@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering - global error page should not be prerendered
+export const dynamic = 'force-dynamic';
+
 import { useEffect } from 'react';
 
 /**
