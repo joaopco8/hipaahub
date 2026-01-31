@@ -153,7 +153,19 @@ const getAdminSupabaseClient = (forceKey?: string) => {
   }
   
   // CRITICAL: If serviceRoleKey is not provided, we MUST fail - never fallback to anon key for admin operations
+  // BUT: During build time, we allow this to pass to avoid breaking the build
   if (!serviceRoleKey) {
+    // During build, skip validation to allow build to complete
+    if (process.env.NEXT_PHASE === 'phase-production-build' || process.env.NEXT_PHASE === 'phase-development-build') {
+      console.warn('⚠️  SUPABASE_SERVICE_ROLE_KEY not available during build - this is OK for build phase');
+      // Return a mock client that will fail at runtime if used
+      return createClient<Database>(supabaseUrl || 'https://placeholder.supabase.co', 'placeholder-key', {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      });
+    }
     console.error('❌ CRITICAL: Cannot create admin client without service_role key!');
     console.error('Admin operations require service_role key to bypass RLS.');
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for admin operations');
@@ -184,8 +196,43 @@ const getAdminSupabaseClient = (forceKey?: string) => {
   return client;
 };
 
-// Keep a default client for backward compatibility
-const supabase = getAdminSupabaseClient();
+// Lazy initialization - only create client when actually needed
+// This prevents build errors when SUPABASE_SERVICE_ROLE_KEY is not available during build
+let defaultSupabaseClient: ReturnType<typeof getAdminSupabaseClient> | null = null;
+
+const getDefaultSupabaseClient = () => {
+  if (!defaultSupabaseClient) {
+    try {
+      defaultSupabaseClient = getAdminSupabaseClient();
+    } catch (error) {
+      // During build, create a placeholder client
+      if (process.env.NEXT_PHASE?.includes('build')) {
+        console.warn('⚠️  Creating placeholder admin client during build');
+        defaultSupabaseClient = createClient<Database>(
+          process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+          'placeholder-key',
+          {
+            auth: {
+              autoRefreshToken: false,
+              persistSession: false
+            }
+          }
+        );
+      } else {
+        throw error;
+      }
+    }
+  }
+  return defaultSupabaseClient;
+};
+
+// Keep a default client for backward compatibility (lazy)
+const supabase = new Proxy({} as ReturnType<typeof getAdminSupabaseClient>, {
+  get(target, prop) {
+    const client = getDefaultSupabaseClient();
+    return (client as any)[prop];
+  }
+});
 
 const upsertProductRecord = async (product: Stripe.Product, serviceKey?: string) => {
   // CRITICAL: Must have service_role key for admin operations
