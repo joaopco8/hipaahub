@@ -10,15 +10,37 @@ import { cn } from '@/lib/utils';
 import { Icons } from '@/components/icons';
 import { MobileNav } from '@/components/mobile-nav';
 import Image from 'next/image';
+import { createClient } from '@/utils/supabase/client';
 
 interface MainNavProps {
   items?: MainNavItem[];
   children?: React.ReactNode;
+  user?: boolean;
 }
 
-export function MainNav({ items, children }: MainNavProps) {
+export function MainNav({ items, children, user: userProp }: MainNavProps) {
   const segment = useSelectedLayoutSegment();
   const [showMobileMenu, setShowMobileMenu] = React.useState<boolean>(false);
+  const [user, setUser] = React.useState<any>(null);
+  const supabase = createClient();
+
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        setUser(null);
+      }
+    };
+    
+    // Use prop if provided, otherwise check auth
+    if (userProp !== undefined) {
+      setUser(userProp ? true : null);
+    } else {
+      checkAuth();
+    }
+  }, [supabase, userProp]);
 
   return (
     <div className="flex gap-6 md:gap-10">
@@ -70,7 +92,7 @@ export function MainNav({ items, children }: MainNavProps) {
         <span className="font-bold">Menu</span>
       </button>
       {showMobileMenu && items && (
-        <MobileNav items={items}>{children}</MobileNav>
+        <MobileNav items={items} user={!!user}>{children}</MobileNav>
       )}
     </div>
   );

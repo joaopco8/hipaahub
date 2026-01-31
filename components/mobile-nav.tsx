@@ -51,7 +51,7 @@ export function MobileNav({ items, children, user }: MobileNavProps) {
         <div className="flex items-center space-x-2 mt-4">
           <ModeToggle />
           <Link
-            href={user ? '/dashboard' : '/login'}
+            href={user ? '/dashboard' : '/signin'}
             className={cn(
               buttonVariants({ variant: 'secondary', size: 'sm' }),
               'px-4'

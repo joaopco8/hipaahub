@@ -9,6 +9,7 @@ import { Icons } from '@/components/icons';
 import { buttonVariants } from '@/components/ui/button';
 import { ModeToggle } from '@/components/mode-toggle';
 import { SunIcon } from '@heroicons/react/24/solid'
+import { createClient } from '@/utils/supabase/client';
 
 interface CircularNavProps {
   items?: MainNavItem[];
@@ -19,9 +20,29 @@ interface CircularNavProps {
 export default function CircularNavigation({
   items,
   children,
-  user
+  user: userProp
 }: CircularNavProps) {
   const [showMobileMenu, setShowMobileMenu] = React.useState<boolean>(false);
+  const [user, setUser] = React.useState<any>(null);
+  const supabase = createClient();
+
+  React.useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        setUser(null);
+      }
+    };
+    
+    // Use prop if provided, otherwise check auth
+    if (userProp !== undefined) {
+      setUser(userProp ? true : null);
+    } else {
+      checkAuth();
+    }
+  }, [supabase, userProp]);
 
   return (
     <nav className="flex flex-wrap items-center justify-between w-full md:w-fit p-2 md:p-1 gap-4 md:gap-20 md:bg-zinc-50 md:dark:bg-zinc-900 md:rounded-full md:px-8 md:border-2 md:border-muted/30 md:dark:border-muted/80 md:shadow-md mx-auto mt-4 backdrop-blur-sm md:backdrop-blur-none">
@@ -70,7 +91,7 @@ export default function CircularNavigation({
       </div>
       {showMobileMenu && items && (
         <div className="absolute top-full left-0 right-0 w-full md:hidden mt-2">
-          <MobileNav items={items}>{children}</MobileNav>
+          <MobileNav items={items} user={!!user}>{children}</MobileNav>
         </div>
       )}
     </nav>
