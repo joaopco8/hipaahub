@@ -5,6 +5,9 @@
  * risk assessment answers, evidence, and attestations
  */
 
+// Force dynamic rendering - this route uses Supabase auth which requires cookies
+export const dynamic = 'force-dynamic';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { convertToQuestionAnswers } from '@/lib/question-answer-converter';

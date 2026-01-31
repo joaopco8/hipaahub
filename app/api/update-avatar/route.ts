@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 
+// Force dynamic rendering - this route uses Supabase auth which requires cookies
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   const supabase = createClient();
   const { userId, avatarUrl }: { userId: string; avatarUrl: string } = await request.json();

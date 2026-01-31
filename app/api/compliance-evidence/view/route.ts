@@ -3,6 +3,9 @@
  * Generates signed URLs for evidence file viewing/preview
  */
 
+// Force dynamic rendering - this route uses Supabase auth which requires cookies
+export const dynamic = 'force-dynamic';
+
 import { createClient } from '@/utils/supabase/server';
 import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';

@@ -4,6 +4,9 @@
  * (Independent of onboarding flow)
  */
 
+// Force dynamic rendering - this route uses Supabase auth which requires cookies
+export const dynamic = 'force-dynamic';
+
 import { createClient as createServerClient } from '@/utils/supabase/server';
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';

@@ -3,6 +3,9 @@
  * Generates OCR-grade audit report with all evidence attachments
  */
 
+// Force dynamic rendering - this route uses Supabase auth which requires cookies
+export const dynamic = 'force-dynamic';
+
 import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { getUser } from '@/utils/supabase/queries';
