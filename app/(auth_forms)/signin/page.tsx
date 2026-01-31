@@ -226,7 +226,9 @@ export default function SignIn() {
         <AuthStatusHandler />
         <OAuthErrorHandler />
       </Suspense>
-      <SignInContent />
+      <Suspense fallback={<div className="flex min-h-[100dvh] bg-[#f3f5f9] items-center justify-center"><div className="text-white">Loading...</div></div>}>
+        <SignInContent />
+      </Suspense>
     </>
   );
 }

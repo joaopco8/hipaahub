@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { initiateCheckout } from '@/app/actions/checkout';
 import { getStripe } from '@/utils/stripe/client';
 
-export default function DownloadPage() {
+function DownloadPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const email = searchParams.get('email');
@@ -305,5 +305,17 @@ For more detailed guidance and automated compliance tools, visit HIPAA Hub.`;
         </div>
       </section>
     </div>
+  );
+}
+
+export default function DownloadPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen bg-white items-center justify-center">
+        <div className="text-[#0c0b1d]">Loading...</div>
+      </div>
+    }>
+      <DownloadPageContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,7 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-export default function CompleteProfilePage() {
+function CompleteProfilePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -173,5 +173,17 @@ export default function CompleteProfilePage() {
         <div className="absolute inset-0 bg-black/10" />
       </div>
     </div>
+  );
+}
+
+export default function CompleteProfilePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[100dvh] bg-[#f3f5f9] items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    }>
+      <CompleteProfilePageContent />
+    </Suspense>
   );
 }
