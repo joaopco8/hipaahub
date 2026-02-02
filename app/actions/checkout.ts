@@ -214,48 +214,75 @@ export async function initiateCheckout(): Promise<CheckoutResult> {
     }
   }
 
-  // Find the annual price ($500/year = 50000 cents)
-  // Look for a price with interval='year' and unit_amount=50000
-  let annualPrice = null;
+  // Find the best available price
+  // Priority: 1) Annual price ($500/year = 50000 cents), 2) Any annual price, 3) Any active price
+  let selectedPrice = null;
   
   try {
+    // Priority 1: Look for exact annual price ($500/year = 50000 cents)
     for (const product of products || []) {
       if (product?.prices && Array.isArray(product.prices)) {
-        annualPrice = product.prices.find(
-          (price: any) => price?.interval === 'year' && price?.unit_amount === 50000
+        selectedPrice = product.prices.find(
+          (price: any) => price?.active === true && 
+                         price?.interval === 'year' && 
+                         price?.unit_amount === 50000
         );
-        if (annualPrice) break;
+        if (selectedPrice) break;
       }
     }
 
-    // If not found, try to find any annual price as fallback
-    if (!annualPrice) {
+    // Priority 2: If not found, try to find any annual price
+    if (!selectedPrice) {
       for (const product of products || []) {
         if (product?.prices && Array.isArray(product.prices)) {
-          annualPrice = product.prices.find((price: any) => price?.interval === 'year');
-          if (annualPrice) break;
+          selectedPrice = product.prices.find(
+            (price: any) => price?.active === true && price?.interval === 'year'
+          );
+          if (selectedPrice) break;
+        }
+      }
+    }
+
+    // Priority 3: If still not found, use the first active price from "HIPAA Hub" product
+    if (!selectedPrice) {
+      const hipaaHubProduct = products?.find(
+        (product: any) => product?.name?.toLowerCase().includes('hipaa') || 
+                         product?.name?.toLowerCase().includes('hub')
+      );
+      
+      if (hipaaHubProduct?.prices && Array.isArray(hipaaHubProduct.prices)) {
+        selectedPrice = hipaaHubProduct.prices.find((price: any) => price?.active === true);
+      }
+    }
+
+    // Priority 4: Last resort - use the first active price from any product
+    if (!selectedPrice) {
+      for (const product of products || []) {
+        if (product?.prices && Array.isArray(product.prices)) {
+          selectedPrice = product.prices.find((price: any) => price?.active === true);
+          if (selectedPrice) break;
         }
       }
     }
   } catch (priceSearchError: any) {
-    console.error('Error searching for annual price:', priceSearchError);
+    console.error('Error searching for price:', priceSearchError);
     return { 
       type: 'error', 
       message: 'Error processing pricing information. Please contact support.' 
     };
   }
 
-  if (!annualPrice) {
+  if (!selectedPrice) {
     return { 
       type: 'error', 
-      message: 'Annual pricing plan not found. Please contact support or ensure products are properly configured in Stripe.' 
+      message: 'No active pricing plan found. Please ensure products are properly configured in Stripe and synced to the database.' 
     };
   }
 
   // Initiate checkout
   try {
     const { errorRedirect, sessionId } = await checkoutWithStripe(
-      annualPrice,
+      selectedPrice,
       '/onboarding/expectation' // After payment, go to onboarding
     );
 
