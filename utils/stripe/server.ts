@@ -136,39 +136,64 @@ export async function checkoutWithStripe(
       // Don't block checkout if we can't check currency (might be a temporary network issue)
     }
 
-    let params: Stripe.Checkout.SessionCreateParams = {
-      allow_promotion_codes: true,
-      billing_address_collection: 'required',
-      customer: finalCustomer,
-      customer_update: {
-        address: 'auto'
-      },
-      line_items: [
-        {
-          price: price.id,
-          quantity: 1
-        }
-      ],
-      cancel_url: getURL(),
-      success_url: getURL(redirectPath)
-    };
+    // Determine checkout mode based on price type
+    // A price is recurring if: type === 'recurring' OR interval is not null
+    const isRecurring = price.type === 'recurring' || 
+                       (price.type !== 'one_time' && price.interval !== null);
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Checkout price details:', {
+        priceId: price.id,
+        priceType: price.type,
+        interval: price.interval,
+        isRecurring,
+        unitAmount: price.unit_amount,
+        currency: price.currency
+      });
+    }
 
-    console.log(
-      'Trial end:',
-      calculateTrialEndUnixTimestamp(price.trial_period_days)
-    );
-    if (price.type === 'recurring') {
+    let params: Stripe.Checkout.SessionCreateParams;
+    
+    if (isRecurring) {
+      // Recurring price requires subscription mode
       params = {
-        ...params,
-        mode: 'subscription',
+        allow_promotion_codes: true,
+        billing_address_collection: 'required',
+        customer: finalCustomer,
+        customer_update: {
+          address: 'auto'
+        },
+        line_items: [
+          {
+            price: price.id,
+            quantity: 1
+          }
+        ],
+        mode: 'subscription', // Explicitly set subscription mode
         subscription_data: {
           trial_end: calculateTrialEndUnixTimestamp(price.trial_period_days)
-        }
+        },
+        cancel_url: getURL(),
+        success_url: getURL(redirectPath)
       };
-    } else if (price.type === 'one_time') {
+    } else {
+      // One-time price requires payment mode
       params = {
-        ...params,
-        mode: 'payment'
+        allow_promotion_codes: true,
+        billing_address_collection: 'required',
+        customer: finalCustomer,
+        customer_update: {
+          address: 'auto'
+        },
+        line_items: [
+          {
+            price: price.id,
+            quantity: 1
+          }
+        ],
+        mode: 'payment', // Explicitly set payment mode
+        cancel_url: getURL(),
+        success_url: getURL(redirectPath)
       };
     }
 
