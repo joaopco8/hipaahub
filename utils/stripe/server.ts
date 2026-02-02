@@ -137,18 +137,46 @@ export async function checkoutWithStripe(
     }
 
     // Determine checkout mode based on price type
-    // A price is recurring if: type === 'recurring' OR interval is not null
-    const isRecurring = price.type === 'recurring' || 
-                       (price.type !== 'one_time' && price.interval !== null);
+    // IMPORTANT: Always verify with Stripe API to ensure we have the correct type
+    // The database might be out of sync, so we check Stripe directly
+    let isRecurring = false;
     
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Checkout price details:', {
+    try {
+      // Always fetch the latest price data from Stripe to ensure accuracy
+      const stripePrice = await stripe.prices.retrieve(price.id);
+      isRecurring = stripePrice.type === 'recurring';
+      
+      console.log('Price verified from Stripe API:', {
+        priceId: stripePrice.id,
+        type: stripePrice.type,
+        interval: stripePrice.recurring?.interval,
+        unitAmount: stripePrice.unit_amount,
+        currency: stripePrice.currency,
+        isRecurring,
+        mode: isRecurring ? 'subscription' : 'payment'
+      });
+      
+      // Log if database is out of sync
+      if (price.type !== stripePrice.type) {
+        console.warn('⚠️ Database price type mismatch:', {
+          databaseType: price.type,
+          stripeType: stripePrice.type,
+          databaseInterval: price.interval,
+          stripeInterval: stripePrice.recurring?.interval
+        });
+      }
+    } catch (stripeError: any) {
+      console.error('Error fetching price from Stripe API:', stripeError.message);
+      // Fallback to database values if Stripe API fails
+      isRecurring = price.type === 'recurring' || 
+                    (price.type !== 'one_time' && price.interval !== null);
+      
+      console.log('Using database price type (fallback):', {
         priceId: price.id,
         priceType: price.type,
         interval: price.interval,
         isRecurring,
-        unitAmount: price.unit_amount,
-        currency: price.currency
+        mode: isRecurring ? 'subscription' : 'payment'
       });
     }
 
