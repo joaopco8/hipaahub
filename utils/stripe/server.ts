@@ -156,14 +156,39 @@ export async function checkoutWithStripe(
         mode: isRecurring ? 'subscription' : 'payment'
       });
       
-      // Log if database is out of sync
-      if (price.type !== stripePrice.type) {
-        console.warn('⚠️ Database price type mismatch:', {
+      // Log if database is out of sync and update it
+      if (price.type !== stripePrice.type || price.interval !== (stripePrice.recurring?.interval ?? null)) {
+        console.warn('⚠️ Database price type mismatch detected. Updating database...', {
           databaseType: price.type,
           stripeType: stripePrice.type,
           databaseInterval: price.interval,
           stripeInterval: stripePrice.recurring?.interval
         });
+        
+        // Update the database to match Stripe
+        try {
+          const supabase = createClient();
+          const { error: updateError } = await supabase
+            .from('prices')
+            .update({
+              type: stripePrice.type,
+              interval: stripePrice.recurring?.interval ?? null,
+              interval_count: stripePrice.recurring?.interval_count ?? null,
+              unit_amount: stripePrice.unit_amount,
+              currency: stripePrice.currency,
+              active: stripePrice.active
+            })
+            .eq('id', price.id);
+          
+          if (updateError) {
+            console.error('Failed to update price in database:', updateError);
+          } else {
+            console.log('✅ Price updated in database to match Stripe');
+          }
+        } catch (updateError: any) {
+          console.error('Error updating price in database:', updateError);
+          // Continue with checkout even if update fails
+        }
       }
     } catch (stripeError: any) {
       console.error('Error fetching price from Stripe API:', stripeError.message);

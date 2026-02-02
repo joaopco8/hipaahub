@@ -78,19 +78,26 @@ export default function CheckoutPage() {
           console.log('CheckoutPage: Proceeding to Stripe checkout...');
           setHasRedirected(true);
           
-          const stripe = await getStripe();
-          if (stripe) {
-            console.log('CheckoutPage: Redirecting to Stripe checkout with session:', result.sessionId);
-            const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: result.sessionId });
-            if (stripeError) {
-              console.error('CheckoutPage: Stripe redirect error:', stripeError);
-              setError(`Stripe error: ${stripeError.message}`);
+          try {
+            const stripe = await getStripe();
+            if (stripe) {
+              console.log('CheckoutPage: Redirecting to Stripe checkout with session:', result.sessionId);
+              const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: result.sessionId });
+              if (stripeError) {
+                console.error('CheckoutPage: Stripe redirect error:', stripeError);
+                setError(`Stripe error: ${stripeError.message}`);
+                setIsLoading(false);
+                setHasRedirected(false);
+              }
+            } else {
+              console.error('CheckoutPage: Stripe returned null');
+              setError('Stripe failed to load. Please refresh the page or contact support.');
               setIsLoading(false);
               setHasRedirected(false);
             }
-          } else {
-            console.error('CheckoutPage: Stripe failed to load');
-            setError('Stripe failed to load. Please refresh the page.');
+          } catch (stripeLoadError: any) {
+            console.error('CheckoutPage: Error loading Stripe.js:', stripeLoadError);
+            setError(`Failed to load Stripe: ${stripeLoadError.message || 'Please check your Stripe configuration and refresh the page.'}`);
             setIsLoading(false);
             setHasRedirected(false);
           }
