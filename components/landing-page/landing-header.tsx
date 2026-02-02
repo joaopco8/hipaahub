@@ -140,53 +140,57 @@ export default function LandingHeader() {
           <div className="absolute inset-0 bg-[#0c0b1d]/95" />
           
           {/* Content container - Full height and width */}
-          <div className="relative z-10 flex flex-col min-h-screen w-full p-6 pt-24 gap-6">
-            {/* Close button at top */}
-            <div className="flex justify-end mb-2">
+          <div className="relative z-10 flex flex-col h-full w-full">
+            {/* Header with Close button - Fixed at top */}
+            <div className="flex items-center justify-between px-6 pt-6 pb-4">
+              <div className="w-8 h-8" /> {/* Spacer for alignment */}
               <button 
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-3 text-white hover:text-[#1ad07a] transition-colors rounded-lg hover:bg-white/10"
+                className="p-2 text-white hover:text-[#1ad07a] transition-colors rounded-lg hover:bg-white/10"
               >
-                <X className="w-7 h-7" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            {/* Navigation Links */}
-            <nav className="flex flex-col gap-1 text-lg font-light text-white">
-              {navLinks.map((link) => (
-                <Link 
-                  key={link.href} 
-                  href={link.href} 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#1ad07a] transition-colors py-4 px-4 rounded-lg hover:bg-white/10 active:bg-white/5"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-            
-            {/* CTA Buttons at bottom */}
-            <div className="mt-auto flex flex-col gap-3 pb-8 pt-6">
-              {user ? (
-                <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                  <Button className="w-full bg-[#1ad07a] text-[#0c0b1d] h-14 rounded-lg text-base font-medium shadow-lg hover:bg-[#1ad07a]/90">
-                    Go to Dashboard
-                  </Button>
-                </Link>
-              ) : (
-                <>
-                  <Link href="/signin" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full border-2 border-white/30 text-white hover:bg-white/10 h-14 rounded-lg text-base backdrop-blur-sm">
-                      Log in
-                    </Button>
+            {/* Scrollable content area */}
+            <div className="flex-1 overflow-y-auto px-6 pb-6">
+              {/* Navigation Links - Start at same height as X button */}
+              <nav className="flex flex-col gap-1 text-lg font-light text-white">
+                {navLinks.map((link) => (
+                  <Link 
+                    key={link.href} 
+                    href={link.href} 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="hover:text-[#1ad07a] transition-colors py-4 px-4 rounded-lg hover:bg-white/10 active:bg-white/5"
+                  >
+                    {link.label}
                   </Link>
-                  <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                ))}
+              </nav>
+              
+              {/* CTA Buttons - Always visible at bottom */}
+              <div className="flex flex-col gap-3 pt-6 pb-4">
+                {user ? (
+                  <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full bg-[#1ad07a] text-[#0c0b1d] h-14 rounded-lg text-base font-medium shadow-lg hover:bg-[#1ad07a]/90">
-                      Get Started
+                      Go to Dashboard
                     </Button>
                   </Link>
-                </>
-              )}
+                ) : (
+                  <>
+                    <Link href="/signin" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full border-2 border-white/30 text-white hover:bg-white/10 h-14 rounded-lg text-base backdrop-blur-sm">
+                        Log in
+                      </Button>
+                    </Link>
+                    <Link href="/signup" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full bg-[#1ad07a] text-[#0c0b1d] h-14 rounded-lg text-base font-medium shadow-lg hover:bg-[#1ad07a]/90">
+                        Get Started
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
