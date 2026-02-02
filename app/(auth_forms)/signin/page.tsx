@@ -8,10 +8,14 @@ import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { signInWithOAuth } from '@/utils/auth-helpers/client';
 import { handleRequest } from '@/utils/auth-helpers/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense } from 'react';
 import { AuthStatusHandler } from '@/components/auth-status-handler';
+import { OAuthErrorHandler } from '../oauth-error-handler';
+import { GoogleLogo } from '@/components/google-logo';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 function SignInContent() {
@@ -24,6 +28,20 @@ function SignInContent() {
     setIsSubmitting(true);
     const { signInWithPassword } = await import('@/utils/auth-helpers/server');
     await handleRequest(e, signInWithPassword, router);
+    setIsSubmitting(false);
+  };
+
+  const oAuthProviders = [
+    {
+      name: 'google',
+      displayName: 'Google',
+      icon: <GoogleLogo className="w-5 h-5" />
+    }
+  ];
+  
+  const handleOAuthSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setIsSubmitting(true);
+    await signInWithOAuth(e);
     setIsSubmitting(false);
   };
 
@@ -137,6 +155,42 @@ function SignInContent() {
             </Button>
           </form>
 
+          {/* OAuth Separator */}
+          <div className="relative">
+            <Separator className="my-6 bg-zinc-700" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="bg-[#0d1122] px-4 text-sm text-zinc-400 font-geologica font-light">
+                or
+              </span>
+            </div>
+          </div>
+
+          {/* OAuth Buttons */}
+          <div className="space-y-3">
+            {oAuthProviders.map((provider) => (
+              <form
+                key={provider.name}
+                onSubmit={(e) => handleOAuthSubmit(e)}
+              >
+                <input type="hidden" name="provider" value={provider.name} />
+                {searchParams.get('redirect') === 'checkout' && (
+                  <input type="hidden" name="redirect" value="checkout" />
+                )}
+                <Button
+                  variant="outline"
+                  type="submit"
+                  className="w-full h-12 flex items-center justify-center gap-3 border-zinc-600 bg-white/5 hover:bg-white/10 text-white transition-colors rounded-lg font-geologica font-light"
+                  disabled={isSubmitting}
+                >
+                  {provider.icon}
+                  <span className="text-[15px]">
+                    Continue with {provider.displayName}
+                  </span>
+                </Button>
+              </form>
+            ))}
+          </div>
+
           {/* Sign Up Link */}
           <div className="text-center pt-4">
             <p className="text-zinc-400 font-geologica font-light text-sm">
@@ -173,6 +227,7 @@ export default function SignIn() {
     <>
       <Suspense fallback={null}>
         <AuthStatusHandler />
+        <OAuthErrorHandler />
       </Suspense>
       <Suspense fallback={<div className="flex min-h-[100dvh] bg-[#f3f5f9] items-center justify-center"><div className="text-white">Loading...</div></div>}>
         <SignInContent />
