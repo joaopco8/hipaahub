@@ -678,9 +678,9 @@ export default function HeroSketchy() {
               })}
             </motion.div>
 
-            {/* CTA Button */}
+            {/* CTA Buttons */}
             <motion.div
-              className="flex flex-col gap-2 sm:gap-2.5 mt-4 sm:mt-6 md:mt-8 items-center w-full px-4 sm:px-0"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 sm:mt-6 md:mt-8 items-center justify-center w-full px-4 sm:px-0"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -705,6 +705,16 @@ export default function HeroSketchy() {
                       <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                     </motion.div>
                   </span>
+                </Button>
+              </Link>
+              
+              <Link href="/#how-it-works" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="group relative w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-4 border-2 border-[#0c0b1d] text-[#0c0b1d] font-medium text-sm sm:text-base rounded-lg hover:bg-[#0c0b1d] hover:text-white transition-all duration-300 bg-white"
+                >
+                  <span className="text-xs sm:text-sm md:text-base">See How It Works</span>
                 </Button>
               </Link>
 
