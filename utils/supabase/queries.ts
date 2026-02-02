@@ -10,26 +10,32 @@ export const getUser = cache(async (supabase: SupabaseClient<Database>) => {
 });
 
 export const getSubscription = cache(async (supabase: SupabaseClient<Database>, userId: string) => {
-  // Now fetch the subscription for this user
-  const { data: subscription, error: subscriptionError } = await supabase
-    .from('subscriptions')
-    .select(`
-      *,
-      prices (
+  try {
+    // Now fetch the subscription for this user
+    const { data: subscription, error: subscriptionError } = await supabase
+      .from('subscriptions')
+      .select(`
         *,
-        products (*)
-      )
-    `)
-    .eq('user_id', userId)
-    .in('status', ['trialing', 'active'])
-    .maybeSingle();
+        prices (
+          *,
+          products (*)
+        )
+      `)
+      .eq('user_id', userId)
+      .in('status', ['trialing', 'active'])
+      .maybeSingle();
 
-  if (subscriptionError) {
-    console.error('Error fetching subscription:', subscriptionError);
+    if (subscriptionError) {
+      console.error('Error fetching subscription:', subscriptionError);
+      return null;
+    }
+
+    return subscription;
+  } catch (err: any) {
+    console.error('Exception in getSubscription:', err);
+    // Always return null to prevent Server Component errors
     return null;
   }
-
-  return subscription;
 });
 
 export const getProducts = cache(async (supabase: SupabaseClient) => {

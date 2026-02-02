@@ -23,6 +23,15 @@ export async function checkoutWithStripe(
   redirectPath: string = '/account'
 ): Promise<CheckoutResponse> {
   try {
+    // Verify Stripe is configured
+    const stripeKey = process.env.STRIPE_SECRET_KEY_LIVE ?? process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey || stripeKey.trim() === '') {
+      console.error('Stripe secret key is not configured');
+      return { 
+        errorRedirect: `/checkout?error=${encodeURIComponent('Stripe is not configured. Please contact support.')}` 
+      };
+    }
+
     // Get the user from Supabase auth
     const supabase = createClient();
     const {

@@ -106,7 +106,14 @@ export async function initiateCheckout(): Promise<CheckoutResult> {
 
   // User doesn't have subscription, proceed with checkout
   // Get products from database
-  let products = await getProducts(supabase);
+  let products: any[] = [];
+  try {
+    products = await getProducts(supabase) || [];
+  } catch (productsError: any) {
+    console.error('Error fetching products:', productsError);
+    // Continue to sync attempt even if fetch fails
+    products = [];
+  }
   
   if (process.env.NODE_ENV === 'development') {
     console.log('initiateCheckout: Products found in database:', products?.length || 0);
@@ -211,27 +218,38 @@ export async function initiateCheckout(): Promise<CheckoutResult> {
   // Look for a price with interval='year' and unit_amount=50000
   let annualPrice = null;
   
-  for (const product of products) {
-    if (product.prices) {
-      annualPrice = product.prices.find(
-        (price: any) => price.interval === 'year' && price.unit_amount === 50000
-      );
-      if (annualPrice) break;
-    }
-  }
-
-  // If not found, try to find any annual price as fallback
-  if (!annualPrice) {
-    for (const product of products) {
-      if (product.prices) {
-        annualPrice = product.prices.find((price: any) => price.interval === 'year');
+  try {
+    for (const product of products || []) {
+      if (product?.prices && Array.isArray(product.prices)) {
+        annualPrice = product.prices.find(
+          (price: any) => price?.interval === 'year' && price?.unit_amount === 50000
+        );
         if (annualPrice) break;
       }
     }
+
+    // If not found, try to find any annual price as fallback
+    if (!annualPrice) {
+      for (const product of products || []) {
+        if (product?.prices && Array.isArray(product.prices)) {
+          annualPrice = product.prices.find((price: any) => price?.interval === 'year');
+          if (annualPrice) break;
+        }
+      }
+    }
+  } catch (priceSearchError: any) {
+    console.error('Error searching for annual price:', priceSearchError);
+    return { 
+      type: 'error', 
+      message: 'Error processing pricing information. Please contact support.' 
+    };
   }
 
   if (!annualPrice) {
-    throw new Error('Annual pricing plan not found. Please contact support.');
+    return { 
+      type: 'error', 
+      message: 'Annual pricing plan not found. Please contact support or ensure products are properly configured in Stripe.' 
+    };
   }
 
   // Initiate checkout
