@@ -33,26 +33,48 @@ export const getSubscription = cache(async (supabase: SupabaseClient<Database>, 
 });
 
 export const getProducts = cache(async (supabase: SupabaseClient) => {
-  const { data: products, error } = await supabase
-    .from('products')
-    .select('*, prices(*)')
-    .eq('active', true)
-    .order('metadata->index');
+  try {
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('*, prices(*)')
+      .eq('active', true);
 
-  if (error) {
-    console.error('Error fetching products:', error);
-    return null;
-  }
-
-  // Filter products that have at least one active price
-  const productsWithActivePrices = products?.filter((product) => {
-    if (!product.prices || !Array.isArray(product.prices)) {
-      return false;
+    if (error) {
+      console.error('Error fetching products:', error);
+      // Return empty array instead of null to prevent Server Component errors
+      return [];
     }
-    return product.prices.some((price: any) => price.active === true);
-  });
 
-  return productsWithActivePrices || [];
+    // If no products, return empty array
+    if (!products || products.length === 0) {
+      return [];
+    }
+
+    // Filter products that have at least one active price
+    const productsWithActivePrices = products.filter((product) => {
+      if (!product.prices || !Array.isArray(product.prices)) {
+        return false;
+      }
+      return product.prices.some((price: any) => price.active === true);
+    });
+
+    // Sort by metadata index if available, otherwise by id
+    productsWithActivePrices.sort((a, b) => {
+      const aIndex = a.metadata?.index ?? 999;
+      const bIndex = b.metadata?.index ?? 999;
+      if (aIndex !== bIndex) {
+        return aIndex - bIndex;
+      }
+      // Fallback to id if index is the same
+      return (a.id || '').localeCompare(b.id || '');
+    });
+
+    return productsWithActivePrices;
+  } catch (err: any) {
+    console.error('Exception in getProducts:', err);
+    // Always return empty array to prevent Server Component errors
+    return [];
+  }
 });
 
 export const getPlans = cache(async (supabase: SupabaseClient) => {
