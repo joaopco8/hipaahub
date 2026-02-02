@@ -176,7 +176,7 @@ export default function FAQ() {
   const filteredFaqs = faqs.filter(faq => faq.category === activeCategory);
 
   return (
-    <section className="w-full bg-[#0c0b1d] py-16 md:py-20 lg:py-24 font-extralight" id="faq-section-v2">
+    <section id="faq" className="w-full bg-[#0c0b1d] py-16 md:py-20 lg:py-24 font-extralight">
       <div className="max-w-7xl mx-auto px-6 font-extralight">
         <div className="space-y-20 font-extralight">
           

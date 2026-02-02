@@ -8,7 +8,7 @@ import { SectionCTA } from './section-cta';
 
 export default function ProblemSectionOptimized() {
   return (
-    <section className="w-full relative bg-gradient-to-b from-[#0c0b1d] via-[#1a1a2e] to-[#0c0b1d] py-16 md:py-20 lg:py-24 font-extralight overflow-hidden">
+    <section id="problem" className="w-full relative bg-gradient-to-b from-[#0c0b1d] via-[#1a1a2e] to-[#0c0b1d] py-16 md:py-20 lg:py-24 font-extralight overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {/* Gradient orbs */}
