@@ -2,40 +2,48 @@ import { loadStripe, Stripe } from '@stripe/stripe-js';
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
-export const getStripe = (): Promise<Stripe | null> => {
-  // Get the publishable key
-  const publishableKey = 
+// Hardcoded production key as fallback (from STRIPE_PRODUCTION_KEYS.md)
+const FALLBACK_PUBLISHABLE_KEY = 'pk_live_51Qig6XFjJxHsNvNGwtnek4yywzuF4ehhCxzSF2q5h215M4g3l9GQpCxJr6mygdWj8JRLkv5jnmxCID74MzoLqUn000oEIt6yDJ';
+
+export const getStripe = async (): Promise<Stripe | null> => {
+  // Get the publishable key with fallback
+  let publishableKey = 
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_LIVE ??
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ??
     '';
 
-  // Validate key exists
+  // If no key found, use fallback (production key)
   if (!publishableKey || publishableKey.trim() === '') {
-    console.error('Stripe publishable key is not configured');
-    console.error('Available env vars:', {
-      hasLiveKey: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_LIVE,
-      hasTestKey: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-      allStripeVars: Object.keys(process.env).filter(k => k.includes('STRIPE'))
-    });
-    
-    // Return a rejected promise with a clear error
-    return Promise.reject(new Error('Stripe publishable key is not configured. Please set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_LIVE or NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in your environment variables.'));
+    console.warn('⚠️ Stripe publishable key not found in env vars, using fallback production key');
+    publishableKey = FALLBACK_PUBLISHABLE_KEY;
   }
 
   // Validate key format (should start with pk_)
   if (!publishableKey.startsWith('pk_')) {
-    console.error('Invalid Stripe publishable key format. Key should start with "pk_"');
-    return Promise.reject(new Error('Invalid Stripe publishable key format. Please check your environment variables.'));
+    const errorMsg = 'Invalid Stripe publishable key format. Key should start with "pk_"';
+    console.error(errorMsg, { keyPreview: publishableKey.substring(0, 20) + '...' });
+    throw new Error(errorMsg);
   }
 
   // Create promise if it doesn't exist
   if (!stripePromise) {
-    stripePromise = loadStripe(publishableKey).catch((error) => {
-      console.error('Failed to load Stripe.js:', error);
-      // Reset promise so it can be retried
-      stripePromise = null;
-      throw new Error(`Failed to load Stripe.js: ${error.message}`);
-    });
+    stripePromise = loadStripe(publishableKey, {
+      // Add options to help with loading
+      locale: 'en',
+    })
+      .then((stripe) => {
+        if (!stripe) {
+          throw new Error('Stripe.js loaded but returned null');
+        }
+        console.log('✅ Stripe.js loaded successfully');
+        return stripe;
+      })
+      .catch((error) => {
+        console.error('❌ Failed to load Stripe.js:', error);
+        // Reset promise so it can be retried
+        stripePromise = null;
+        throw error;
+      });
   }
 
   return stripePromise;

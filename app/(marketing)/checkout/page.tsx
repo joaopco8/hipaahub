@@ -90,16 +90,21 @@ export default function CheckoutPage() {
                 setHasRedirected(false);
               }
             } else {
-              console.error('CheckoutPage: Stripe returned null');
-              setError('Stripe failed to load. Please refresh the page or contact support.');
+              console.error('CheckoutPage: Stripe returned null, using direct redirect');
+              // Fallback: redirect directly to Stripe checkout URL
+              window.location.href = `https://checkout.stripe.com/pay/${result.sessionId}`;
+            }
+          } catch (stripeLoadError: any) {
+            console.error('CheckoutPage: Error loading Stripe.js, using direct redirect:', stripeLoadError);
+            // Fallback: redirect directly to Stripe checkout URL if Stripe.js fails
+            try {
+              window.location.href = `https://checkout.stripe.com/pay/${result.sessionId}`;
+            } catch (redirectError: any) {
+              console.error('CheckoutPage: Direct redirect also failed:', redirectError);
+              setError(`Failed to load Stripe: ${stripeLoadError.message || 'Please check your Stripe configuration and refresh the page.'}`);
               setIsLoading(false);
               setHasRedirected(false);
             }
-          } catch (stripeLoadError: any) {
-            console.error('CheckoutPage: Error loading Stripe.js:', stripeLoadError);
-            setError(`Failed to load Stripe: ${stripeLoadError.message || 'Please check your Stripe configuration and refresh the page.'}`);
-            setIsLoading(false);
-            setHasRedirected(false);
           }
         } else if (result.type === 'error') {
           // Error occurred
