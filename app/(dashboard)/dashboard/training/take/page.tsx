@@ -52,6 +52,65 @@ export default function TakeTrainingPage() {
   const [userRole, setUserRole] = useState<string>('');
   const [trainingStartTime, setTrainingStartTime] = useState<Date | null>(null);
 
+  // Load saved progress from localStorage on mount
+  useEffect(() => {
+    const savedAnswers = localStorage.getItem('hipaa-training-answers');
+    const savedSection = localStorage.getItem('hipaa-training-section');
+    const savedAcknowledged = localStorage.getItem('hipaa-training-acknowledged');
+    const savedStartTime = localStorage.getItem('hipaa-training-start-time');
+    const savedUserName = localStorage.getItem('hipaa-training-user-name');
+    const savedUserRole = localStorage.getItem('hipaa-training-user-role');
+    const savedHasStarted = localStorage.getItem('hipaa-training-has-started');
+
+    let hasProgress = false;
+
+    if (savedAnswers) {
+      setQuizAnswers(JSON.parse(savedAnswers));
+      hasProgress = true;
+    }
+    if (savedSection) {
+      setCurrentSection(parseInt(savedSection));
+      hasProgress = true;
+    }
+    if (savedAcknowledged === 'true') {
+      setAcknowledged(true);
+    }
+    if (savedStartTime) {
+      setTrainingStartTime(new Date(savedStartTime));
+    }
+    if (savedUserName) {
+      setUserName(savedUserName);
+    }
+    if (savedUserRole) {
+      setUserRole(savedUserRole);
+    }
+    if (savedHasStarted === 'true') {
+      setHasStarted(true);
+      if (hasProgress) {
+        toast.success('Welcome back! Your progress has been restored.');
+      }
+    }
+  }, []);
+
+  // Save answers to localStorage whenever they change
+  useEffect(() => {
+    if (Object.keys(quizAnswers).length > 0) {
+      localStorage.setItem('hipaa-training-answers', JSON.stringify(quizAnswers));
+    }
+  }, [quizAnswers]);
+
+  // Save current section to localStorage whenever it changes
+  useEffect(() => {
+    if (hasStarted) {
+      localStorage.setItem('hipaa-training-section', currentSection.toString());
+    }
+  }, [currentSection, hasStarted]);
+
+  // Save acknowledged state to localStorage
+  useEffect(() => {
+    localStorage.setItem('hipaa-training-acknowledged', acknowledged.toString());
+  }, [acknowledged]);
+
   useEffect(() => {
     async function getUserInfo() {
       const { data: { user } } = await supabase.auth.getUser();
@@ -470,8 +529,15 @@ export default function TakeTrainingPage() {
       toast.error('Please enter your job role/title');
       return;
     }
+    const startTime = new Date();
     setHasStarted(true);
-    setTrainingStartTime(new Date());
+    setTrainingStartTime(startTime);
+    
+    // Save to localStorage
+    localStorage.setItem('hipaa-training-has-started', 'true');
+    localStorage.setItem('hipaa-training-start-time', startTime.toISOString());
+    localStorage.setItem('hipaa-training-user-name', userName);
+    localStorage.setItem('hipaa-training-user-role', userRole);
   };
 
   const handleNext = () => {
@@ -480,13 +546,19 @@ export default function TakeTrainingPage() {
       handleSubmit();
     } else {
       setCurrentSection(prev => prev + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Scroll to top immediately and smoothly
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 0);
     }
   };
 
   const handlePrevious = () => {
     setCurrentSection(prev => prev - 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to top immediately and smoothly
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 0);
   };
 
   const calculateQuizScore = () => {
@@ -658,6 +730,16 @@ export default function TakeTrainingPage() {
       }
 
       toast.success('Training completed successfully!');
+      
+      // Clear localStorage after successful completion
+      localStorage.removeItem('hipaa-training-answers');
+      localStorage.removeItem('hipaa-training-section');
+      localStorage.removeItem('hipaa-training-acknowledged');
+      localStorage.removeItem('hipaa-training-start-time');
+      localStorage.removeItem('hipaa-training-user-name');
+      localStorage.removeItem('hipaa-training-user-role');
+      localStorage.removeItem('hipaa-training-has-started');
+      
       // Redirect to evidence page to show certificate
       router.push(`/dashboard/training/${trainingData.id}/evidence`);
     } catch (error: any) {
