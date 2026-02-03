@@ -40,7 +40,8 @@ export default function VideoSection({
   };
 
   // YouTube embed URL with autoplay and proper parameters
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
+  // Using /embed/ format (not /watch/) and including necessary parameters
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : 'https://hipaahubhealth.com'}`;
 
   return (
     <section className="relative w-full py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white via-[#f3f5f9] to-white overflow-hidden">
