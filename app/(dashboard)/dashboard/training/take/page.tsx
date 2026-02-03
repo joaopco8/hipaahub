@@ -472,12 +472,12 @@ export default function TakeTrainingPage() {
               these rights:
             </p>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
-              <li><strong>Right to Access:</strong> Patients can request copies of their medical records</li>
-              <li><strong>Right to Amend:</strong> Patients can request corrections to their records</li>
-              <li><strong>Right to an Accounting:</strong> Patients can request a list of disclosures of their PHI</li>
-              <li><strong>Right to Request Restrictions:</strong> Patients can request limits on how their PHI is used</li>
-              <li><strong>Right to Confidential Communications:</strong> Patients can request alternative communication methods</li>
-              <li><strong>Right to File a Complaint:</strong> Patients can file complaints about privacy violations</li>
+              <li><strong className="text-zinc-700">Right to Access:</strong> Patients can request copies of their medical records</li>
+              <li><strong className="text-zinc-700">Right to Amend:</strong> Patients can request corrections to their records</li>
+              <li><strong className="text-zinc-700">Right to an Accounting:</strong> Patients can request a list of disclosures of their PHI</li>
+              <li><strong className="text-zinc-700">Right to Request Restrictions:</strong> Patients can request limits on how their PHI is used</li>
+              <li><strong className="text-zinc-700">Right to Confidential Communications:</strong> Patients can request alternative communication methods</li>
+              <li><strong className="text-zinc-700">Right to File a Complaint:</strong> Patients can file complaints about privacy violations</li>
             </ul>
           </div>
           <div>
