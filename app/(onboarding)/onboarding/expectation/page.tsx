@@ -34,14 +34,25 @@ export default function ExpectationPage() {
         
         // Add timeout to getUser call
         const authPromise = supabase.auth.getUser();
-        const timeoutPromise = new Promise((_, reject) => 
+        const timeoutPromise = new Promise<{ data: { user: null }, error: { message: string } }>((_, reject) => 
           setTimeout(() => reject(new Error('Auth check timeout')), 2000)
         );
         
-        const { data: { user }, error: authError } = await Promise.race([
-          authPromise,
-          timeoutPromise
-        ]) as any;
+        let result;
+        try {
+          result = await Promise.race([
+            authPromise,
+            timeoutPromise
+          ]);
+        } catch (timeoutError) {
+          console.warn('ExpectationPage: Auth check timed out, showing page anyway');
+          clearTimeout(timeoutFallback);
+          setIsCheckingAuth(false);
+          setIsAuthenticated(true);
+          return;
+        }
+        
+        const { data: { user }, error: authError } = result;
         
         clearTimeout(timeoutFallback);
         
