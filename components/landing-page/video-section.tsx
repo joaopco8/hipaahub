@@ -2,8 +2,9 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, X } from 'lucide-react';
+import { Play, X, CheckCircle2, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface VideoSectionProps {
   videoId?: string; // YouTube video ID (e.g., "dQw4w9WgXcQ")
@@ -202,17 +203,47 @@ export default function VideoSection({
           </AnimatePresence>
         </motion.div>
 
-        {/* Additional Info */}
+        {/* CTA Button with Benefits */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="text-center mt-8"
+          className="text-center mt-10 md:mt-12"
         >
-          <p className="text-sm md:text-base text-zinc-500 font-light">
-            No credit card required • Watch in under 3 minutes
-          </p>
+          <Link
+            href="/checkout"
+            className="inline-flex flex-col items-center gap-3 group"
+          >
+            <motion.button
+              className="px-8 py-4 bg-[#1ad07a] hover:bg-[#1ad07a]/90 text-[#0c0b1d] font-semibold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group-hover:scale-105"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Get Started with HIPAA Guard
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+            
+            {/* Benefits List */}
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 mt-2">
+              <div className="flex items-center gap-2 text-sm text-zinc-600">
+                <CheckCircle2 className="w-4 h-4 text-[#1ad07a]" />
+                <span>Full compliance suite</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-zinc-600">
+                <CheckCircle2 className="w-4 h-4 text-[#1ad07a]" />
+                <span>AI-powered documents</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-zinc-600">
+                <CheckCircle2 className="w-4 h-4 text-[#1ad07a]" />
+                <span>Audit-ready evidence</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-zinc-600">
+                <CheckCircle2 className="w-4 h-4 text-[#1ad07a]" />
+                <span>Risk assessment included</span>
+              </div>
+            </div>
+          </Link>
         </motion.div>
       </div>
     </section>

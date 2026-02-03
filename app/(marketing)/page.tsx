@@ -54,7 +54,7 @@ export default async function IndexPage() {
 
         {/* SECTION 6.5: VIDEO DEMO (Vídeo explicativo do software) */}
         <VideoSection
-          videoId="dQw4w9WgXcQ" // Replace with your actual YouTube video ID
+          videoId="Ir9bUDr4Op4"
           title="See How HIPAA Hub Works in 3 Minutes"
           description="Watch a quick demo to see how HIPAA Hub helps clinics achieve and maintain HIPAA compliance without the stress."
         />
