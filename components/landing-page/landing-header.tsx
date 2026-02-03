@@ -153,7 +153,7 @@ export default function LandingHeader() {
             </div>
 
             {/* Scrollable content area */}
-            <div className="flex-1 overflow-y-auto px-6 pb-6">
+            <div className="flex-1 overflow-y-auto px-6 flex flex-col">
               {/* Navigation Links - Start at same height as X button */}
               <nav className="flex flex-col gap-1 text-lg font-light text-white">
                 {navLinks.map((link) => (
@@ -168,8 +168,8 @@ export default function LandingHeader() {
                 ))}
               </nav>
               
-              {/* CTA Buttons - Always visible at bottom */}
-              <div className="flex flex-col gap-3 pt-6 pb-4">
+              {/* CTA Buttons - Pushed up with margin-top auto */}
+              <div className="flex flex-col gap-3 mt-auto pt-8 pb-8">
                 {user ? (
                   <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full bg-[#1ad07a] text-[#0c0b1d] h-14 rounded-lg text-base font-medium shadow-lg hover:bg-[#1ad07a]/90">
@@ -179,7 +179,7 @@ export default function LandingHeader() {
                 ) : (
                   <>
                     <Link href="/signin" onClick={() => setMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full border-2 border-white/30 text-white hover:bg-white/10 h-14 rounded-lg text-base backdrop-blur-sm">
+                      <Button variant="outline" className="w-full border-2 border-white/30 text-[#1ad07a] hover:bg-white/10 hover:text-[#1ad07a] h-14 rounded-lg text-base font-medium backdrop-blur-sm">
                         Log in
                       </Button>
                     </Link>
