@@ -14,7 +14,7 @@ interface VideoSectionProps {
 }
 
 export default function VideoSection({
-  videoId = 'dQw4w9WgXcQ', // Default placeholder - replace with your video ID
+  videoId = 'Ir9bUDr4Op4', // Default video ID
   thumbnailUrl,
   title = 'See How HIPAA Hub Works',
   description = 'Watch a quick 3-minute demo to see how HIPAA Hub helps clinics achieve and maintain HIPAA compliance.',
@@ -39,8 +39,8 @@ export default function VideoSection({
     }
   };
 
-  // YouTube embed URL with autoplay
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0`;
+  // YouTube embed URL with autoplay and proper parameters
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`;
 
   return (
     <section className="relative w-full py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white via-[#f3f5f9] to-white overflow-hidden">
@@ -183,7 +183,9 @@ export default function VideoSection({
                   title={title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
+                  frameBorder="0"
                   className="absolute inset-0 w-full h-full"
+                  loading="lazy"
                 />
                 
                 {/* Close Button */}
