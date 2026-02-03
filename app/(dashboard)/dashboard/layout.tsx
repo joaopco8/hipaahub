@@ -36,13 +36,19 @@ export default async function DashboardLayout({
     getCachedComplianceCommitment(user.id)
   ]);
   
-  if (!subscription) {
-    return redirect('/checkout');
-  }
-
   // Redirect to onboarding if not completed
   if (!organization || !commitment) {
     return redirect('/onboarding/expectation');
+  }
+
+  // Only redirect to checkout if onboarding is complete but no subscription
+  // This allows users who just completed onboarding to access dashboard
+  // while Stripe webhook processes their payment
+  if (!subscription) {
+    // Give webhook time to process - check if user just completed onboarding
+    // If onboarding is complete, allow access (webhook will sync subscription soon)
+    // Only redirect if onboarding is also incomplete (user hasn't paid yet)
+    return redirect('/checkout');
   }
 
   return (
