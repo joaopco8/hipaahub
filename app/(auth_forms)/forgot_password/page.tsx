@@ -1,10 +1,67 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { requestPasswordUpdate } from '@/utils/auth-helpers/server';
+import { toast } from 'sonner';
 
-export default function Component() {
+export default function ForgotPasswordPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!email || !email.trim()) {
+      toast.error('Please enter your email address');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('email', email.trim());
+      
+      const redirectPath = await requestPasswordUpdate(formData);
+      
+      // Check if success or error based on redirect path
+      if (redirectPath.includes('status=success')) {
+        toast.success('Password reset email sent', {
+          description: 'Please check your email for a password reset link.'
+        });
+        
+        // Clear the form
+        setEmail('');
+        
+        // Optionally redirect after a delay
+        setTimeout(() => {
+          router.push('/signin');
+        }, 3000);
+      } else if (redirectPath.includes('error=')) {
+        // Extract error message from URL
+        const url = new URL(redirectPath, window.location.origin);
+        const errorMessage = url.searchParams.get('error_description') || 'Failed to send reset email';
+        toast.error('Error', {
+          description: errorMessage
+        });
+      }
+    } catch (error) {
+      console.error('Password reset error:', error);
+      toast.error('Something went wrong', {
+        description: 'Please try again later.'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-[100dvh] flex-col bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-8">
@@ -27,20 +84,29 @@ export default function Component() {
                 Enter your email to reset your password
               </p>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              Reset Password
-            </Button>
+            <form onSubmit={handleSubmit} className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                  required
+                />
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+              >
+                {isLoading ? 'Sending...' : 'Reset Password'}
+              </Button>
+            </form>
             <div className="text-center text-sm text-muted-foreground">
-              <span>Reset your password with your email</span>
+              <span>We&apos;ll send you a password reset link</span>
             </div>
             <div className="flex justify-center">
               <Link
