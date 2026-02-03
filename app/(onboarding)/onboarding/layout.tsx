@@ -8,56 +8,83 @@ export default async function OnboardingLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    const supabase = createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  // ALWAYS require authentication for onboarding
-  if (!user) {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Onboarding Layout: User not authenticated, redirecting to signup');
+    // Handle auth errors gracefully
+    if (authError) {
+      console.error('Onboarding Layout: Auth error:', authError);
+      redirect('/signup?redirect=checkout');
     }
+
+    // ALWAYS require authentication for onboarding
+    if (!user) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Onboarding Layout: User not authenticated, redirecting to signup');
+      }
+      redirect('/signup?redirect=checkout');
+    }
+
+    // If user is authenticated, check subscription status FIRST
+    if (user) {
+      try {
+        // ALWAYS verify subscription status before allowing onboarding access
+        const subscription = await getSubscription(supabase, user.id);
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Onboarding Layout: Checking subscription for user:', user.id);
+          console.log('Onboarding Layout: Subscription found:', subscription ? 'YES' : 'NO');
+        }
+        
+        // If no subscription, wait a moment and check again (webhook might be processing)
+        if (!subscription) {
+          // Wait 2 seconds for webhook to process
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          
+          // Check again
+          const retrySubscription = await getSubscription(supabase, user.id);
+          
+          if (!retrySubscription) {
+            // User doesn't have subscription, redirect to checkout
+            if (process.env.NODE_ENV === 'development') {
+              console.log('Onboarding Layout: User does NOT have subscription after retry, redirecting to checkout');
+            }
+            redirect('/checkout');
+          }
+        }
+        
+        // User has subscription, check if onboarding is already complete
+        const [organization, commitment] = await Promise.all([
+          getOrganization(supabase, user.id).catch(() => null),
+          getComplianceCommitment(supabase, user.id).catch(() => null)
+        ]);
+
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Onboarding Layout: Organization exists:', !!organization);
+          console.log('Onboarding Layout: Commitment exists:', !!commitment);
+        }
+
+        // If onboarding is complete, redirect to dashboard
+        if (organization && commitment) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Onboarding Layout: Onboarding complete, redirecting to dashboard');
+          }
+          redirect('/dashboard');
+        }
+      } catch (subscriptionError: any) {
+        console.error('Onboarding Layout: Error checking subscription/organization:', subscriptionError);
+        // Continue to onboarding even if there's an error (graceful degradation)
+        // The page itself will handle the error
+      }
+    }
+
+    return <OnboardingProvider>{children}</OnboardingProvider>;
+  } catch (error: any) {
+    console.error('Onboarding Layout: Unexpected error:', error);
+    // Redirect to signup on critical errors
     redirect('/signup?redirect=checkout');
   }
-
-  // If user is authenticated, check subscription status FIRST
-  if (user) {
-    // ALWAYS verify subscription status before allowing onboarding access
-    const subscription = await getSubscription(supabase, user.id);
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Onboarding Layout: Checking subscription for user:', user.id);
-      console.log('Onboarding Layout: Subscription found:', subscription ? 'YES' : 'NO');
-    }
-    
-    if (!subscription) {
-      // User doesn't have subscription, redirect to checkout
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Onboarding Layout: User does NOT have subscription, redirecting to checkout');
-      }
-      redirect('/checkout');
-    }
-    
-    // User has subscription, check if onboarding is already complete
-    const [organization, commitment] = await Promise.all([
-      getOrganization(supabase, user.id),
-      getComplianceCommitment(supabase, user.id)
-    ]);
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Onboarding Layout: Organization exists:', !!organization);
-      console.log('Onboarding Layout: Commitment exists:', !!commitment);
-    }
-
-    // If onboarding is complete, redirect to dashboard
-    if (organization && commitment) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Onboarding Layout: Onboarding complete, redirecting to dashboard');
-      }
-      redirect('/dashboard');
-    }
-  }
-
-  return <OnboardingProvider>{children}</OnboardingProvider>;
 }
 
 
