@@ -270,13 +270,26 @@ export default async function DashboardPage() {
       ? Math.round((requiredEvidenceCompleted / requiredEvidenceFieldIds.length) * 100)
       : 0;
 
+  // Calculate Risk Assessment completion percentage based on answered questions
+  // Import QUESTIONS to get total count
+  const { QUESTIONS } = await import('@/app/(onboarding)/onboarding/risk-assessment/questions');
+  const totalQuestions = QUESTIONS.length;
+  const answeredQuestions = riskAssessment?.answers 
+    ? Object.keys(riskAssessment.answers as Record<string, any>).length 
+    : 0;
+  const riskAssessmentCompletionPercent = totalQuestions > 0
+    ? Math.round((answeredQuestions / totalQuestions) * 100)
+    : 0;
+
   // Audit readiness score (normalized weights to avoid fake 0% when a signal is unavailable)
+  // Risk Assessment completion is now the PRIMARY factor (40% weight) since it's the core compliance activity
   const readinessSignals: Array<{ weight: number; value: number | null }> = [
-    { weight: 0.35, value: requiredEvidencePercent },
-    { weight: 0.25, value: trainingCoveragePercent },
-    { weight: 0.15, value: hasMandatorySraEvidence ? 100 : 0 },
-    { weight: 0.15, value: hasDesignatedSecurityOfficer ? 100 : 0 },
-    { weight: 0.10, value: policyCoverage?.percent ?? null }
+    { weight: 0.40, value: riskAssessmentCompletionPercent }, // PRIMARY: Based on 150 questions answered
+    { weight: 0.25, value: requiredEvidencePercent },
+    { weight: 0.15, value: trainingCoveragePercent },
+    { weight: 0.10, value: hasMandatorySraEvidence ? 100 : 0 },
+    { weight: 0.05, value: hasDesignatedSecurityOfficer ? 100 : 0 },
+    { weight: 0.05, value: policyCoverage?.percent ?? null }
   ];
 
   const totalWeight = readinessSignals.reduce((sum, s) => sum + (s.value === null ? 0 : s.weight), 0);
