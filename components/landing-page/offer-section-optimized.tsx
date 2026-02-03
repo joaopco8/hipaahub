@@ -20,11 +20,26 @@ export default function OfferSectionOptimized() {
       if (result.type === 'redirect') {
         window.location.href = result.path;
       } else if (result.type === 'checkout') {
-        const stripe = await getStripe();
-        if (stripe) {
-          await stripe.redirectToCheckout({ sessionId: result.sessionId });
-        } else {
-          window.location.href = '/signup?redirect=checkout';
+        try {
+          const stripe = await getStripe();
+          if (stripe) {
+            await stripe.redirectToCheckout({ sessionId: result.sessionId });
+          } else {
+            // Fallback: use session URL if Stripe.js fails
+            if (result.sessionUrl) {
+              window.location.href = result.sessionUrl;
+            } else {
+              window.location.href = '/signup?redirect=checkout';
+            }
+          }
+        } catch (stripeError: any) {
+          console.error('Stripe.js error, using session URL:', stripeError);
+          // Fallback: use session URL if Stripe.js throws error
+          if (result.sessionUrl) {
+            window.location.href = result.sessionUrl;
+          } else {
+            window.location.href = '/signup?redirect=checkout';
+          }
         }
       } else if (result.type === 'error') {
         window.location.href = '/signup?redirect=checkout';

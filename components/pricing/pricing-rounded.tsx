@@ -62,7 +62,7 @@ export default function PricingRounded({
       return router.push('/signup');
     }
 
-    const { errorRedirect, sessionId } = await checkoutWithStripe(
+    const { errorRedirect, sessionId, sessionUrl } = await checkoutWithStripe(
       price,
       currentPath
     );
