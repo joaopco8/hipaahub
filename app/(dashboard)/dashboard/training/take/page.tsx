@@ -381,8 +381,8 @@ export default function TakeTrainingPage() {
               HIPAA violations can result in severe federal penalties:
             </p>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
-              <li><strong>Civil penalties:</strong> $100 to $50,000 per violation, up to $1.5 million per year</li>
-              <li><strong>Criminal penalties:</strong> Up to $250,000 in fines and up to 10 years in prison</li>
+              <li><strong className="text-zinc-700">Civil penalties:</strong> $100 to $50,000 per violation, up to $1.5 million per year</li>
+              <li><strong className="text-zinc-700">Criminal penalties:</strong> Up to $250,000 in fines and up to 10 years in prison</li>
               <li>Personal liability for individual workforce members</li>
             </ul>
           </div>
