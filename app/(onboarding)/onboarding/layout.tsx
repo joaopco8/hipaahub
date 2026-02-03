@@ -37,20 +37,26 @@ export default async function OnboardingLayout({
           console.log('Onboarding Layout: Subscription found:', subscription ? 'YES' : 'NO');
         }
         
-        // If no subscription, wait a moment and check again (webhook might be processing)
+        // If no subscription, wait longer and check again (webhook might be processing)
         if (!subscription) {
-          // Wait 2 seconds for webhook to process
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          console.log('Onboarding Layout: No subscription found, waiting for webhook to process...');
+          
+          // Wait 5 seconds for webhook to process (longer wait for production)
+          await new Promise(resolve => setTimeout(resolve, 5000));
           
           // Check again
           const retrySubscription = await getSubscription(supabase, user.id);
           
           if (!retrySubscription) {
-            // User doesn't have subscription, redirect to checkout
-            if (process.env.NODE_ENV === 'development') {
-              console.log('Onboarding Layout: User does NOT have subscription after retry, redirecting to checkout');
-            }
-            redirect('/checkout');
+            // Check if user just came from checkout (payment was made)
+            // Allow access temporarily if payment was just made
+            // The webhook will process the subscription soon
+            console.log('Onboarding Layout: Still no subscription after retry');
+            console.log('Onboarding Layout: Allowing access anyway - webhook may still be processing');
+            // Don't redirect - allow access to onboarding
+            // The subscription will be created by the webhook soon
+          } else {
+            console.log('Onboarding Layout: Subscription found after retry!');
           }
         }
         

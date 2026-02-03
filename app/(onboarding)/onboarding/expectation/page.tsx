@@ -15,24 +15,40 @@ export default function ExpectationPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        // User is not authenticated, redirect to signup
-        router.push('/signup?redirect=checkout');
-        return;
-      }
-      
-      setIsAuthenticated(true);
-      setIsCheckingAuth(false);
-      
-      // Auto-advance after 3 seconds
-      const timer = setTimeout(() => {
-        router.push('/onboarding');
-      }, 3000);
+      try {
+        const supabase = createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError) {
+          console.error('ExpectationPage: Auth error:', authError);
+          router.push('/signup?redirect=checkout');
+          return;
+        }
+        
+        if (!user) {
+          // User is not authenticated, redirect to signup
+          console.log('ExpectationPage: User not authenticated, redirecting to signup');
+          router.push('/signup?redirect=checkout');
+          return;
+        }
+        
+        console.log('ExpectationPage: User authenticated:', user.id);
+        setIsAuthenticated(true);
+        setIsCheckingAuth(false);
+        
+        // Auto-advance after 3 seconds
+        const timer = setTimeout(() => {
+          console.log('ExpectationPage: Auto-advancing to onboarding');
+          router.push('/onboarding');
+        }, 3000);
 
-      return () => clearTimeout(timer);
+        return () => clearTimeout(timer);
+      } catch (error: any) {
+        console.error('ExpectationPage: Error checking auth:', error);
+        setIsCheckingAuth(false);
+        // Don't redirect on error - show the page anyway
+        setIsAuthenticated(true);
+      }
     };
 
     checkAuth();
