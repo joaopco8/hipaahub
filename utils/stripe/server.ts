@@ -169,30 +169,13 @@ export async function checkoutWithStripe(
         try {
           // Use service role key directly to bypass RLS
           const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-          if (serviceRoleKey) {
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+          
+          if (serviceRoleKey && supabaseUrl) {
             const { createClient } = await import('@supabase/supabase-js');
-            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-            if (supabaseUrl) {
-              const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
-          
-          const { error: updateError } = await adminSupabase
-            .from('prices')
-            .update({
-              type: stripePrice.type,
-              interval: stripePrice.recurring?.interval ?? null,
-              interval_count: stripePrice.recurring?.interval_count ?? null,
-              unit_amount: stripePrice.unit_amount,
-              currency: stripePrice.currency,
-              active: stripePrice.active,
-              trial_period_days: stripePrice.recurring?.trial_period_days ?? null
-            })
-            .eq('id', price.id);
-          
-          if (updateError) {
-            console.error('❌ Failed to update price in database:', updateError);
-            // Try with regular client as fallback
-            const supabase = createClient();
-            const { error: fallbackError } = await supabase
+            const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+            
+            const { error: updateError } = await adminSupabase
               .from('prices')
               .update({
                 type: stripePrice.type,
@@ -200,23 +183,37 @@ export async function checkoutWithStripe(
                 interval_count: stripePrice.recurring?.interval_count ?? null,
                 unit_amount: stripePrice.unit_amount,
                 currency: stripePrice.currency,
-                active: stripePrice.active
+                active: stripePrice.active,
+                trial_period_days: stripePrice.recurring?.trial_period_days ?? null
               })
               .eq('id', price.id);
             
-            if (fallbackError) {
-              console.error('❌ Fallback update also failed:', fallbackError);
+            if (updateError) {
+              console.error('❌ Failed to update price in database:', updateError);
+              // Try with regular client as fallback
+              const supabase = createClient();
+              const { error: fallbackError } = await supabase
+                .from('prices')
+                .update({
+                  type: stripePrice.type,
+                  interval: stripePrice.recurring?.interval ?? null,
+                  interval_count: stripePrice.recurring?.interval_count ?? null,
+                  unit_amount: stripePrice.unit_amount,
+                  currency: stripePrice.currency,
+                  active: stripePrice.active
+                })
+                .eq('id', price.id);
+              
+              if (fallbackError) {
+                console.error('❌ Fallback update also failed:', fallbackError);
+              } else {
+                console.log('✅ Price updated in database (using fallback method)');
+              }
             } else {
-              console.log('✅ Price updated in database (using fallback method)');
+              console.log('✅ Price updated in database to match Stripe');
             }
           } else {
-            console.log('✅ Price updated in database to match Stripe');
-          }
-            } else {
-              console.warn('⚠️ SUPABASE_SERVICE_ROLE_KEY not available, skipping database update');
-            }
-          } else {
-            console.warn('⚠️ SUPABASE_SERVICE_ROLE_KEY not configured, skipping database update');
+            console.warn('⚠️ SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL not configured, skipping database update');
           }
         } catch (updateError: any) {
           console.error('❌ Error updating price in database:', updateError);
