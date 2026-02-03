@@ -190,9 +190,9 @@ export async function checkoutWithStripe(
             
             if (updateError) {
               console.error('❌ Failed to update price in database:', updateError);
-              // Try with regular client as fallback
-              const supabase = createClient();
-              const { error: fallbackError } = await supabase
+              // Try with regular client as fallback (from server utils)
+              const fallbackSupabase = createClient();
+              const { error: fallbackError } = await fallbackSupabase
                 .from('prices')
                 .update({
                   type: stripePrice.type,
