@@ -43,12 +43,12 @@ export default async function ContactPage() {
               <p className="text-sm text-zinc-600 mb-2">Email address:</p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 text-base font-mono text-zinc-900 bg-white px-3 py-2 rounded border border-zinc-200">
-                  contact@hipaahub.com
+                  contact@hipaahubhealth.com
                 </code>
-                <CopyEmailButton email="contact@hipaahub.com" />
+                <CopyEmailButton email="contact@hipaahubhealth.com" />
               </div>
             </div>
-            <a href="mailto:contact@hipaahub.com">
+            <a href="mailto:contact@hipaahubhealth.com">
               <Button className="w-full bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#0c0b1d] hover:text-white">
                 <Mail className="mr-2 h-4 w-4" />
                 Open Email Client

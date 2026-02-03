@@ -83,7 +83,7 @@ export default function BAAPage() {
               </p>
               <div className="bg-white p-6 rounded-lg border border-zinc-200 mt-4">
                 <p className="mb-2"><strong>HIPAA Hub Inc.</strong></p>
-                <p className="mb-2">Email: compliance@hipaahub.com</p>
+                <p className="mb-2">Email: contact@hipaahubhealth.com</p>
                 <p>Website: https://hipaahub.com</p>
               </div>
             </section>

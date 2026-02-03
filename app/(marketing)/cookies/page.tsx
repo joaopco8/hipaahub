@@ -135,7 +135,7 @@ export default function CookiePolicyPage() {
                 If you have questions about our use of cookies, please contact us at:
               </p>
               <p className="text-zinc-700 font-extralight leading-relaxed">
-                Email: <a href="mailto:hello@hipaahub.com" className="text-[#1ad07a] hover:underline">hello@hipaahub.com</a>
+                Email: <a href="mailto:contact@hipaahubhealth.com" className="text-[#1ad07a] hover:underline">contact@hipaahubhealth.com</a>
               </p>
             </section>
           </div>

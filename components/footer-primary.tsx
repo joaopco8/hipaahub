@@ -102,7 +102,7 @@ export default function FooterPrimary() {
             <div className="space-y-6">
               <div className="flex items-start gap-4 text-white/70">
                 <Mail className="w-5 h-5 text-[#1acb77] shrink-0 mt-0.5" />
-                <span className="font-light">hello@hipaahub.com</span>
+                <span className="font-light">contact@hipaahubhealth.com</span>
               </div>
             </div>
             
