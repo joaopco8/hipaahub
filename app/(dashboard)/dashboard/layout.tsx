@@ -36,23 +36,30 @@ export default async function DashboardLayout({
     getCachedComplianceCommitment(user.id)
   ]);
   
-  // If user has active subscription, ALWAYS allow access (never redirect to checkout)
-  if (subscription) {
-    // Redirect to onboarding if not completed
-    if (!organization || !commitment) {
-      return redirect('/onboarding/expectation');
+  // Log for debugging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Dashboard Layout: User:', user.id);
+    console.log('Dashboard Layout: Has subscription:', !!subscription);
+    console.log('Dashboard Layout: Has organization:', !!organization);
+    console.log('Dashboard Layout: Has commitment:', !!commitment);
+  }
+  
+  // Redirect to onboarding if not completed (regardless of subscription)
+  if (!organization || !commitment) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Dashboard Layout: Onboarding incomplete, redirecting to onboarding');
     }
-    // User has subscription and onboarding complete → allow access
-    // No need to check anything else
-  } else {
-    // User doesn't have subscription yet
-    // Redirect to onboarding if not completed
-    if (!organization || !commitment) {
-      return redirect('/onboarding/expectation');
+    return redirect('/onboarding/expectation');
+  }
+
+  // If onboarding is complete, ALWAYS allow access to dashboard
+  // Even if subscription hasn't synced yet (webhook may still be processing)
+  // NEVER redirect to checkout if onboarding is complete
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Dashboard Layout: Onboarding complete, allowing dashboard access');
+    if (!subscription) {
+      console.log('Dashboard Layout: No subscription yet, but onboarding complete - allowing access');
     }
-    // Onboarding is complete but no subscription yet
-    // Allow access anyway (webhook may still be processing after payment)
-    // Don't redirect to checkout if onboarding is complete
   }
 
   return (
