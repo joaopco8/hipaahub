@@ -191,7 +191,9 @@ export async function checkoutWithStripe(
             if (updateError) {
               console.error('❌ Failed to update price in database:', updateError);
               // Try with regular client as fallback (from server utils)
-              const fallbackSupabase = createClient();
+              // Use the createClient from top-level import, not the dynamic one
+              const { createClient: createServerClient } = await import('@/utils/supabase/server');
+              const fallbackSupabase = createServerClient();
               const { error: fallbackError } = await fallbackSupabase
                 .from('prices')
                 .update({
