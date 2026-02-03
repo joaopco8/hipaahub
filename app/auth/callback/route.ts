@@ -134,12 +134,13 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${requestUrl.origin}/checkout`);
       }
       
-      // No redirect param - check onboarding status
+      // No redirect param - check onboarding status FIRST
+      // If onboarding is complete, ALWAYS allow dashboard access (never redirect to checkout)
       if (organization && commitment) {
-        // Onboarding complete but no subscription yet (webhook may be processing)
-        // Allow access to dashboard (don't redirect to checkout)
+        // Onboarding complete → ALWAYS go to dashboard (even without subscription)
+        // Webhook may still be processing, but user should have access
         if (process.env.NODE_ENV === 'development') {
-          console.log('Auth callback: Onboarding complete but no subscription yet, allowing dashboard access');
+          console.log('Auth callback: Onboarding complete, allowing dashboard access (subscription may be processing)');
         }
         return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
       } else {

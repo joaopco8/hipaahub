@@ -25,7 +25,9 @@ const relevantEvents = new Set([
   'checkout.session.completed',
   'customer.subscription.created',
   'customer.subscription.updated',
-  'customer.subscription.deleted'
+  'customer.subscription.deleted',
+  'invoice.payment_succeeded',
+  'invoice.paid'
 ]);
 
 export async function POST(req: Request) {
@@ -135,18 +137,28 @@ export async function POST(req: Request) {
           console.log('✅ Checkout session completed event handled');
           break;
         case 'invoice.payment_succeeded':
+        case 'invoice.paid':
           const invoice = event.data.object as Stripe.Invoice;
+          console.log('✅ Handling invoice payment event:', event.type);
+          console.log('Invoice ID:', invoice.id);
+          console.log('Invoice subscription:', invoice.subscription);
+          console.log('Invoice customer:', invoice.customer);
+          console.log('Invoice billing reason:', invoice.billing_reason);
 
-          console.log('Invoice', invoice);
-          console.log('Invoice subscripton reason', invoice.billing_reason);
-
-          if (invoice.billing_reason === 'subscription_cycle') {
-            const subscriptionId = invoice.subscription;
-            const customerId = invoice.customer;
-
-            console.log('It is subscription cycle.');
-
-            console.log(`Successfully reset questions_counter for user `);
+          // If invoice has a subscription, ensure it's synced to database
+          if (invoice.subscription && invoice.customer) {
+            const subscriptionId = invoice.subscription as string;
+            const customerId = invoice.customer as string;
+            
+            console.log('Processing subscription from invoice:', subscriptionId, 'for customer:', customerId);
+            await manageSubscriptionStatusChange(
+              subscriptionId,
+              customerId,
+              invoice.billing_reason === 'subscription_create' || invoice.billing_reason === 'subscription_cycle'
+            );
+            console.log('✅ Subscription synced from invoice payment');
+          } else {
+            console.log('⚠️  Invoice does not have subscription or customer ID');
           }
           break;
         default:
