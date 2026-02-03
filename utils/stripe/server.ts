@@ -304,12 +304,29 @@ export async function checkoutWithStripe(
     }
 
     // Instead of returning a Response, just return the data or error.
-    if (session && session.url) {
+    if (session) {
+      console.log('checkoutWithStripe: Session created successfully', {
+        sessionId: session.id,
+        hasUrl: !!session.url,
+        url: session.url ? session.url.substring(0, 50) + '...' : 'N/A',
+        mode: session.mode,
+        status: session.status
+      });
+      
+      if (!session.url) {
+        console.error('checkoutWithStripe: WARNING - Session created but no URL returned!', {
+          sessionId: session.id,
+          mode: session.mode,
+          status: session.status
+        });
+      }
+      
       return { 
         sessionId: session.id,
-        sessionUrl: session.url 
+        sessionUrl: session.url || undefined
       };
     } else {
+      console.error('checkoutWithStripe: Session creation returned null/undefined');
       throw new Error('Unable to create checkout session.');
     }
   } catch (error) {

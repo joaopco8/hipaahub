@@ -75,13 +75,31 @@ export default function CheckoutPage() {
           window.location.href = result.path;
         } else if (result.type === 'checkout') {
           // User can proceed to checkout
-          console.log('CheckoutPage: Proceeding to Stripe checkout...');
+          console.log('CheckoutPage: Proceeding to Stripe checkout...', {
+            sessionId: result.sessionId,
+            hasSessionUrl: !!result.sessionUrl,
+            sessionUrl: result.sessionUrl
+          });
+          
+          // PRIORITY: Always use sessionUrl if available (most reliable)
+          if (result.sessionUrl) {
+            console.log('CheckoutPage: Using sessionUrl for direct redirect:', result.sessionUrl);
+            setHasRedirected(true);
+            window.location.href = result.sessionUrl;
+            return; // Exit early, redirect is happening
+          }
+          
+          // Fallback: Try Stripe.js if sessionUrl is not available
+          console.log('CheckoutPage: sessionUrl not available, trying Stripe.js...');
           setHasRedirected(true);
           
           try {
+            console.log('CheckoutPage: Attempting to load Stripe.js...');
             const stripe = await getStripe();
+            console.log('CheckoutPage: Stripe.js loaded:', !!stripe);
+            
             if (stripe) {
-              console.log('CheckoutPage: Redirecting to Stripe checkout with session:', result.sessionId);
+              console.log('CheckoutPage: Redirecting via Stripe.js with sessionId:', result.sessionId);
               const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: result.sessionId });
               if (stripeError) {
                 console.error('CheckoutPage: Stripe redirect error:', stripeError);
@@ -90,26 +108,20 @@ export default function CheckoutPage() {
                 setHasRedirected(false);
               }
             } else {
-              console.error('CheckoutPage: Stripe returned null, using session URL');
-              // Fallback: use the session URL from Stripe if available
-              if (result.sessionUrl) {
-                window.location.href = result.sessionUrl;
-              } else {
-                setError('Unable to redirect to checkout. Please try again.');
-                setIsLoading(false);
-                setHasRedirected(false);
-              }
-            }
-          } catch (stripeLoadError: any) {
-            console.error('CheckoutPage: Error loading Stripe.js, using session URL:', stripeLoadError);
-            // Fallback: use the session URL from Stripe if Stripe.js fails
-            if (result.sessionUrl) {
-              window.location.href = result.sessionUrl;
-            } else {
-              setError(`Failed to load Stripe: ${stripeLoadError.message || 'Please check your Stripe configuration and refresh the page.'}`);
+              console.error('CheckoutPage: Stripe.js returned null');
+              setError('Unable to redirect to checkout. Please try again or contact support.');
               setIsLoading(false);
               setHasRedirected(false);
             }
+          } catch (stripeLoadError: any) {
+            console.error('CheckoutPage: Error loading Stripe.js:', {
+              message: stripeLoadError.message,
+              stack: stripeLoadError.stack,
+              name: stripeLoadError.name
+            });
+            setError(`Failed to load Stripe: ${stripeLoadError.message || 'Please check your Stripe configuration and refresh the page.'}`);
+            setIsLoading(false);
+            setHasRedirected(false);
           }
         } else if (result.type === 'error') {
           // Error occurred
