@@ -1,47 +1,25 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Play, X, CheckCircle2, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 interface VideoSectionProps {
-  videoId?: string; // YouTube video ID (e.g., "dQw4w9WgXcQ")
-  thumbnailUrl?: string; // Custom thumbnail URL (optional)
+  videoId?: string;
   title?: string;
   description?: string;
 }
 
 export default function VideoSection({
-  videoId = 'Ir9bUDr4Op4', // Default video ID
-  thumbnailUrl,
-  title = 'See How HIPAA Hub Works',
-  description = 'Watch a quick 3-minute demo to see how HIPAA Hub helps clinics achieve and maintain HIPAA compliance.',
+  videoId = 'Ir9bUDr4Op4',
+  title = 'See How HIPAA Hub Works in 3 Minutes',
+  description = 'Watch a quick demo to see how HIPAA Hub helps clinics achieve and maintain HIPAA compliance without the stress.',
 }: VideoSectionProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Generate thumbnail URL from YouTube video ID if not provided
-  const thumbnail = thumbnailUrl || `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-
-  const handlePlay = () => {
-    setIsPlaying(true);
-  };
-
-  const handleClose = () => {
-    setIsPlaying(false);
-    // Pause video when closing
-    if (iframeRef.current) {
-      const iframe = iframeRef.current;
-      iframe.src = iframe.src; // Reset iframe to pause video
-    }
-  };
-
-  // YouTube embed URL with autoplay and proper parameters
-  // Using /embed/ format (not /watch/) and including necessary parameters
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : 'https://hipaahubhealth.com'}`;
+  // YouTube embed URL
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
 
   return (
     <section className="relative w-full py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white via-[#f3f5f9] to-white overflow-hidden">
@@ -62,148 +40,48 @@ export default function VideoSection({
           </p>
         </motion.div>
 
-        {/* Video Container */}
+        {/* YouTube Video Container */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.8, delay: 0.2 }}
           className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl bg-[#0c0b1d]"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
         >
-          <AnimatePresence mode="wait">
-            {!isPlaying ? (
-              // Thumbnail with Play Button Overlay
-              <motion.div
-                key="thumbnail"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="relative w-full h-full cursor-pointer group"
-                onClick={handlePlay}
-              >
-                {/* Thumbnail Image */}
-                <div className="absolute inset-0">
-                  <Image
-                    src={thumbnail}
-                    alt="Video thumbnail"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                    priority={false}
-                    unoptimized={thumbnail.includes('youtube.com')}
-                  />
-                  {/* Dark overlay for better contrast */}
-                  <div className="absolute inset-0 bg-[#0c0b1d]/40 group-hover:bg-[#0c0b1d]/30 transition-colors duration-300" />
-                </div>
-
-                {/* Play Button - Pulsing Animation */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.button
-                    className="relative z-10 w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#1ad07a] flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-300"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
+          {!isPlaying ? (
+            <div
+              className="relative w-full h-full cursor-pointer"
+              onClick={() => setIsPlaying(true)}
+            >
+              {/* YouTube Thumbnail */}
+              <img
+                src={`https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`}
+                alt="Video thumbnail"
+                className="w-full h-full object-cover"
+              />
+              {/* Play Button Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-red-600 flex items-center justify-center hover:bg-red-700 transition-colors">
+                  <svg
+                    className="w-10 h-10 md:w-12 md:h-12 text-white ml-1"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    {/* Pulsing Rings */}
-                    <motion.div
-                      className="absolute inset-0 rounded-full bg-[#1ad07a]"
-                      animate={{
-                        scale: [1, 1.5, 1.8],
-                        opacity: [0.6, 0.3, 0],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: 'easeOut',
-                      }}
-                    />
-                    <motion.div
-                      className="absolute inset-0 rounded-full bg-[#1ad07a]"
-                      animate={{
-                        scale: [1, 1.3, 1.6],
-                        opacity: [0.6, 0.3, 0],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        delay: 0.3,
-                        ease: 'easeOut',
-                      }}
-                    />
-                    <motion.div
-                      className="absolute inset-0 rounded-full bg-[#1ad07a]"
-                      animate={{
-                        scale: [1, 1.2, 1.4],
-                        opacity: [0.6, 0.3, 0],
-                      }}
-                      transition={{
-                        duration: 2,
-                        delay: 0.6,
-                        repeat: Infinity,
-                        ease: 'easeOut',
-                      }}
-                    />
-
-                    {/* Play Icon */}
-                    <div className="relative z-10 flex items-center justify-center">
-                      <Play className="w-8 h-8 md:w-10 md:h-10 text-[#0c0b1d] ml-1" fill="currentColor" />
-                    </div>
-                  </motion.button>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
                 </div>
-
-                {/* Hover Text */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 10 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-10"
-                >
-                  <p className="text-white font-light text-sm md:text-base px-4 py-2 bg-black/40 backdrop-blur-sm rounded-full">
-                    Click to play video
-                  </p>
-                </motion.div>
-              </motion.div>
-            ) : (
-              // YouTube Embed
-              <motion.div
-                key="video"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
-                className="relative w-full h-full"
-              >
-                <iframe
-                  ref={iframeRef}
-                  src={embedUrl}
-                  title={title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                  frameBorder="0"
-                  className="absolute inset-0 w-full h-full"
-                  loading="lazy"
-                />
-                
-                {/* Close Button */}
-                <motion.button
-                  onClick={handleClose}
-                  className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-sm flex items-center justify-center transition-colors duration-200"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <X className="w-5 h-5 text-white" />
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </div>
+          ) : (
+            <iframe
+              src={embedUrl}
+              title={title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full"
+              style={{ border: 0 }}
+            />
+          )}
         </motion.div>
 
         {/* CTA Button with Benefits */}
