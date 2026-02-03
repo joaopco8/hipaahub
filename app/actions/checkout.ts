@@ -312,11 +312,18 @@ export async function initiateCheckout(): Promise<CheckoutResult> {
     }
 
     if (!sessionId) {
+      console.error('initiateCheckout: No sessionId returned from checkoutWithStripe');
       return { type: 'error', message: 'Failed to create checkout session. Please try again.' };
     }
 
-    // Return checkout session ID for client-side redirect
-    return { type: 'checkout', sessionId };
+    console.log('initiateCheckout: Checkout session created successfully', {
+      sessionId,
+      hasSessionUrl: !!sessionUrl,
+      sessionUrl: sessionUrl ? sessionUrl.substring(0, 50) + '...' : 'N/A'
+    });
+
+    // Return checkout session ID and URL for client-side redirect
+    return { type: 'checkout', sessionId, sessionUrl };
   } catch (error: any) {
     // Catch and return currency or other Stripe errors
     console.error('Error in checkoutWithStripe:', error);
