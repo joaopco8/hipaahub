@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { ArrowRight, ChevronLeft, ChevronRight, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { FadeIn } from './animated-section';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const testimonials = [
   {
@@ -104,16 +103,24 @@ export default function TestimonialsSection() {
           </FadeIn>
 
           {/* Testimonial Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {visibleTestimonials.map((testimonial, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-shadow"
-              >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 relative">
+            <AnimatePresence mode="popLayout">
+              {visibleTestimonials.map((testimonial, idx) => {
+                const actualIndex = currentIndex + idx;
+                return (
+                  <motion.div
+                    key={actualIndex}
+                    initial={{ opacity: 0, x: 50, scale: 0.95 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: -50, scale: 0.95 }}
+                    transition={{ 
+                      duration: 0.4, 
+                      ease: [0.4, 0, 0.2, 1],
+                      delay: idx * 0.1 
+                    }}
+                    layout
+                    className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-shadow"
+                  >
                 {/* Title */}
                 <h4 className="text-lg font-semibold text-[#0c0b1d] mb-3">
                   {testimonial.title}
@@ -157,38 +164,35 @@ export default function TestimonialsSection() {
                     </span>
                   </div>
                 </div>
-              </motion.div>
-            ))}
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
 
           {/* Navigation Controls */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-start">
             {/* Arrow Buttons */}
             <div className="flex gap-3">
-              <button
+              <motion.button
                 onClick={handlePrev}
                 disabled={currentIndex === 0}
                 className="w-12 h-12 rounded-lg bg-zinc-100 border border-zinc-300 flex items-center justify-center text-zinc-600 hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                whileHover={{ scale: currentIndex === 0 ? 1 : 1.05 }}
+                whileTap={{ scale: currentIndex === 0 ? 1 : 0.95 }}
               >
                 <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={handleNext}
                 disabled={currentIndex >= testimonials.length - 3}
                 className="w-12 h-12 rounded-lg bg-zinc-100 border border-zinc-300 flex items-center justify-center text-zinc-600 hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                whileHover={{ scale: currentIndex >= testimonials.length - 3 ? 1 : 1.05 }}
+                whileTap={{ scale: currentIndex >= testimonials.length - 3 ? 1 : 0.95 }}
               >
                 <ChevronRight className="w-5 h-5" />
-              </button>
+              </motion.button>
             </div>
-            
-            {/* See All Button */}
-            <Button
-              variant="outline"
-              className="border border-[#1ad07a] text-[#1ad07a] hover:bg-[#1ad07a] hover:text-white font-extralight rounded-lg px-6"
-            >
-              See all
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
           </div>
       </div>
     </section>
