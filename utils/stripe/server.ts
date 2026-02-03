@@ -16,6 +16,7 @@ type Price = Tables<'prices'>;
 type CheckoutResponse = {
   errorRedirect?: string;
   sessionId?: string;
+  sessionUrl?: string;
 };
 
 export async function checkoutWithStripe(
@@ -303,8 +304,11 @@ export async function checkoutWithStripe(
     }
 
     // Instead of returning a Response, just return the data or error.
-    if (session) {
-      return { sessionId: session.id };
+    if (session && session.url) {
+      return { 
+        sessionId: session.id,
+        sessionUrl: session.url 
+      };
     } else {
       throw new Error('Unable to create checkout session.');
     }

@@ -43,8 +43,8 @@ async function hasActiveSubscription(userId: string): Promise<boolean> {
 }
 
 export type CheckoutResult = 
-  | { type: 'redirect'; path: string } 
-  | { type: 'checkout'; sessionId: string }
+  | { type: 'redirect'; path: string }
+  | { type: 'checkout'; sessionId: string; sessionUrl?: string }
   | { type: 'error'; message: string };
 
 /**
@@ -281,7 +281,7 @@ export async function initiateCheckout(): Promise<CheckoutResult> {
 
   // Initiate checkout
   try {
-    const { errorRedirect, sessionId } = await checkoutWithStripe(
+    const { errorRedirect, sessionId, sessionUrl } = await checkoutWithStripe(
       selectedPrice,
       '/onboarding/expectation' // After payment, go to onboarding
     );
