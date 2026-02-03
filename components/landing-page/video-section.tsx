@@ -222,7 +222,7 @@ export default function VideoSection({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              Get Started with HIPAA Guard
+              Get Started with HIPAA Hub
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
             
