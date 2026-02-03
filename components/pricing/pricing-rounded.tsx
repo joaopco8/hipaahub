@@ -83,8 +83,21 @@ export default function PricingRounded({
       );
     }
 
-    const stripe = await getStripe();
-    stripe?.redirectToCheckout({ sessionId });
+    try {
+      const stripe = await getStripe();
+      if (stripe) {
+        await stripe.redirectToCheckout({ sessionId });
+      } else if (sessionUrl) {
+        // Fallback: use session URL if Stripe.js fails
+        window.location.href = sessionUrl;
+      }
+    } catch (stripeError: any) {
+      console.error('Stripe.js error, using session URL:', stripeError);
+      // Fallback: use session URL if Stripe.js throws error
+      if (sessionUrl) {
+        window.location.href = sessionUrl;
+      }
+    }
 
     setPriceIdLoading(undefined);
   };
