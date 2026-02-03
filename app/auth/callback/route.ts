@@ -89,71 +89,66 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(redirectUrl);
       }
 
-      // Check if user came from checkout flow (check redirect parameter)
-      const redirectParam = requestUrl.searchParams.get('redirect');
-      
-      // If redirect is checkout, verify subscription status FIRST
-      if (redirectParam === 'checkout') {
-        // Check if user has active subscription
-        const { getSubscription } = await import('@/utils/supabase/queries');
-        const subscription = await getSubscription(supabase, user.id);
-        
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Auth callback: Checking subscription for user:', user.id);
-          console.log('Auth callback: Subscription found:', subscription ? 'YES' : 'NO');
-        }
-        
-        if (subscription) {
-          // User has active subscription, redirect to dashboard
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Auth callback: User has subscription, redirecting to dashboard');
-          }
-          return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
-        } else {
-          // User doesn't have subscription, proceed to checkout
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Auth callback: User does NOT have subscription, redirecting to checkout');
-          }
-          return NextResponse.redirect(`${requestUrl.origin}/checkout`);
-        }
-      }
-
-      // ALWAYS verify subscription status before allowing dashboard access
+      // Check subscription and onboarding status
       const { getSubscription, getOrganization, getComplianceCommitment } = await import('@/utils/supabase/queries');
       const subscription = await getSubscription(supabase, user.id);
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Auth callback (no redirect param): Checking subscription for user:', user.id);
-        console.log('Auth callback: Subscription found:', subscription ? 'YES' : 'NO');
-      }
-      
-      if (!subscription) {
-        // User doesn't have subscription, redirect to checkout
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Auth callback: User does NOT have subscription, redirecting to checkout');
-        }
-        return NextResponse.redirect(`${requestUrl.origin}/checkout`);
-      }
-
-      // User has subscription, check onboarding status
       const [organization, commitment] = await Promise.all([
         getOrganization(supabase, user.id),
         getComplianceCommitment(supabase, user.id)
       ]);
-
-      // If onboarding is complete, go to dashboard
-      if (organization && commitment) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Auth callback: User has subscription and onboarding complete, redirecting to dashboard');
-        }
-        return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Auth callback: Checking subscription for user:', user.id);
+        console.log('Auth callback: Subscription found:', subscription ? 'YES' : 'NO');
+        console.log('Auth callback: Onboarding complete:', (organization && commitment) ? 'YES' : 'NO');
       }
       
-      // Otherwise, redirect to onboarding
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Auth callback: User has subscription but onboarding incomplete, redirecting to onboarding');
+      // If user has active subscription, ALWAYS allow access (never redirect to checkout)
+      if (subscription) {
+        // User has subscription, check onboarding status
+        if (organization && commitment) {
+          // Onboarding complete → go to dashboard
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Auth callback: User has subscription and onboarding complete, redirecting to dashboard');
+          }
+          return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
+        } else {
+          // Onboarding incomplete → go to onboarding
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Auth callback: User has subscription but onboarding incomplete, redirecting to onboarding');
+          }
+          return NextResponse.redirect(`${requestUrl.origin}/onboarding/expectation`);
+        }
       }
-      return NextResponse.redirect(`${requestUrl.origin}/onboarding/expectation`);
+      
+      // User doesn't have subscription yet
+      // Check if user came from checkout flow (check redirect parameter)
+      const redirectParam = requestUrl.searchParams.get('redirect');
+      
+      if (redirectParam === 'checkout') {
+        // User came from checkout flow but doesn't have subscription yet
+        // Allow them to proceed to checkout
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Auth callback: User came from checkout flow, redirecting to checkout');
+        }
+        return NextResponse.redirect(`${requestUrl.origin}/checkout`);
+      }
+      
+      // No redirect param - check onboarding status
+      if (organization && commitment) {
+        // Onboarding complete but no subscription yet (webhook may be processing)
+        // Allow access to dashboard (don't redirect to checkout)
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Auth callback: Onboarding complete but no subscription yet, allowing dashboard access');
+        }
+        return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
+      } else {
+        // Onboarding incomplete and no subscription → redirect to checkout
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Auth callback: No subscription and onboarding incomplete, redirecting to checkout');
+        }
+        return NextResponse.redirect(`${requestUrl.origin}/checkout`);
+      }
     }
   }
 

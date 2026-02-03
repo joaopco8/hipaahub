@@ -36,16 +36,23 @@ export default async function DashboardLayout({
     getCachedComplianceCommitment(user.id)
   ]);
   
-  // Redirect to onboarding if not completed
-  if (!organization || !commitment) {
-    return redirect('/onboarding/expectation');
-  }
-
-  // If onboarding is complete, allow access to dashboard even if subscription
-  // hasn't synced yet (webhook may still be processing after payment)
-  // Only redirect to checkout if onboarding is also incomplete
-  if (!subscription && (!organization || !commitment)) {
-    return redirect('/checkout');
+  // If user has active subscription, ALWAYS allow access (never redirect to checkout)
+  if (subscription) {
+    // Redirect to onboarding if not completed
+    if (!organization || !commitment) {
+      return redirect('/onboarding/expectation');
+    }
+    // User has subscription and onboarding complete → allow access
+    // No need to check anything else
+  } else {
+    // User doesn't have subscription yet
+    // Redirect to onboarding if not completed
+    if (!organization || !commitment) {
+      return redirect('/onboarding/expectation');
+    }
+    // Onboarding is complete but no subscription yet
+    // Allow access anyway (webhook may still be processing after payment)
+    // Don't redirect to checkout if onboarding is complete
   }
 
   return (
