@@ -14,21 +14,57 @@ export default function ExpectationPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    console.log('ExpectationPage: useEffect started');
+    
+    // Timeout fallback - show page after 3 seconds even if auth check is stuck
+    const timeoutFallback = setTimeout(() => {
+      console.warn('ExpectationPage: Auth check timeout - showing page anyway');
+      setIsCheckingAuth(false);
+      setIsAuthenticated(true);
+    }, 3000);
+
     const checkAuth = async () => {
       try {
+        console.log('ExpectationPage: Starting auth check...');
+        console.log('ExpectationPage: Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT SET');
+        console.log('ExpectationPage: Supabase Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'SET' : 'NOT SET');
+        
         const supabase = createClient();
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        console.log('ExpectationPage: Supabase client created');
+        
+        // Add timeout to getUser call
+        const authPromise = supabase.auth.getUser();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Auth check timeout')), 2000)
+        );
+        
+        const { data: { user }, error: authError } = await Promise.race([
+          authPromise,
+          timeoutPromise
+        ]) as any;
+        
+        clearTimeout(timeoutFallback);
         
         if (authError) {
           console.error('ExpectationPage: Auth error:', authError);
-          router.push('/signup?redirect=checkout');
+          // Don't redirect immediately - show page first
+          setIsAuthenticated(true);
+          setIsCheckingAuth(false);
+          // Redirect after a moment
+          setTimeout(() => {
+            router.push('/signup?redirect=checkout');
+          }, 2000);
           return;
         }
         
         if (!user) {
-          // User is not authenticated, redirect to signup
-          console.log('ExpectationPage: User not authenticated, redirecting to signup');
-          router.push('/signup?redirect=checkout');
+          console.log('ExpectationPage: User not authenticated');
+          // Show page first, then redirect
+          setIsAuthenticated(true);
+          setIsCheckingAuth(false);
+          setTimeout(() => {
+            router.push('/signup?redirect=checkout');
+          }, 2000);
           return;
         }
         
@@ -45,13 +81,18 @@ export default function ExpectationPage() {
         return () => clearTimeout(timer);
       } catch (error: any) {
         console.error('ExpectationPage: Error checking auth:', error);
+        clearTimeout(timeoutFallback);
         setIsCheckingAuth(false);
-        // Don't redirect on error - show the page anyway
+        // Always show the page on error - don't block
         setIsAuthenticated(true);
       }
     };
 
     checkAuth();
+    
+    return () => {
+      clearTimeout(timeoutFallback);
+    };
   }, [router]);
 
   const handleContinue = () => {
