@@ -33,13 +33,13 @@ export function ActionItemsClient({ initialItems }: ActionItemsClientProps) {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'critical':
-        return 'bg-red-100 text-red-700 border-red-200';
+        return 'bg-red-50 text-red-600 border-red-200';
       case 'high':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+        return 'bg-amber-50 text-amber-600 border-amber-200';
       case 'medium':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
+        return 'bg-[#00bceb]/10 text-[#00bceb] border-[#00bceb]/20';
       default:
-        return 'bg-zinc-100 text-zinc-700 border-zinc-200';
+        return 'bg-[#f3f5f9] text-[#565656] border-gray-200';
     }
   };
 
@@ -93,35 +93,34 @@ export function ActionItemsClient({ initialItems }: ActionItemsClientProps) {
   const renderItem = (item: ActionItem, index: number) => (
     <Card 
       key={item.id} 
-      className={`border-zinc-200 card-premium-enter stagger-item ${
+      className={`border-0 shadow-sm bg-white rounded-none ${
         item.status === 'completed' ? 'opacity-75' : ''
       }`}
-      style={{ animationDelay: `${index * 50}ms` }}
     >
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
-          <div className="p-2 rounded-lg bg-zinc-100 text-zinc-600 shrink-0">
+          <div className="p-2 rounded-none bg-[#f3f5f9] text-[#565656] shrink-0">
             {getCategoryIcon(item.category)}
           </div>
           <div className="flex-1 space-y-3">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-semibold text-zinc-900 text-lg">{item.title}</h3>
-                  <Badge className={`${getPriorityColor(item.priority)} border capitalize`}>
+                  <h3 className="font-light text-[#0e274e] text-lg">{item.title}</h3>
+                  <Badge className={`${getPriorityColor(item.priority)} border rounded-none font-light capitalize`}>
                     {item.priority}
                   </Badge>
                   {item.status === 'completed' && (
-                    <Badge className="bg-green-100 text-green-700 border-green-200">
+                    <Badge className="bg-[#71bc48]/10 text-[#71bc48] border-[#71bc48]/20 rounded-none font-light">
                       Completed
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-zinc-600">{item.description}</p>
+                <p className="text-sm text-[#565656] font-light">{item.description}</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4 text-sm text-zinc-500">
+            <div className="flex items-center gap-4 text-sm text-[#565656] font-light">
               <div className="flex items-center gap-2">
                 <Info className="h-4 w-4" />
                 <span>{item.category}</span>
@@ -141,7 +140,10 @@ export function ActionItemsClient({ initialItems }: ActionItemsClientProps) {
                   onClick={() => handleStatusUpdate(item.id, 'in-progress')}
                   disabled={updatingId === item.id || item.status === 'in-progress'}
                   variant={item.status === 'in-progress' ? 'default' : 'outline'}
-                  className="border-zinc-300 hover:bg-zinc-50"
+                  className={item.status === 'in-progress' 
+                    ? "bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
+                    : "border-gray-300 text-[#565656] hover:bg-gray-50 rounded-none font-light"
+                  }
                 >
                   {updatingId === item.id ? 'Updating...' : item.status === 'in-progress' ? 'In Progress' : 'Start Working'}
                 </Button>
@@ -149,12 +151,12 @@ export function ActionItemsClient({ initialItems }: ActionItemsClientProps) {
                   size="sm"
                   onClick={() => handleStatusUpdate(item.id, 'completed')}
                   disabled={updatingId === item.id}
-                  className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+                  className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
                 >
                   {updatingId === item.id ? 'Saving...' : 'Mark Complete'}
                 </Button>
                 {item.category === 'Policies' && (
-                  <Button size="sm" variant="outline" asChild className="border-zinc-300 hover:bg-zinc-50">
+                  <Button size="sm" variant="outline" asChild className="border-gray-300 text-[#565656] hover:bg-gray-50 rounded-none font-light">
                     <Link href="/dashboard/policies">
                       Go to Policies
                     </Link>
@@ -173,7 +175,7 @@ export function ActionItemsClient({ initialItems }: ActionItemsClientProps) {
       {/* Pending Items */}
       {pendingItems.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 mb-4">Pending Items</h2>
+          <h2 className="text-xl font-light text-[#0e274e] mb-4">Pending Items</h2>
           <div className="grid gap-4">
             {pendingItems.map((item, index) => renderItem(item, index))}
           </div>
@@ -183,7 +185,7 @@ export function ActionItemsClient({ initialItems }: ActionItemsClientProps) {
       {/* In Progress Items */}
       {inProgressItems.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 mb-4">In Progress</h2>
+          <h2 className="text-xl font-light text-[#0e274e] mb-4">In Progress</h2>
           <div className="grid gap-4">
             {inProgressItems.map((item, index) => renderItem(item, pendingItems.length + index))}
           </div>
@@ -193,7 +195,7 @@ export function ActionItemsClient({ initialItems }: ActionItemsClientProps) {
       {/* Completed Items */}
       {completedItems.length > 0 && (
         <div>
-          <h2 className="text-xl font-semibold text-zinc-900 mb-4">Completed</h2>
+          <h2 className="text-xl font-light text-[#0e274e] mb-4">Completed</h2>
           <div className="grid gap-4">
             {completedItems.map((item, index) => renderItem(item, pendingItems.length + inProgressItems.length + index))}
           </div>

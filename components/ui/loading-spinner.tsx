@@ -20,7 +20,7 @@ export function LoadingSpinner({ size = 'md', className, text }: LoadingSpinnerP
     <div className={cn('flex flex-col items-center gap-3', className)}>
       <Loader2 
         className={cn(
-          'animate-spin text-[#1ad07a]',
+          'animate-spin text-[#00bceb]',
           sizeClasses[size]
         )}
         style={{

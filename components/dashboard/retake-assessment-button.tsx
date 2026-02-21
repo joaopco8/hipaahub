@@ -85,7 +85,7 @@ export function RetakeAssessmentButton() {
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isLoading}
-            className="bg-[#1ad07a] hover:bg-[#1ad07a]/90 text-[#0c0b1d] font-medium"
+            className="bg-[#00bceb] hover:bg-[#00bceb]/90 text-white rounded-none font-bold"
           >
             {isLoading ? 'Resetting...' : 'Yes, Reset Assessment'}
           </AlertDialogAction>

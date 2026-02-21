@@ -84,13 +84,13 @@ export function OnboardingLayout({
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex flex-col">
+    <div className="min-h-screen bg-[#f3f5f9] flex flex-col">
       <OnboardingProgressBar />
       <div className="flex-1 flex flex-col w-full px-4 sm:px-8 lg:px-12 xl:px-16 py-10">
         <div className="flex-1 max-w-[1400px] mx-auto w-full page-transition-premium">
           {children}
         </div>
-        <div className="flex items-center justify-between pt-6 border-t border-zinc-200 mt-8">
+        <div className="flex items-center justify-between pt-6 border-t border-gray-200 mt-8">
           <Button
             variant="outline"
             onClick={(e) => {
@@ -99,7 +99,7 @@ export function OnboardingLayout({
               console.log('Back button onClick triggered');
               handleBack(e);
             }}
-            className={!showBackButton ? 'invisible' : 'cursor-pointer'}
+            className={!showBackButton ? 'invisible' : 'cursor-pointer rounded-none border-gray-300 text-gray-600 font-light hover:text-[#0e274e]'}
             type="button"
             style={{ pointerEvents: 'auto' }}
           >
@@ -117,7 +117,7 @@ export function OnboardingLayout({
                 }
               }} 
               disabled={nextButtonDisabled}
-              className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold px-8 disabled:opacity-50 disabled:cursor-not-allowed"
               type="button"
             >
               {nextButtonLabel}
@@ -128,4 +128,3 @@ export function OnboardingLayout({
     </div>
   );
 }
-

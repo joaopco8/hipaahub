@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Head from 'next/head';
 import { createClient } from '@/utils/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,37 @@ export default function TrainingEvidencePage() {
   const supabase = createClient();
   const [trainingRecord, setTrainingRecord] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Load Monsieur La Doulaise font
+  useEffect(() => {
+    // Check if font is already loaded
+    if (document.querySelector('link[href*="Monsieur+La+Doulaise"]')) {
+      return;
+    }
+
+    const link1 = document.createElement('link');
+    link1.rel = 'preconnect';
+    link1.href = 'https://fonts.googleapis.com';
+    document.head.appendChild(link1);
+
+    const link2 = document.createElement('link');
+    link2.rel = 'preconnect';
+    link2.href = 'https://fonts.gstatic.com';
+    link2.crossOrigin = 'anonymous';
+    document.head.appendChild(link2);
+
+    const link3 = document.createElement('link');
+    link3.href = 'https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&display=swap';
+    link3.rel = 'stylesheet';
+    document.head.appendChild(link3);
+
+    // Preload the font
+    const fontLink = document.createElement('link');
+    fontLink.rel = 'preload';
+    fontLink.as = 'style';
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&display=swap';
+    document.head.appendChild(fontLink);
+  }, []);
 
   useEffect(() => {
     async function loadTrainingRecord() {
@@ -88,16 +120,29 @@ export default function TrainingEvidencePage() {
           <meta charset="UTF-8">
           <link rel="preconnect" href="https://fonts.googleapis.com">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Monsieur+La+Doulaise&display=swap" rel="stylesheet">
           <style>
             @media print {
               @page {
-                size: letter landscape;
+                size: 3508px 2480px;
                 margin: 0;
               }
               body {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                width: 3508px;
+                height: 2480px;
+              }
+              .certificate-container {
+                 transform: scale(1); /* Ensure no scaling down for print if possible */
+                 width: 100%;
+                 height: 100%;
+                 max-width: none;
+                 border: 40px solid white; /* Proportional border */
+                 outline: 20px solid #999;
+              }
+              .certificate-inner {
+                 padding: 120px 160px; /* Scaled padding */
               }
             }
             * {
@@ -107,268 +152,271 @@ export default function TrainingEvidencePage() {
             }
             body {
               font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-              background: linear-gradient(135deg, #f3f5f9 0%, #e8ecf3 100%);
+              background: #fff;
               display: flex;
               align-items: center;
               justify-content: center;
               min-height: 100vh;
-              padding: 20px;
+              padding: 0;
             }
             .certificate-container {
-              background: white;
-              width: 100%;
-              max-width: 1000px;
-              padding: 60px 80px;
-              box-shadow: 0 20px 60px rgba(12, 11, 29, 0.15);
-              border-radius: 8px;
-              border: 3px solid #0c0b1d;
+              background: #ebf7fa;
+              width: 3508px;
+              height: 2480px;
+              /* Scale down for screen preview */
+              transform-origin: top center;
+              transform: scale(0.25); 
+              padding: 0;
+              box-shadow: 0 10px 30px rgba(0,0,0,0.1);
               position: relative;
-              overflow: hidden;
+              border: 40px solid white;
+              outline: 20px solid #999;
             }
-            .certificate-container::before {
-              content: '';
-              position: absolute;
-              top: 0;
-              left: 0;
-              right: 0;
-              height: 8px;
-              background: linear-gradient(90deg, #1ad07a 0%, #0c0b1d 100%);
+            .certificate-inner {
+              padding: 120px 160px;
+              height: 100%;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
             }
-            .certificate-container::after {
-              content: '';
-              position: absolute;
-              bottom: 0;
-              left: 0;
-              right: 0;
-              height: 8px;
-              background: linear-gradient(90deg, #0c0b1d 0%, #1ad07a 100%);
-            }
+            .certificate-container::before { display: none; }
+            .certificate-container::after { display: none; }
+            
             .logo-header {
               display: flex;
-              align-items: center;
-              justify-content: center;
-              margin-bottom: 40px;
+              align-items: flex-start;
+              justify-content: flex-start;
+              margin-bottom: 20px;
             }
             .logo {
-              width: 180px;
-              height: auto;
+              height: 140px;
+              width: auto;
+              filter: brightness(0); /* Make black */
             }
+            
             .certificate-title {
               text-align: center;
-              font-size: 42px;
-              font-weight: 800;
-              color: #0c0b1d;
-              letter-spacing: 2px;
-              text-transform: uppercase;
-              margin-bottom: 12px;
-            }
-            .certificate-subtitle {
-              text-align: center;
-              font-size: 20px;
-              font-weight: 600;
-              color: #1ad07a;
+              font-size: 56px;
+              font-weight: 400;
+              color: #1a1a1a;
               letter-spacing: 1px;
-              margin-bottom: 40px;
-              text-transform: uppercase;
+              margin-bottom: 80px;
+              text-transform: none;
             }
-            .divider {
-              width: 120px;
-              height: 3px;
-              background: #1ad07a;
-              margin: 20px auto;
-            }
-            .certify-text {
-              text-align: center;
-              font-size: 16px;
-              font-weight: 500;
-              color: #52525b;
-              margin: 30px 0 20px;
-            }
+            .certificate-subtitle { display: none; }
+            .divider { display: none; }
+            
             .trainee-name {
               text-align: center;
-              font-size: 38px;
+              font-size: 100px;
               font-weight: 700;
-              color: #0c0b1d;
-              margin: 20px 0;
-              padding: 0 20px;
-              border-bottom: 2px solid #0c0b1d;
-              display: inline-block;
-              min-width: 400px;
+              color: #000;
+              margin: 20px 0 60px;
+              padding: 0;
+              border: none;
+              display: block;
+              width: 100%;
             }
             .trainee-name-container {
               text-align: center;
-              margin-bottom: 20px;
+              margin-bottom: 0;
             }
+            
             .completion-statement {
               text-align: center;
-              font-size: 16px;
-              font-weight: 500;
-              color: #52525b;
-              margin: 20px 0 50px;
-              line-height: 1.6;
+              font-size: 38px;
+              font-weight: 400;
+              color: #1a1a1a;
+              margin: 0 auto 60px;
+              line-height: 1.5;
+              max-width: 80%;
             }
-            .details-grid {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 30px 60px;
-              margin: 50px 0;
-              padding: 40px;
-              background: #f9fafb;
-              border-radius: 8px;
-              border: 1px solid #e5e7eb;
-            }
-            .detail-item {
-              text-align: left;
-            }
-            .detail-label {
-              font-size: 12px;
-              font-weight: 700;
-              color: #71717a;
-              text-transform: uppercase;
-              letter-spacing: 1px;
-              margin-bottom: 6px;
-            }
-            .detail-value {
-              font-size: 16px;
+            
+            .certification-main-title {
+              text-align: center;
+              font-size: 80px;
               font-weight: 600;
-              color: #0c0b1d;
+              color: #000;
+              margin-bottom: 100px;
             }
-            .detail-value.mono {
-              font-family: 'Courier New', monospace;
-              font-size: 14px;
-              color: #1ad07a;
-            }
+            
             .seal-section {
               display: flex;
               justify-content: center;
               align-items: center;
-              margin-top: 60px;
-              padding-top: 30px;
-              border-top: 2px solid #e5e7eb;
+              margin: 80px 0;
+              border: none;
+              padding: 0;
             }
-            .seal {
-              text-align: center;
-            }
-            .seal-icon {
-              width: 90px;
-              height: 90px;
-              background: #0c0b1d;
+            
+            /* Custom HIPAA Seal */
+            .custom-seal {
+              width: 300px;
+              height: 300px;
+              border: 6px solid #1a1a1a;
               border-radius: 50%;
               display: flex;
+              flex-direction: column;
               align-items: center;
               justify-content: center;
-              margin: 0 auto 12px;
-              border: 5px solid #1ad07a;
+              position: relative;
             }
-            .seal-icon-text {
-              color: white;
-              font-size: 36px;
-              font-weight: 800;
+            .custom-seal::before {
+              content: '';
+              position: absolute;
+              top: 10px;
+              left: 10px;
+              right: 10px;
+              bottom: 10px;
+              border: 2px solid #1a1a1a;
+              border-radius: 50%;
             }
-            .seal-label {
-              font-size: 12px;
+            .seal-top-text {
+              font-size: 24px;
               font-weight: 700;
-              color: #71717a;
               text-transform: uppercase;
-              letter-spacing: 1.5px;
+              letter-spacing: 2px;
+              margin-bottom: 10px;
+              color: #1a1a1a;
             }
-            .footer-info {
-              text-align: center;
-              margin-top: 40px;
-              padding-top: 20px;
-              border-top: 1px solid #e5e7eb;
-              font-size: 11px;
-              color: #a1a1aa;
+            .seal-center-text {
+              font-size: 56px;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 4px;
+              color: #1a1a1a;
+              border-top: 4px solid #1a1a1a;
+              border-bottom: 4px solid #1a1a1a;
+              padding: 10px 0;
+            }
+            
+            .bottom-section {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+              margin-top: 100px;
+              padding: 0 80px;
+            }
+            
+            .date-info {
+              text-align: left;
+              font-size: 32px;
+              color: #1a1a1a;
               line-height: 1.6;
             }
-            .footer-info strong {
-              color: #71717a;
+            .date-row {
+              display: flex;
+              gap: 40px;
             }
-            .pass-badge {
-              display: inline-block;
-              background: #1ad07a;
-              color: #0c0b1d;
-              padding: 8px 20px;
-              border-radius: 6px;
-              font-size: 14px;
+            .date-label {
+              min-width: 240px;
+            }
+            .date-value {
+              font-weight: 600;
+            }
+            
+            .signature-block {
+              text-align: right;
+            }
+            .signature-image {
+              font-family: 'Monsieur La Doulaise', cursive !important;
+              font-weight: 400 !important;
+              font-style: normal !important;
+              font-size: 110px;
+              color: #1a1a1a;
+              margin-bottom: 15px;
+              line-height: 1;
+            }
+            .signer-name {
+              font-size: 32px;
               font-weight: 700;
-              letter-spacing: 1px;
-              margin: 20px 0;
-              text-transform: uppercase;
+              color: #1a1a1a;
+            }
+            .signer-title {
+              font-size: 28px;
+              color: #555;
+            }
+            
+            .footer-validation {
+              margin-top: 80px;
+              font-size: 24px;
+              color: #555;
+              border-top: none;
+              text-align: left;
+              padding: 0 80px 40px;
+            }
+            
+            /* Hide unused styles */
+            .details-grid, .pass-badge, .footer-info, .certify-text, .seal, .seal-icon, .seal-icon-text, .seal-label {
+              display: none;
             }
           </style>
         </head>
         <body>
           <div class="certificate-container">
-            <!-- Logo Header -->
-            <div class="logo-header">
-              <img src="/images/logoescura.png" alt="HIPAA Hub" class="logo" />
-            </div>
+            <div class="certificate-inner">
+              <!-- Logo Header -->
+              <div class="logo-header">
+                <img src="/images/logoescura.png" alt="HIPAA Hub" class="logo" />
+              </div>
 
-            <!-- Certificate Title -->
-            <div class="certificate-title">Certificate of Completion</div>
-            <div class="certificate-subtitle">HIPAA Security Awareness Training</div>
-            <div class="divider"></div>
+              <!-- Header Title -->
+              <div class="certificate-title">HIPAA Hub Certifications</div>
 
-            <!-- Certification Statement -->
-            <div class="certify-text">This document certifies that</div>
-            <div class="trainee-name-container">
+              <!-- Trainee Name -->
               <div class="trainee-name">${trainingRecord.full_name}</div>
-            </div>
-            <div class="completion-statement">
-              has successfully completed the mandatory HIPAA Security Awareness Training<br/>
-              as required by 45 CFR § 164.308(a)(5) and demonstrated proficiency<br/>
-              in protecting Protected Health Information (PHI).
-            </div>
 
-            ${(trainingRecord.quiz_score || 0) >= 70 ? '<div class="pass-badge">✓ Passed with ' + (trainingRecord.quiz_score || 0) + '%</div>' : ''}
+              <!-- Completion Text -->
+              <div class="completion-statement">
+                has successfully completed the mandatory HIPAA certification exam requirements and is recognized as a
+              </div>
 
-            <!-- Training Details -->
-            <div class="details-grid">
-              <div class="detail-item">
-                <div class="detail-label">Training Date</div>
-                <div class="detail-value">${trainingDate}</div>
+              <!-- Certification Title -->
+              <div class="certification-main-title">
+                HIPAA Security Certified Associate
               </div>
-              <div class="detail-item">
-                <div class="detail-label">Quiz Score</div>
-                <div class="detail-value">${trainingRecord.quiz_score || 0}%</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">Certificate ID</div>
-                <div class="detail-value mono">${certificateId}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">Policy Version</div>
-                <div class="detail-value">${trainingRecord.training_content_version || '1.0'}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">Training Type</div>
-                <div class="detail-value">${trainingRecord.training_type || 'Annual Compliance'}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">Expiration Date</div>
-                <div class="detail-value">${new Date(trainingRecord.expiration_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
-              </div>
-            </div>
 
-            <!-- Digital Seal -->
-            <div class="seal-section">
-              <div class="seal">
-                <div class="seal-icon">
-                  <div class="seal-icon-text">✓</div>
+              <!-- Seal -->
+              <div class="seal-section">
+                <div class="custom-seal">
+                  <div class="seal-top-text">HIPAA HUB</div>
+                  <div class="seal-center-text">HIPAA</div>
+                  <div class="seal-top-text" style="margin-top: 10px;">CERTIFIED</div>
                 </div>
-                <div class="seal-label">Digitally Verified</div>
               </div>
-            </div>
 
-            <!-- Footer -->
-            <div class="footer-info">
-              <strong>Legal Notice:</strong> This certificate serves as official documentation of HIPAA training completion 
-              and may be presented as evidence during audits or regulatory reviews.<br/>
-              <strong>Completed:</strong> ${completionDateTime} | 
-              <strong>IP Address:</strong> ${trainingRecord.acknowledgement_ip || 'N/A'}<br/>
-              <strong>Generated:</strong> ${new Date().toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })} | 
-              HIPAA Hub - Compliance Management System
+              <!-- Bottom Details -->
+              <div class="bottom-section">
+                <div class="date-info">
+                  <div class="date-row">
+                    <span class="date-label">Date Certified</span>
+                    <span class="date-value">${trainingDate}</span>
+                  </div>
+                  <div class="date-row">
+                    <span class="date-label">Valid Through</span>
+                    <span class="date-value">${new Date(trainingRecord.expiration_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                  </div>
+                  <div class="date-row">
+                    <span class="date-label">Certificate ID</span>
+                    <span class="date-value" style="font-family: monospace;">${certificateId}</span>
+                  </div>
+                </div>
+
+                <div class="signature-block">
+                  <div class="signature-image">John Camargo</div>
+                  <div class="signer-name">John Camargo</div>
+                  <div class="signer-title">CEO, HIPAA Hub</div>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="footer-validation">
+                Validate this certificate's authenticity at<br/>
+                www.hipaahubhealth.com/verify/${certificateId}<br/>
+                Certificate Verification No. ${certificateId}
+                <br/><br/>
+                © ${new Date().getFullYear()} HIPAA Hub Compliance Solutions
+              </div>
             </div>
           </div>
         </body>
@@ -384,10 +432,10 @@ export default function TrainingEvidencePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#f3f5f9]">
         <div className="text-center">
-          <Clock className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-zinc-600">Loading training evidence...</p>
+          <Clock className="h-8 w-8 animate-spin mx-auto mb-4 text-[#00bceb]" />
+          <p className="text-[#565656] font-light">Loading training evidence...</p>
         </div>
       </div>
     );
@@ -395,11 +443,11 @@ export default function TrainingEvidencePage() {
 
   if (!trainingRecord) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Card className="max-w-md">
+      <div className="flex min-h-screen items-center justify-center bg-[#f3f5f9]">
+        <Card className="max-w-md border-0 shadow-sm bg-white rounded-none">
           <CardContent className="pt-6">
-            <p className="text-center text-zinc-600">Training record not found</p>
-            <Button onClick={() => router.back()} className="mt-4 w-full">
+            <p className="text-center text-[#565656] font-light">Training record not found</p>
+            <Button onClick={() => router.back()} className="mt-4 w-full bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Go Back
             </Button>
@@ -413,120 +461,116 @@ export default function TrainingEvidencePage() {
   const quizAnswers = trainingRecord.quiz_answers || {};
 
   return (
-    <div className="flex w-full flex-col gap-6 px-4 py-6 sm:px-0 sm:py-0">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <>
+      <style dangerouslySetInnerHTML={{__html: `
+        @import url('https://fonts.googleapis.com/css2?family=Monsieur+La+Doulaise&display=swap');
+        .signature-font {
+          font-family: 'Monsieur La Doulaise', cursive !important;
+          font-weight: 400 !important;
+          font-style: normal !important;
+        }
+      `}} />
+      <div className="flex w-full flex-col gap-6 px-4 py-6 sm:px-0 sm:py-0 bg-[#f3f5f9]">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Button variant="ghost" onClick={() => router.back()} className="mb-4">
+          <Button variant="ghost" onClick={() => router.back()} className="mb-4 text-[#565656] hover:bg-gray-50 rounded-none font-light">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Training Evidence</h1>
-          <p className="text-zinc-600 mt-1">
+          <h1 className="text-3xl font-light text-[#0e274e]">Training Evidence</h1>
+          <p className="text-[#565656] mt-1 font-light">
             Legal evidence and audit trail for {trainingRecord.full_name}
           </p>
         </div>
-        <Button onClick={generateCertificate} className="w-full sm:w-auto">
+        <Button onClick={generateCertificate} className="w-full sm:w-auto bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold">
           <Download className="mr-2 h-4 w-4" />
           Download Certificate
         </Button>
       </div>
 
       {/* Certificate Preview */}
-      <Card className="relative overflow-hidden border-2 border-[#0c0b1d] shadow-lg">
-        {/* Top accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#1ad07a] to-[#0c0b1d]" />
-        {/* Bottom accent bar */}
-        <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0c0b1d] to-[#1ad07a]" />
-        
-        <CardHeader className="pb-4">
-          <div className="flex flex-col items-center gap-4">
-            <img 
-              src="/images/logoescura.png" 
-              alt="HIPAA Hub" 
-              className="h-16 w-auto"
-            />
-            <div className="text-center">
-              <CardTitle className="text-3xl font-bold text-[#0c0b1d] tracking-wide uppercase">
-                Certificate of Completion
-              </CardTitle>
-              <p className="text-lg font-semibold text-[#1ad07a] mt-2 tracking-wider uppercase">
-                HIPAA Security Awareness Training
-              </p>
+      <Card className="relative overflow-hidden border-2 border-gray-200 shadow-sm bg-[#ebf7fa] rounded-none">
+        <div className="absolute top-0 left-0 right-0 bottom-0 border-[15px] border-white pointer-events-none" />
+        <CardContent className="p-12 relative z-10">
+          <div className="flex flex-col items-start">
+            <div className="mb-8">
+               <img src="/images/logoescura.png" alt="HIPAA Hub" className="h-12 w-auto brightness-0" />
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-6 pb-8">
-          <div className="space-y-6">
-            {/* Certification Statement */}
-            <div className="text-center py-6">
-              <p className="text-sm font-medium text-zinc-600 mb-3">This document certifies that</p>
-              <div className="relative inline-block">
-                <p className="text-3xl font-bold text-[#0c0b1d] px-8 py-2 border-b-2 border-[#0c0b1d]">
-                  {trainingRecord.full_name}
-                </p>
-              </div>
-              <p className="text-sm font-medium text-zinc-600 mt-4 leading-relaxed max-w-2xl mx-auto">
-                has successfully completed the mandatory HIPAA Security Awareness Training<br/>
-                as required by 45 CFR § 164.308(a)(5) and demonstrated proficiency<br/>
-                in protecting Protected Health Information (PHI).
+            
+            <h2 className="w-full text-center text-xl text-[#1a1a1a] font-normal tracking-wide mb-8">
+              HIPAA Hub Certifications
+            </h2>
+            
+            <div className="w-full text-center">
+              <h1 className="text-4xl font-bold text-black mb-6">
+                {trainingRecord.full_name}
+              </h1>
+              
+              <p className="text-[#1a1a1a] max-w-2xl mx-auto mb-8 leading-relaxed">
+                has successfully completed the mandatory HIPAA certification exam requirements and is recognized as a
               </p>
               
-              {isPassed && (
-                <div className="inline-flex items-center gap-2 bg-[#1ad07a] text-[#0c0b1d] px-6 py-2 rounded-md font-bold text-sm uppercase tracking-wider mt-4">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Passed with {trainingRecord.quiz_score || 0}%
+              <h3 className="text-3xl font-semibold text-black mb-12">
+                HIPAA Security Certified Associate
+              </h3>
+            </div>
+            
+            <div className="w-full flex justify-center mb-12">
+              <div className="w-32 h-32 border-[3px] border-[#1a1a1a] rounded-full flex flex-col items-center justify-center relative">
+                 <div className="absolute inset-1 border border-[#1a1a1a] rounded-full" />
+                 <span className="text-[8px] font-bold uppercase tracking-widest mb-1 text-[#1a1a1a]">HIPAA HUB</span>
+                 <span className="text-xl font-extrabold uppercase tracking-[0.2em] py-1 border-t-2 border-b-2 border-[#1a1a1a] text-[#1a1a1a]">HIPAA</span>
+                 <span className="text-[8px] font-bold uppercase tracking-widest mt-1 text-[#1a1a1a]">CERTIFIED</span>
+              </div>
+            </div>
+            
+            <div className="w-full flex justify-between items-end px-8 mt-8">
+              <div className="text-xs text-[#1a1a1a] space-y-1">
+                <div className="flex gap-4">
+                  <span className="min-w-[80px]">Date Certified</span>
+                  <span className="font-semibold">
+                    {new Date(trainingRecord.training_date).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </span>
                 </div>
-              )}
-            </div>
-
-            {/* Training Details Grid */}
-            <div className="grid grid-cols-3 gap-6 pt-6 pb-4 bg-zinc-50/50 rounded-lg p-6 border border-zinc-200">
-              <div className="text-center">
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Training Date</p>
-                <p className="text-base font-bold text-[#0c0b1d]">
-                  {new Date(trainingRecord.training_date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </p>
-              </div>
-              <div className="text-center border-l border-r border-zinc-200">
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Certificate ID</p>
-                <p className="font-mono text-sm font-bold text-[#1ad07a]">
-                  {trainingRecord.certificate_id || 'N/A'}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Expires</p>
-                <p className="text-base font-bold text-[#0c0b1d]">
-                  {new Date(trainingRecord.expiration_date).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}
-                </p>
-              </div>
-            </div>
-
-            {/* Digital Seal */}
-            <div className="flex justify-center pt-8 border-t border-zinc-200">
-              <div className="text-center">
-                <div className="w-20 h-20 bg-[#0c0b1d] rounded-full flex items-center justify-center border-[5px] border-[#1ad07a] mx-auto mb-3">
-                  <CheckCircle2 className="h-10 w-10 text-[#1ad07a]" />
+                <div className="flex gap-4">
+                  <span className="min-w-[80px]">Valid Through</span>
+                  <span className="font-semibold">
+                    {new Date(trainingRecord.expiration_date).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </span>
                 </div>
-                <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Digitally Verified</p>
+                <div className="flex gap-4">
+                  <span className="min-w-[80px]">Certificate ID</span>
+                  <span className="font-mono font-semibold">
+                    {trainingRecord.certificate_id || 'N/A'}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <div 
+                  className="signature-font text-4xl text-[#1a1a1a] mb-1 leading-none"
+                >
+                  John Camargo
+                </div>
+                <div className="text-xs font-bold text-[#1a1a1a]">John Camargo</div>
+                <div className="text-[10px] text-[#555]">CEO, HIPAA Hub</div>
               </div>
             </div>
-
-            {/* Footer Info */}
-            <div className="text-center text-xs text-zinc-400 pt-4 border-t border-zinc-100">
-              <p className="font-medium text-zinc-500">
-                <strong>Legal Notice:</strong> This certificate serves as official documentation of HIPAA training completion
-              </p>
-              <p className="mt-1">
-                Completed: {new Date(trainingRecord.training_date).toLocaleString()} | 
-                IP: {trainingRecord.acknowledgement_ip || 'N/A'}
+            
+            <div className="w-full mt-8 pt-4 border-t border-transparent px-8">
+              <p className="text-[9px] text-[#555]">
+                Validate this certificate's authenticity at<br/>
+                www.hipaahubhealth.com/verify/{trainingRecord.certificate_id || 'N/A'}<br/>
+                Certificate Verification No. {trainingRecord.certificate_id || 'N/A'}<br/><br/>
+                © {new Date().getFullYear()} HIPAA Hub Compliance Solutions
               </p>
             </div>
           </div>
@@ -535,116 +579,116 @@ export default function TrainingEvidencePage() {
 
       {/* Evidence Data */}
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardHeader className="border-b border-gray-200">
+            <CardTitle className="flex items-center gap-2 font-light text-[#0e274e]">
               <User className="h-5 w-5" />
               Employee Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 pt-6">
             <div>
-              <p className="text-sm text-zinc-600">Full Name</p>
-              <p className="font-semibold">{trainingRecord.full_name}</p>
+              <p className="text-sm text-[#565656] font-light">Full Name</p>
+              <p className="font-light text-[#0e274e]">{trainingRecord.full_name}</p>
             </div>
             <div>
-              <p className="text-sm text-zinc-600">Email</p>
-              <p className="font-semibold">{trainingRecord.email}</p>
+              <p className="text-sm text-[#565656] font-light">Email</p>
+              <p className="font-light text-[#0e274e]">{trainingRecord.email}</p>
             </div>
             <div>
-              <p className="text-sm text-zinc-600">Role</p>
-              <p className="font-semibold">{trainingRecord.role_title}</p>
+              <p className="text-sm text-[#565656] font-light">Role</p>
+              <p className="font-light text-[#0e274e]">{trainingRecord.role_title}</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardHeader className="border-b border-gray-200">
+            <CardTitle className="flex items-center gap-2 font-light text-[#0e274e]">
               <Shield className="h-5 w-5" />
               Training Results
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 pt-6">
             <div>
-              <p className="text-sm text-zinc-600">Score</p>
-              <p className="font-semibold text-2xl">{trainingRecord.quiz_score || 0}%</p>
+              <p className="text-sm text-[#565656] font-light">Score</p>
+              <p className="font-light text-2xl text-[#0e274e]">{trainingRecord.quiz_score || 0}%</p>
             </div>
             <div>
-              <p className="text-sm text-zinc-600">Status</p>
-              <Badge className={isPassed ? 'bg-green-600' : 'bg-red-600'}>
+              <p className="text-sm text-[#565656] font-light">Status</p>
+              <Badge className={isPassed ? 'bg-[#71bc48] text-white rounded-none font-light' : 'bg-red-600 text-white rounded-none font-light'}>
                 {isPassed ? 'Passed' : 'Failed'}
               </Badge>
             </div>
             <div>
-              <p className="text-sm text-zinc-600">Training Type</p>
-              <p className="font-semibold capitalize">{trainingRecord.training_type}</p>
+              <p className="text-sm text-[#565656] font-light">Training Type</p>
+              <p className="font-light capitalize text-[#0e274e]">{trainingRecord.training_type}</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardHeader className="border-b border-gray-200">
+            <CardTitle className="flex items-center gap-2 font-light text-[#0e274e]">
               <Calendar className="h-5 w-5" />
               Timestamps
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 pt-6">
             <div>
-              <p className="text-sm text-zinc-600">Training Date</p>
-              <p className="font-semibold">
+              <p className="text-sm text-[#565656] font-light">Training Date</p>
+              <p className="font-light text-[#0e274e]">
                 {new Date(trainingRecord.training_date).toLocaleString()}
               </p>
             </div>
             {trainingRecord.training_start_time && (
               <div>
-                <p className="text-sm text-zinc-600">Started</p>
-                <p className="font-semibold">
+                <p className="text-sm text-[#565656] font-light">Started</p>
+                <p className="font-light text-[#0e274e]">
                   {new Date(trainingRecord.training_start_time).toLocaleString()}
                 </p>
               </div>
             )}
             {trainingRecord.training_duration_minutes && (
               <div>
-                <p className="text-sm text-zinc-600">Duration</p>
-                <p className="font-semibold">{trainingRecord.training_duration_minutes} minutes</p>
+                <p className="text-sm text-[#565656] font-light">Duration</p>
+                <p className="font-light text-[#0e274e]">{trainingRecord.training_duration_minutes} minutes</p>
               </div>
             )}
             <div>
-              <p className="text-sm text-zinc-600">Expires</p>
-              <p className="font-semibold">
+              <p className="text-sm text-[#565656] font-light">Expires</p>
+              <p className="font-light text-[#0e274e]">
                 {new Date(trainingRecord.expiration_date).toLocaleDateString()}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardHeader className="border-b border-gray-200">
+            <CardTitle className="flex items-center gap-2 font-light text-[#0e274e]">
               <Globe className="h-5 w-5" />
               Forensic Evidence
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 pt-6">
             <div>
-              <p className="text-sm text-zinc-600">IP Address</p>
-              <p className="font-mono text-sm font-semibold">{trainingRecord.acknowledgement_ip || 'N/A'}</p>
+              <p className="text-sm text-[#565656] font-light">IP Address</p>
+              <p className="font-mono text-sm font-light text-[#0e274e]">{trainingRecord.acknowledgement_ip || 'N/A'}</p>
             </div>
             {trainingRecord.user_agent && (
               <div>
-                <p className="text-sm text-zinc-600">User Agent</p>
-                <p className="font-mono text-xs break-all">{trainingRecord.user_agent}</p>
+                <p className="text-sm text-[#565656] font-light">User Agent</p>
+                <p className="font-mono text-xs break-all font-light text-[#565656]">{trainingRecord.user_agent}</p>
               </div>
             )}
             <div>
-              <p className="text-sm text-zinc-600">Recorded By</p>
-              <p className="font-semibold">{trainingRecord.recorded_by}</p>
+              <p className="text-sm text-[#565656] font-light">Recorded By</p>
+              <p className="font-light text-[#0e274e]">{trainingRecord.recorded_by}</p>
             </div>
             <div>
-              <p className="text-sm text-zinc-600">Record Timestamp</p>
-              <p className="font-semibold">
+              <p className="text-sm text-[#565656] font-light">Record Timestamp</p>
+              <p className="font-light text-[#0e274e]">
                 {new Date(trainingRecord.record_timestamp).toLocaleString()}
               </p>
             </div>
@@ -654,34 +698,34 @@ export default function TrainingEvidencePage() {
 
       {/* Quiz Answers Log */}
       {Object.keys(quizAnswers).length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardHeader className="border-b border-gray-200">
+            <CardTitle className="flex items-center gap-2 font-light text-[#0e274e]">
               <FileText className="h-5 w-5" />
               Complete Quiz Log
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-[#565656] font-light">
               Detailed record of all questions and answers (legal evidence)
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="space-y-6 max-h-[600px] overflow-y-auto">
               {Object.entries(quizAnswers).map(([key, answer]: [string, any]) => (
-                <div key={key} className="border-l-4 border-zinc-200 pl-4 py-2">
+                <div key={key} className="border-l-4 border-gray-200 pl-4 py-2">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
-                      <p className="font-semibold text-zinc-900">{answer.question}</p>
-                      <p className="text-sm text-zinc-600 mt-1">
+                      <p className="font-light text-[#0e274e]">{answer.question}</p>
+                      <p className="text-sm text-[#565656] mt-1 font-light">
                         Section: {answer.section_title}
                       </p>
                     </div>
                     {answer.is_correct ? (
-                      <Badge className="bg-green-100 text-green-800 border-green-200">
+                      <Badge className="bg-[#71bc48]/10 text-[#71bc48] border-[#71bc48]/20 rounded-none font-light">
                         <CheckCircle2 className="h-3 w-3 mr-1" />
                         Correct
                       </Badge>
                     ) : (
-                      <Badge className="bg-red-100 text-red-800 border-red-200">
+                      <Badge className="bg-red-50 text-red-600 border-red-200 rounded-none font-light">
                         Incorrect
                       </Badge>
                     )}
@@ -690,24 +734,24 @@ export default function TrainingEvidencePage() {
                     {answer.options?.map((option: string, idx: number) => (
                       <div
                         key={idx}
-                        className={`p-2 rounded text-sm ${
+                        className={`p-2 rounded-none text-sm border ${
                           idx === answer.correct_answer
-                            ? 'bg-green-50 border border-green-200'
+                            ? 'bg-[#71bc48]/10 border-[#71bc48]/20'
                             : idx === answer.user_answer
-                            ? 'bg-red-50 border border-red-200'
-                            : 'bg-zinc-50 border border-zinc-200'
+                            ? 'bg-red-50 border-red-200'
+                            : 'bg-[#f3f5f9] border-gray-200'
                         }`}
                       >
-                        <span className="font-medium">
+                        <span className="font-light text-[#565656]">
                           {idx === answer.correct_answer && '✓ '}
                           {idx === answer.user_answer && answer.user_answer !== answer.correct_answer && '✗ '}
                           {option}
                         </span>
                         {idx === answer.correct_answer && (
-                          <span className="text-green-700 text-xs ml-2">(Correct Answer)</span>
+                          <span className="text-[#71bc48] text-xs ml-2 font-light">(Correct Answer)</span>
                         )}
                         {idx === answer.user_answer && (
-                          <span className="text-blue-700 text-xs ml-2">(Your Answer)</span>
+                          <span className="text-[#00bceb] text-xs ml-2 font-light">(Your Answer)</span>
                         )}
                       </div>
                     ))}
@@ -718,6 +762,7 @@ export default function TrainingEvidencePage() {
           </CardContent>
         </Card>
       )}
-    </div>
+      </div>
+    </>
   );
 }

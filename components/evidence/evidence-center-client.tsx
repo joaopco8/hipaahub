@@ -15,16 +15,12 @@ import {
 import {
   Download,
   Eye,
-  Edit,
   Trash2,
-  Filter,
   Search,
   FileText,
   Image as ImageIcon,
   Link as LinkIcon,
-  File as GenericFileIcon,
   Calendar,
-  User,
   CheckCircle2,
   AlertCircle,
   Clock,
@@ -42,9 +38,9 @@ import { useRouter } from 'next/navigation';
 import { formatFileSize } from '@/utils/helpers';
 
 const STATUS_COLORS: Record<EvidenceStatus, string> = {
-  VALID: 'bg-[#1ad07a]/10 text-[#0c0b1d] border border-[#1ad07a]/20',
-  EXPIRED: 'bg-amber-50 text-amber-800 border border-amber-200',
-  MISSING: 'bg-red-50 text-red-800 border border-red-200',
+  VALID: 'bg-[#71bc48]/10 text-[#71bc48] border border-[#71bc48]/20',
+  EXPIRED: 'bg-red-50 text-red-800 border border-red-200',
+  MISSING: 'bg-gray-50 text-gray-800 border border-gray-200',
   REQUIRES_REVIEW: 'bg-yellow-50 text-yellow-800 border border-yellow-200',
   ARCHIVED: 'bg-zinc-100 text-zinc-700 border border-zinc-200',
 };
@@ -119,20 +115,19 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
 
   const getFileIcon = (evidenceType: EvidenceType) => {
     if (evidenceType.includes('screenshot') || evidenceType.includes('image')) {
-      return <ImageIcon className="h-5 w-5 text-blue-500" />;
+      return <ImageIcon className="h-5 w-5 text-[#00bceb]" />;
     }
     if (evidenceType.includes('log') || evidenceType.includes('audit')) {
-      return <FileText className="h-5 w-5 text-purple-500" />;
+      return <FileText className="h-5 w-5 text-[#0e274e]" />;
     }
     if (evidenceType.includes('link') || evidenceType.includes('url')) {
-      return <LinkIcon className="h-5 w-5 text-purple-500" />;
+      return <LinkIcon className="h-5 w-5 text-[#00bceb]" />;
     }
-    return <FileText className="h-5 w-5 text-[#1ad07a]" />;
+    return <FileText className="h-5 w-5 text-[#71bc48]" />;
   };
 
   const getDownloadUrl = async (evidence: ComplianceEvidence) => {
     if (!evidence.file_url) return null;
-    
     try {
       const response = await fetch(`/api/compliance-evidence/download?file_url=${encodeURIComponent(evidence.file_url)}`);
       const data = await response.json();
@@ -147,23 +142,18 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
     const downloadUrl = await getDownloadUrl(evidence);
     if (downloadUrl) {
       try {
-        // Fetch the file as blob and force download
         const fileResponse = await fetch(downloadUrl);
-        if (!fileResponse.ok) {
-          throw new Error('Failed to fetch file');
-        }
+        if (!fileResponse.ok) throw new Error('Failed to fetch file');
         
         const blob = await fileResponse.blob();
         const blobUrl = window.URL.createObjectURL(blob);
         
-        // Create download link
         const link = document.createElement('a');
         link.href = blobUrl;
         link.download = evidence.file_name || evidence.title || 'document';
         document.body.appendChild(link);
         link.click();
         
-        // Cleanup
         document.body.removeChild(link);
         window.URL.revokeObjectURL(blobUrl);
       } catch (error: any) {
@@ -192,11 +182,11 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
 
   if (evidence.length === 0) {
     return (
-      <Card className="card-premium-enter stagger-item">
+      <Card className="border-0 shadow-sm bg-white rounded-none">
         <CardContent className="flex flex-col items-center justify-center py-12">
-          <FileText className="h-12 w-12 text-zinc-400 mb-4" />
-          <CardTitle className="mb-2 text-zinc-900">No evidence uploaded yet</CardTitle>
-          <p className="text-sm text-zinc-600 mb-4 text-center max-w-md">
+          <FileText className="h-12 w-12 text-zinc-300 mb-4" />
+          <CardTitle className="mb-2 text-[#0e274e] font-light">No evidence uploaded yet</CardTitle>
+          <p className="text-sm text-gray-400 mb-4 text-center max-w-md font-light">
             Start building your compliance evidence library by uploading documents, 
             screenshots, logs, and other proof of your HIPAA compliance efforts.
           </p>
@@ -208,26 +198,26 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
   return (
     <div className="space-y-6">
       {/* Filters */}
-      <Card className="card-premium-enter stagger-item">
+      <Card className="border-0 shadow-sm bg-white rounded-none">
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-4 items-center">
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Search evidence..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
+                  className="pl-9 rounded-none border-gray-200 focus:border-[#00bceb]"
                 />
               </div>
             </div>
 
             <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as EvidenceStatus | 'ALL')}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] rounded-none border-gray-200">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-none">
                 <SelectItem value="ALL">All Status</SelectItem>
                 <SelectItem value="VALID">Valid</SelectItem>
                 <SelectItem value="EXPIRED">Expired</SelectItem>
@@ -238,10 +228,10 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
             </Select>
 
             <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as EvidenceType | 'ALL')}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[200px] rounded-none border-gray-200">
                 <SelectValue placeholder="Type" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-none">
                 <SelectItem value="ALL">All Types</SelectItem>
                 <SelectItem value="security_risk_analysis">Security Risk Analysis</SelectItem>
                 <SelectItem value="policy_procedure">Policy & Procedure</SelectItem>
@@ -262,6 +252,7 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
                   setTypeFilter('ALL');
                   setCategoryFilter('ALL');
                 }}
+                className="rounded-none border-gray-200 text-gray-500 hover:text-[#00bceb]"
               >
                 <X className="h-4 w-4 mr-2" />
                 Clear Filters
@@ -273,11 +264,11 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
 
       {/* Evidence List */}
       {Object.keys(groupedEvidence).length === 0 ? (
-        <Card className="card-premium-enter stagger-item">
+        <Card className="border-0 shadow-sm bg-white rounded-none">
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Search className="h-12 w-12 text-zinc-400 mb-4" />
-            <CardTitle className="mb-2 text-zinc-900">No evidence found</CardTitle>
-            <p className="text-sm text-zinc-600">
+            <Search className="h-12 w-12 text-zinc-300 mb-4" />
+            <CardTitle className="mb-2 text-[#0e274e] font-light">No evidence found</CardTitle>
+            <p className="text-sm text-gray-400 font-light">
               Try adjusting your filters or search query
             </p>
           </CardContent>
@@ -286,10 +277,10 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
         Object.entries(groupedEvidence).map(([category, items], catIndex) => (
           <div key={category} className="space-y-4">
             <div className="flex items-center gap-3">
-              <h2 className="text-lg font-semibold text-zinc-800">{category}</h2>
+              <h2 className="text-lg font-light text-[#0e274e]">{category}</h2>
               <Badge 
                 variant="secondary"
-                className="px-2 py-0.5 text-xs font-bold bg-zinc-100 text-zinc-500 border-zinc-200"
+                className="px-2 py-0.5 text-xs font-light bg-[#f3f5f9] text-[#565656] border-gray-200 rounded-none"
               >
                 {items.length}
               </Badge>
@@ -298,20 +289,19 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
               {items.map((item, itemIndex) => (
                 <Card 
                   key={item.id} 
-                  className="hover:shadow-md transition-all duration-200 border-zinc-200 bg-white card-premium-enter stagger-item"
-                  style={{ animationDelay: `${(catIndex * 100) + (itemIndex * 50)}ms` }}
+                  className="hover:shadow-md transition-all duration-200 border-0 shadow-sm bg-white rounded-none"
                 >
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-2 flex-1">
-                        <div className="bg-zinc-50 p-1.5 rounded-md border border-zinc-100">
+                        <div className="bg-gray-50 p-1.5 border border-gray-100 rounded-none">
                           {getFileIcon(item.evidence_type)}
                         </div>
-                        <CardTitle className="text-base font-semibold text-zinc-800 line-clamp-2">{item.title}</CardTitle>
+                        <CardTitle className="text-base font-light text-[#0e274e] line-clamp-2">{item.title}</CardTitle>
                       </div>
                       <Badge 
                         variant="outline"
-                        className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 ${STATUS_COLORS[item.status]}`}
+                        className={`text-[10px] font-light px-2 py-0.5 rounded-none ${STATUS_COLORS[item.status]}`}
                       >
                         <span className="flex items-center gap-1">
                           {STATUS_ICONS[item.status]}
@@ -321,12 +311,12 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
                     </div>
 
                     {item.description && (
-                      <p className="text-sm text-zinc-500 mb-4 line-clamp-2 leading-relaxed">
+                      <p className="text-sm text-gray-500 mb-4 line-clamp-2 leading-relaxed font-light">
                         {item.description}
                       </p>
                     )}
 
-                    <div className="space-y-2 text-[11px] text-zinc-400 mb-4">
+                    <div className="space-y-2 text-[11px] text-gray-400 mb-4 font-light">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-3.5 w-3.5" />
                         <span>Uploaded: {new Date(item.upload_date).toLocaleDateString('en-US', { 
@@ -351,40 +341,15 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
                       )}
                     </div>
 
-                    {item.related_document_ids && item.related_document_ids.length > 0 && (
-                      <div className="mb-5 bg-zinc-50/50 p-2 rounded-md border border-zinc-100">
-                        <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-tight mb-1.5 px-1">Mapped to Policies:</p>
-                        <div className="flex flex-wrap gap-1">
-                          {item.related_document_ids.slice(0, 3).map((docId) => (
-                            <Badge 
-                              key={docId} 
-                              variant="outline"
-                              className="text-[10px] font-bold bg-white text-zinc-500 border-zinc-200 px-1.5 py-0"
-                            >
-                              {docId}
-                            </Badge>
-                          ))}
-                          {item.related_document_ids.length > 3 && (
-                            <Badge 
-                              variant="secondary"
-                              className="text-[10px] font-bold bg-zinc-100 text-zinc-400 border-zinc-200 px-1.5 py-0"
-                            >
-                              +{item.related_document_ids.length - 3}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
                     <div className="flex gap-2">
                       {item.file_url && (
                         <Button 
                           variant="outline" 
                           size="sm"
                           onClick={() => handleDownload(item)}
-                          className="flex-1 h-9 text-xs font-semibold border-zinc-200 text-zinc-700 hover:bg-zinc-50"
+                          className="flex-1 h-9 text-xs font-light border-gray-200 text-gray-600 hover:bg-gray-50 rounded-none"
                         >
-                          <Download className="h-3.5 w-3.5 mr-2 text-zinc-400" />
+                          <Download className="h-3.5 w-3.5 mr-2 text-gray-400" />
                           Download
                         </Button>
                       )}
@@ -392,7 +357,7 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(item.id)}
-                        className="h-9 px-3 border-zinc-200 text-zinc-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
+                        className="h-9 px-3 border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors rounded-none"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>

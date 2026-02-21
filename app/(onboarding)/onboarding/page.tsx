@@ -30,59 +30,59 @@ export default function OnboardingPage() {
     <OnboardingLayout showNextButton={false} showBackButton={false}>
       <div className="space-y-6 relative" style={{ zIndex: 1 }}>
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-extralight text-zinc-900">
+          <h1 className="text-4xl font-thin text-[#0e274e]">
             Welcome to HIPAA Hub
           </h1>
-          <p className="text-lg text-zinc-600 max-w-2xl mx-auto">
+          <p className="text-lg text-[#565656] max-w-2xl mx-auto font-light">
             Let's get your practice HIPAA compliant in just a few steps. This
             will take about 20-30 minutes, including time to upload evidence documents.
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 mt-8">
-          <Card className="card-premium-enter stagger-item">
+          <Card className="border-0 shadow-sm bg-white rounded-none">
             <CardHeader>
-              <Shield className="h-8 w-8 text-[#1ad07a] mb-2" />
-              <CardTitle>Risk Assessment</CardTitle>
+              <Shield className="h-8 w-8 text-[#00bceb] mb-2" />
+              <CardTitle className="text-[#0e274e] font-light">Risk Assessment</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[#565656] font-light">
                 Quick questionnaire to identify your HIPAA compliance gaps
               </p>
             </CardContent>
           </Card>
 
-          <Card className="card-premium-enter stagger-item" style={{ animationDelay: '50ms' }}>
+          <Card className="border-0 shadow-sm bg-white rounded-none">
             <CardHeader>
-              <FileCheck className="h-8 w-8 text-[#1ad07a] mb-2" />
-              <CardTitle>Action Plan</CardTitle>
+              <FileCheck className="h-8 w-8 text-[#00bceb] mb-2" />
+              <CardTitle className="text-[#0e274e] font-light">Action Plan</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[#565656] font-light">
                 Get a clear list of what you need to do to become compliant
               </p>
             </CardContent>
           </Card>
 
-          <Card className="card-premium-enter stagger-item" style={{ animationDelay: '100ms' }}>
+          <Card className="border-0 shadow-sm bg-white rounded-none">
             <CardHeader>
-              <FileCheck className="h-8 w-8 text-[#1ad07a] mb-2" />
-              <CardTitle>Ready Documents</CardTitle>
+              <FileCheck className="h-8 w-8 text-[#00bceb] mb-2" />
+              <CardTitle className="text-[#0e274e] font-light">Ready Documents</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[#565656] font-light">
                 Generate HIPAA policies and documents instantly
               </p>
             </CardContent>
           </Card>
 
-          <Card className="card-premium-enter stagger-item" style={{ animationDelay: '150ms' }}>
+          <Card className="border-0 shadow-sm bg-white rounded-none">
             <CardHeader>
-              <Users className="h-8 w-8 text-[#1ad07a] mb-2" />
-              <CardTitle>Staff Management</CardTitle>
+              <Users className="h-8 w-8 text-[#00bceb] mb-2" />
+              <CardTitle className="text-[#0e274e] font-light">Staff Management</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[#565656] font-light">
                 Track employee training and compliance
               </p>
             </CardContent>
@@ -96,7 +96,7 @@ export default function OnboardingPage() {
               console.log('Link clicked!');
               handleGetStarted(e);
             }}
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-11 px-8 bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90 transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1ad07a] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-[1.01] active:scale-[0.98] cursor-pointer no-underline"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-none text-sm font-bold h-11 px-8 bg-[#00bceb] text-white hover:bg-[#00bceb]/90 transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00bceb] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-[1.01] active:scale-[0.98] cursor-pointer no-underline"
             style={{ pointerEvents: 'auto', position: 'relative', zIndex: 1000 }}
           >
             Get Started

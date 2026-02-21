@@ -189,3 +189,132 @@ export const getActionItems = cache(async (supabase: SupabaseClient<Database>, u
 
   return actionItems || [];
 });
+
+// Get Policy Documents Count
+// Counts policies that have been generated (have evidence or are marked as complete)
+export const getPolicyDocumentsCount = cache(async (supabase: SupabaseClient<Database>, userId: string) => {
+  // Get organization_id first
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (!organization) {
+    return { total: 9, completed: 0 };
+  }
+
+  // Check compliance_evidence for policy-related documents
+  // Policy document IDs: POL-001 through POL-009
+  const policyIds = ['POL-001', 'POL-002', 'POL-003', 'POL-004', 'POL-005', 'POL-006', 'POL-007', 'POL-008', 'POL-009'];
+  
+  const { data: evidence, error } = await (supabase as any)
+    .from('compliance_evidence')
+    .select('related_document_ids')
+    .eq('organization_id', organization.id)
+    .in('status', ['VALID', 'REQUIRES_REVIEW']);
+
+  if (error) {
+    console.error('Error fetching policy documents:', error);
+    return { total: 9, completed: 0 };
+  }
+
+  // Count unique policy IDs found in evidence
+  const foundPolicyIds = new Set<string>();
+  if (evidence && Array.isArray(evidence)) {
+    evidence.forEach((item: any) => {
+      if (item.related_document_ids && Array.isArray(item.related_document_ids)) {
+        item.related_document_ids.forEach((docId: string) => {
+          if (policyIds.includes(docId)) {
+            foundPolicyIds.add(docId);
+          }
+        });
+      }
+    });
+  }
+
+  return {
+    total: 9,
+    completed: foundPolicyIds.size
+  };
+});
+
+// Get Activity Feed
+// Returns recent activity based on action items, risk assessments, and training
+export const getActivityFeed = cache(async (supabase: SupabaseClient<Database>, userId: string, limit: number = 10) => {
+  const activities: Array<{
+    title: string;
+    time: string;
+    date: string;
+    status: 'info' | 'success' | 'warning' | 'error';
+  }> = [];
+
+  // Get recent action item completions
+  const { data: completedActions } = await supabase
+    .from('action_items')
+    .select('title, completed_at')
+    .eq('user_id', userId)
+    .eq('status', 'completed')
+    .not('completed_at', 'is', null)
+    .order('completed_at', { ascending: false })
+    .limit(5);
+
+  if (completedActions) {
+    completedActions.forEach((action: any) => {
+      const date = new Date(action.completed_at);
+      activities.push({
+        title: `Action Item Completed: ${action.title}`,
+        time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }),
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        status: 'success'
+      });
+    });
+  }
+
+  // Get recent risk assessment updates
+  const { data: riskAssessment } = await (supabase as any)
+    .from('onboarding_risk_assessments')
+    .select('updated_at, risk_level')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (riskAssessment && riskAssessment.updated_at) {
+    const date = new Date(riskAssessment.updated_at);
+    activities.push({
+      title: `Risk Assessment Updated: ${riskAssessment.risk_level?.toUpperCase() || 'Unknown'} Risk`,
+      time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }),
+      date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      status: 'info'
+    });
+  }
+
+  // Get recent training completions
+  const { data: trainings } = await supabase
+    .from('staff_members')
+    .select('name, training_completed_at')
+    .eq('user_id', userId)
+    .not('training_completed_at', 'is', null)
+    .order('training_completed_at', { ascending: false })
+    .limit(3);
+
+  if (trainings) {
+    trainings.forEach((training: any) => {
+      const date = new Date(training.training_completed_at);
+      activities.push({
+        title: `Staff Training Completed: ${training.name || 'Staff Member'}`,
+        time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }),
+        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        status: 'success'
+      });
+    });
+  }
+
+  // Sort by date (most recent first) and limit
+  activities.sort((a, b) => {
+    const dateA = new Date(`${a.date} ${a.time}`);
+    const dateB = new Date(`${b.date} ${b.time}`);
+    return dateB.getTime() - dateA.getTime();
+  });
+
+  return activities.slice(0, limit);
+});

@@ -20,7 +20,7 @@ interface ActionItem {
 export default function ActionPlanPage() {
   const { state, nextStep, markStepComplete } = useOnboarding();
   const router = useRouter();
-  const { riskAssessment, riskLevel } = state;
+  const { riskAssessment } = state;
 
   const actionItems = useMemo<ActionItem[]>(() => {
     const items: ActionItem[] = [];
@@ -152,25 +152,25 @@ export default function ActionPlanPage() {
       <div className="space-y-8 max-w-5xl mx-auto w-full">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-extralight text-[#0c0b1d]">
+          <h1 className="text-4xl font-thin text-[#0e274e]">
             Your HIPAA Action Plan
           </h1>
-          <p className="text-xl text-zinc-600 font-extralight">
+          <p className="text-xl text-[#565656] font-light">
             Here's what you need to do to become compliant
           </p>
         </div>
 
         {/* Action Items Grid */}
         {actionItems.length === 0 ? (
-          <Card className="border-zinc-200 bg-gradient-to-br from-green-50 to-white">
+          <Card className="border-zinc-200 bg-gradient-to-br from-green-50 to-white rounded-none">
             <CardContent className="py-16 text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-6">
-                <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#71bc48]/10 mb-6">
+                <CheckCircle2 className="h-8 w-8 text-[#71bc48]" />
               </div>
-              <h3 className="text-2xl font-extralight text-zinc-900 mb-3">
+              <h3 className="text-2xl font-light text-[#0e274e] mb-3">
                 You're all set!
               </h3>
-              <p className="text-zinc-600 font-extralight">
+              <p className="text-[#565656] font-light">
                 No critical action items identified.
               </p>
             </CardContent>
@@ -197,7 +197,7 @@ export default function ActionPlanPage() {
                   bg: 'bg-blue-50',
                   border: 'border-blue-200',
                   iconBg: 'bg-blue-100',
-                  iconColor: 'text-blue-600',
+                  iconColor: 'text-[#00bceb]',
                   badge: 'bg-blue-100 text-blue-700 border-blue-300'
                 }
               };
@@ -207,12 +207,12 @@ export default function ActionPlanPage() {
               return (
                 <Card
                   key={item.id}
-                  className={`${config.bg} ${config.border} border-2 hover:shadow-lg transition-all duration-300`}
+                  className={`${config.bg} ${config.border} border hover:shadow-md transition-all duration-300 rounded-none`}
                 >
                   <CardContent className="p-8">
                     <div className="flex items-start gap-6">
                       {/* Icon */}
-                      <div className={`p-4 rounded-2xl ${config.iconBg} ${config.iconColor} shrink-0`}>
+                      <div className={`p-4 rounded-none ${config.iconBg} ${config.iconColor} shrink-0`}>
                         <div className="w-8 h-8">
                           {item.icon}
                         </div>
@@ -222,23 +222,23 @@ export default function ActionPlanPage() {
                       <div className="flex-1 space-y-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
-                            <h3 className="text-xl font-extralight text-[#0c0b1d] mb-2">
+                            <h3 className="text-xl font-light text-[#0e274e] mb-2">
                               {item.title}
                             </h3>
-                            <p className="text-base text-zinc-600 font-extralight leading-relaxed">
+                            <p className="text-base text-[#565656] font-light leading-relaxed">
                               {item.description}
                             </p>
                           </div>
                           <Badge
-                            className={`${config.badge} border capitalize font-extralight px-3 py-1 text-sm`}
+                            className={`${config.badge} border capitalize font-light px-3 py-1 text-sm rounded-none`}
                           >
                             {item.priority}
                           </Badge>
                         </div>
 
                         {/* Category */}
-                        <div className="flex items-center gap-2 pt-2 border-t border-zinc-200">
-                          <span className="text-xs font-extralight text-zinc-500 uppercase tracking-wider">
+                        <div className="flex items-center gap-2 pt-2 border-t border-zinc-200/50">
+                          <span className="text-xs font-light text-gray-500 uppercase tracking-wider">
                             {item.category}
                           </span>
                         </div>
@@ -253,17 +253,17 @@ export default function ActionPlanPage() {
 
         {/* Next Steps Info */}
         {actionItems.length > 0 && (
-          <Card className="bg-gradient-to-br from-[#f3f5f9] to-white border-2 border-zinc-200">
+          <Card className="bg-white border border-gray-200 rounded-none shadow-sm">
             <CardContent className="p-8">
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-xl bg-[#1ad07a]/10 shrink-0">
-                  <Info className="h-6 w-6 text-[#1ad07a]" />
+                <div className="p-3 bg-[#00bceb]/10 shrink-0">
+                  <Info className="h-6 w-6 text-[#00bceb]" />
                 </div>
                 <div className="flex-1 space-y-2">
-                  <h4 className="text-lg font-extralight text-[#0c0b1d]">
+                  <h4 className="text-lg font-light text-[#0e274e]">
                     Next Steps
                   </h4>
-                  <p className="text-base text-zinc-600 font-extralight leading-relaxed">
+                  <p className="text-base text-[#565656] font-light leading-relaxed">
                     Start with the critical items first. You can mark items as complete and upload evidence as you go. Don't worry - you can always come back to finish later.
                   </p>
                 </div>
@@ -275,4 +275,3 @@ export default function ActionPlanPage() {
     </OnboardingLayout>
   );
 }
-

@@ -106,6 +106,13 @@ export default function TakeTrainingPage() {
     }
   }, [currentSection, hasStarted]);
 
+  // Scroll to top when section changes
+  useEffect(() => {
+    if (hasStarted) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [currentSection, hasStarted]);
+
   // Save acknowledged state to localStorage
   useEffect(() => {
     localStorage.setItem('hipaa-training-acknowledged', acknowledged.toString());
@@ -133,9 +140,9 @@ export default function TakeTrainingPage() {
       title: 'Introduction to HIPAA',
       icon: <Shield className="h-6 w-6" />,
       content: (
-        <div className="space-y-4 text-zinc-700">
+        <div className="space-y-4 text-[#565656] font-light">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">What is HIPAA?</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">What is HIPAA?</h3>
             <p className="leading-relaxed">
               The Health Insurance Portability and Accountability Act (HIPAA) is a federal law that protects 
               the privacy and security of patients' health information. As a healthcare workforce member, you 
@@ -143,7 +150,7 @@ export default function TakeTrainingPage() {
             </p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Why HIPAA Matters</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Why HIPAA Matters</h3>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
               <li>Protects patient privacy and builds trust</li>
               <li>Prevents identity theft and fraud</li>
@@ -151,9 +158,9 @@ export default function TakeTrainingPage() {
               <li>Maintains professional standards in healthcare</li>
             </ul>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-zinc-700">
-              <strong className="text-zinc-900">Remember:</strong> Violations of HIPAA can result in severe penalties, including fines 
+          <div className="bg-[#00bceb]/10 border border-[#00bceb]/20 rounded-none p-4">
+            <p className="text-sm text-[#565656] font-light">
+              <strong className="text-[#0e274e] font-light">Remember:</strong> Violations of HIPAA can result in severe penalties, including fines 
               up to $1.5 million per year and potential criminal charges. Your compliance is essential.
             </p>
           </div>
@@ -170,9 +177,9 @@ export default function TakeTrainingPage() {
       title: 'Understanding PHI and ePHI',
       icon: <FileText className="h-6 w-6" />,
       content: (
-        <div className="space-y-4 text-zinc-700">
+        <div className="space-y-4 text-[#565656] font-light">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">What is PHI?</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">What is PHI?</h3>
             <p className="leading-relaxed mb-3">
               Protected Health Information (PHI) is any information that can identify a patient and relates to:
             </p>
@@ -182,14 +189,14 @@ export default function TakeTrainingPage() {
               <li>Payment for healthcare services</li>
             </ul>
             <p className="leading-relaxed">
-              <strong>Examples of PHI include:</strong> Names, addresses, phone numbers, email addresses, 
+              <strong className="font-light text-[#0e274e]">Examples of PHI include:</strong> Names, addresses, phone numbers, email addresses, 
               Social Security numbers, medical record numbers, health plan beneficiary numbers, account numbers, 
               license numbers, vehicle identifiers, device identifiers, web URLs, IP addresses, biometric identifiers, 
               full-face photos, and any other unique identifying numbers or codes.
             </p>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">What is ePHI?</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">What is ePHI?</h3>
             <p className="leading-relaxed">
               Electronic Protected Health Information (ePHI) is PHI that is created, stored, transmitted, or 
               received in electronic form. This includes information in:
@@ -202,9 +209,9 @@ export default function TakeTrainingPage() {
               <li>Computer systems and networks</li>
             </ul>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-sm text-zinc-700">
-              <strong className="text-zinc-900">Critical Rule:</strong> Never access, use, or disclose PHI unless it is necessary to perform 
+          <div className="bg-red-50 border border-red-200 rounded-none p-4">
+            <p className="text-sm text-[#565656] font-light">
+              <strong className="text-[#0e274e] font-light">Critical Rule:</strong> Never access, use, or disclose PHI unless it is necessary to perform 
               your job duties. When in doubt, ask your supervisor or the Privacy Officer.
             </p>
           </div>
@@ -221,25 +228,25 @@ export default function TakeTrainingPage() {
       title: 'Minimum Necessary Rule',
       icon: <Lock className="h-6 w-6" />,
       content: (
-        <div className="space-y-4 text-zinc-700">
+        <div className="space-y-4 text-[#565656] font-light">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">The Minimum Necessary Standard</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">The Minimum Necessary Standard</h3>
             <p className="leading-relaxed mb-3">
               The Minimum Necessary Rule requires that you access, use, or disclose only the minimum amount of 
               PHI necessary to accomplish your intended purpose. This is one of the most important HIPAA principles.
             </p>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 my-4">
-              <h4 className="font-semibold text-zinc-900 mb-2">✅ Good Practices:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm text-zinc-700">
+            <div className="bg-[#71bc48]/10 border border-[#71bc48]/20 rounded-none p-4 my-4">
+              <h4 className="font-light text-[#0e274e] mb-2">Good Practices</h4>
+              <ul className="list-disc list-inside space-y-1 text-sm text-[#565656] font-light">
                 <li>Access only the patient records you need for your specific task</li>
                 <li>Share only the minimum information required with colleagues</li>
                 <li>Use de-identified data when possible for training or research</li>
                 <li>Close patient records immediately after use</li>
               </ul>
             </div>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <h4 className="font-semibold text-zinc-900 mb-2">❌ Prohibited Practices:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm text-zinc-700">
+            <div className="bg-red-50 border border-red-200 rounded-none p-4">
+              <h4 className="font-light text-[#0e274e] mb-2">Prohibited Practices</h4>
+              <ul className="list-disc list-inside space-y-1 text-sm text-[#565656] font-light">
                 <li>Browsing patient records out of curiosity</li>
                 <li>Accessing records of friends, family, or celebrities</li>
                 <li>Sharing more information than necessary</li>
@@ -248,9 +255,9 @@ export default function TakeTrainingPage() {
             </div>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Applying Minimum Necessary</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Applying Minimum Necessary</h3>
             <p className="leading-relaxed">
-              Before accessing PHI, always ask yourself: <strong>"Do I really need this information to do my job?"</strong> 
+              Before accessing PHI, always ask yourself: <strong className="font-light text-[#0e274e]">"Do I really need this information to do my job?"</strong> 
               If the answer is no, don't access it. If you're unsure, ask your supervisor.
             </p>
           </div>
@@ -267,9 +274,9 @@ export default function TakeTrainingPage() {
       title: 'Access Controls & Passwords',
       icon: <Lock className="h-6 w-6" />,
       content: (
-        <div className="space-y-4 text-zinc-700">
+        <div className="space-y-4 text-[#565656] font-light">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Password Security</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Password Security</h3>
             <p className="leading-relaxed mb-3">
               Strong passwords are your first line of defense against unauthorized access to PHI. Follow these 
               requirements:
@@ -284,7 +291,7 @@ export default function TakeTrainingPage() {
             </ul>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Account Security</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Account Security</h3>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
               <li>Never leave your computer unlocked when unattended</li>
               <li>Log out of all systems when you're done working</li>
@@ -293,9 +300,9 @@ export default function TakeTrainingPage() {
               <li>Don't write down passwords or store them in unsecured locations</li>
             </ul>
           </div>
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <p className="text-sm text-zinc-700">
-              <strong className="text-zinc-900">Remember:</strong> If someone uses your account to access PHI, you are responsible. 
+          <div className="bg-amber-50 border border-amber-200 rounded-none p-4">
+            <p className="text-sm text-[#565656] font-light">
+              <strong className="text-[#0e274e] font-light">Remember:</strong> If someone uses your account to access PHI, you are responsible. 
               Protect your credentials as if they were your own identity.
             </p>
           </div>
@@ -312,15 +319,15 @@ export default function TakeTrainingPage() {
       title: 'Email & Communication Security',
       icon: <Mail className="h-6 w-6" />,
       content: (
-        <div className="space-y-4 text-zinc-700">
+        <div className="space-y-4 text-[#565656] font-light">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Secure Communication Practices</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Secure Communication Practices</h3>
             <p className="leading-relaxed mb-3">
               PHI transmitted via email or other communication methods must be protected. Follow these guidelines:
             </p>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 my-4">
-              <h4 className="font-semibold text-zinc-900 mb-2">✅ Secure Practices:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm text-zinc-700">
+            <div className="bg-[#71bc48]/10 border border-[#71bc48]/20 rounded-none p-4 my-4">
+              <h4 className="font-light text-[#0e274e] mb-2">Secure Practices</h4>
+              <ul className="list-disc list-inside space-y-1 text-sm text-[#565656] font-light">
                 <li>Use encrypted email systems approved by your organization</li>
                 <li>Verify recipient email addresses before sending PHI</li>
                 <li>Use secure messaging platforms for internal communication</li>
@@ -328,9 +335,9 @@ export default function TakeTrainingPage() {
                 <li>Use secure file transfer methods for large files</li>
               </ul>
             </div>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <h4 className="font-semibold text-zinc-900 mb-2">❌ Prohibited Practices:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm text-zinc-700">
+            <div className="bg-red-50 border border-red-200 rounded-none p-4">
+              <h4 className="font-light text-[#0e274e] mb-2">Prohibited Practices</h4>
+              <ul className="list-disc list-inside space-y-1 text-sm text-[#565656] font-light">
                 <li>Never send PHI via personal email accounts (Gmail, Yahoo, etc.)</li>
                 <li>Don't send PHI via unencrypted text messages</li>
                 <li>Avoid discussing PHI in public areas or on social media</li>
@@ -340,7 +347,7 @@ export default function TakeTrainingPage() {
             </div>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Phone and In-Person Communication</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Phone and In-Person Communication</h3>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
               <li>Verify the identity of callers before discussing PHI</li>
               <li>Speak quietly when discussing PHI in person</li>
@@ -361,9 +368,9 @@ export default function TakeTrainingPage() {
       title: 'Incident & Breach Reporting',
       icon: <AlertTriangle className="h-6 w-6" />,
       content: (
-        <div className="space-y-4 text-zinc-700">
+        <div className="space-y-4 text-[#565656] font-light">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">What is a Breach?</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">What is a Breach?</h3>
             <p className="leading-relaxed mb-3">
               A breach is the acquisition, access, use, or disclosure of PHI in a manner not permitted by HIPAA, 
               which compromises the security or privacy of the PHI. Examples include:
@@ -377,14 +384,14 @@ export default function TakeTrainingPage() {
             </ul>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Your Reporting Obligation</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Your Reporting Obligation</h3>
             <p className="leading-relaxed mb-3">
-              <strong>You must report any suspected breach immediately.</strong> Time is critical - the sooner 
+              <strong className="font-light text-[#0e274e]">You must report any suspected breach immediately.</strong> Time is critical - the sooner 
               we know, the sooner we can contain the damage and comply with legal requirements.
             </p>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <h4 className="font-semibold text-zinc-900 mb-2">Report Immediately To:</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm text-zinc-700">
+            <div className="bg-red-50 border border-red-200 rounded-none p-4">
+              <h4 className="font-light text-[#0e274e] mb-2">Report Immediately To:</h4>
+              <ul className="list-disc list-inside space-y-1 text-sm text-[#565656] font-light">
                 <li>Your immediate supervisor</li>
                 <li>Security Officer</li>
                 <li>Privacy Officer</li>
@@ -393,7 +400,7 @@ export default function TakeTrainingPage() {
             </div>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">What Information to Report</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">What Information to Report</h3>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
               <li>What happened (describe the incident)</li>
               <li>When it happened (date and time)</li>
@@ -402,9 +409,9 @@ export default function TakeTrainingPage() {
               <li>How you discovered it</li>
             </ul>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-zinc-700">
-              <strong className="text-zinc-900">Important:</strong> Reporting a potential breach is not an admission of wrongdoing. 
+          <div className="bg-[#00bceb]/10 border border-[#00bceb]/20 rounded-none p-4">
+            <p className="text-sm text-[#565656] font-light">
+              <strong className="text-[#0e274e] font-light">Important:</strong> Reporting a potential breach is not an admission of wrongdoing. 
               Prompt reporting protects you and the organization. Failure to report can result in severe consequences.
             </p>
           </div>
@@ -421,9 +428,9 @@ export default function TakeTrainingPage() {
       title: 'Sanctions for Violations',
       icon: <AlertTriangle className="h-6 w-6" />,
       content: (
-        <div className="space-y-4 text-zinc-700">
+        <div className="space-y-4 text-[#565656] font-light">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Organizational Sanctions</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Organizational Sanctions</h3>
             <p className="leading-relaxed mb-3">
               Our organization has a zero-tolerance policy for HIPAA violations. Violations may result in:
             </p>
@@ -435,19 +442,19 @@ export default function TakeTrainingPage() {
             </ul>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Federal Penalties</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Federal Penalties</h3>
             <p className="leading-relaxed mb-3">
               HIPAA violations can result in severe federal penalties:
             </p>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
-              <li><strong className="text-zinc-700">Civil penalties:</strong> $100 to $50,000 per violation, up to $1.5 million per year</li>
-              <li><strong className="text-zinc-700">Criminal penalties:</strong> Up to $250,000 in fines and up to 10 years in prison</li>
+              <li><strong className="text-[#565656] font-light">Civil penalties:</strong> $100 to $50,000 per violation, up to $1.5 million per year</li>
+              <li><strong className="text-[#565656] font-light">Criminal penalties:</strong> Up to $250,000 in fines and up to 10 years in prison</li>
               <li>Personal liability for individual workforce members</li>
             </ul>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-sm text-zinc-700">
-              <strong className="text-zinc-900">Remember:</strong> Ignorance is not a defense. You are responsible for knowing and 
+          <div className="bg-red-50 border border-red-200 rounded-none p-4">
+            <p className="text-sm text-[#565656] font-light">
+              <strong className="text-[#0e274e] font-light">Remember:</strong> Ignorance is not a defense. You are responsible for knowing and 
               following HIPAA rules. When in doubt, ask questions before acting.
             </p>
           </div>
@@ -464,24 +471,24 @@ export default function TakeTrainingPage() {
       title: 'Privacy Rights of Patients',
       icon: <Users className="h-6 w-6" />,
       content: (
-        <div className="space-y-4 text-zinc-700">
+        <div className="space-y-4 text-[#565656] font-light">
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Patient Rights Under HIPAA</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Patient Rights Under HIPAA</h3>
             <p className="leading-relaxed mb-3">
               Patients have specific rights regarding their health information. You must respect and facilitate 
               these rights:
             </p>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
-              <li><strong className="text-zinc-700">Right to Access:</strong> Patients can request copies of their medical records</li>
-              <li><strong className="text-zinc-700">Right to Amend:</strong> Patients can request corrections to their records</li>
-              <li><strong className="text-zinc-700">Right to an Accounting:</strong> Patients can request a list of disclosures of their PHI</li>
-              <li><strong className="text-zinc-700">Right to Request Restrictions:</strong> Patients can request limits on how their PHI is used</li>
-              <li><strong className="text-zinc-700">Right to Confidential Communications:</strong> Patients can request alternative communication methods</li>
-              <li><strong className="text-zinc-700">Right to File a Complaint:</strong> Patients can file complaints about privacy violations</li>
+              <li><strong className="text-[#565656] font-light">Right to Access:</strong> Patients can request copies of their medical records</li>
+              <li><strong className="text-[#565656] font-light">Right to Amend:</strong> Patients can request corrections to their records</li>
+              <li><strong className="text-[#565656] font-light">Right to an Accounting:</strong> Patients can request a list of disclosures of their PHI</li>
+              <li><strong className="text-[#565656] font-light">Right to Request Restrictions:</strong> Patients can request limits on how their PHI is used</li>
+              <li><strong className="text-[#565656] font-light">Right to Confidential Communications:</strong> Patients can request alternative communication methods</li>
+              <li><strong className="text-[#565656] font-light">Right to File a Complaint:</strong> Patients can file complaints about privacy violations</li>
             </ul>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Your Responsibilities</h3>
+            <h3 className="text-lg font-light text-[#0e274e] mb-2">Your Responsibilities</h3>
             <ul className="list-disc list-inside space-y-1 leading-relaxed">
               <li>Treat all patient requests with respect and professionalism</li>
               <li>Direct patient requests to the Privacy Officer when appropriate</li>
@@ -489,9 +496,9 @@ export default function TakeTrainingPage() {
               <li>Maintain confidentiality when discussing patient requests</li>
             </ul>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-zinc-700">
-              <strong className="text-zinc-900">Remember:</strong> Patient rights are protected by law. Violating these rights can result 
+          <div className="bg-[#00bceb]/10 border border-[#00bceb]/20 rounded-none p-4">
+            <p className="text-sm text-[#565656] font-light">
+              <strong className="text-[#0e274e] font-light">Remember:</strong> Patient rights are protected by law. Violating these rights can result 
               in severe penalties for both you and the organization.
             </p>
           </div>
@@ -546,19 +553,15 @@ export default function TakeTrainingPage() {
       handleSubmit();
     } else {
       setCurrentSection(prev => prev + 1);
-      // Scroll to top immediately and smoothly
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 0);
+      // Scroll to top immediately
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   };
 
   const handlePrevious = () => {
     setCurrentSection(prev => prev - 1);
-    // Scroll to top immediately and smoothly
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 0);
+    // Scroll to top immediately
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   const calculateQuizScore = () => {
@@ -753,25 +756,25 @@ export default function TakeTrainingPage() {
   // Show pre-training form if not started
   if (!hasStarted) {
     return (
-      <div className="flex min-h-screen w-full items-center justify-center px-4 py-8">
-        <Card className="max-w-2xl w-full">
-          <CardHeader>
+      <div className="flex min-h-screen w-full items-center justify-center px-4 py-8 bg-[#f3f5f9]">
+        <Card className="max-w-2xl w-full border-0 shadow-sm bg-white rounded-none">
+          <CardHeader className="border-b border-gray-200">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 bg-[#1ad07a]/10 rounded-lg">
-                <Shield className="h-8 w-8 text-[#1ad07a]" />
+              <div className="p-3 bg-[#00bceb]/10 rounded-none">
+                <Shield className="h-8 w-8 text-[#00bceb]" />
               </div>
               <div>
-                <CardTitle className="text-2xl text-[#0c0b1d]">HIPAA Employee Training</CardTitle>
-                <CardDescription className="mt-1">
+                <CardTitle className="text-2xl font-light text-[#0e274e]">HIPAA Employee Training</CardTitle>
+                <CardDescription className="mt-1 text-[#565656] font-light">
                   Before you begin, please provide your information
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 pt-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-sm font-semibold text-zinc-700">
+                <Label htmlFor="fullName" className="text-sm font-light text-[#0e274e]">
                   Full Name *
                 </Label>
                 <Input
@@ -780,15 +783,15 @@ export default function TakeTrainingPage() {
                   placeholder="Enter your full name as it should appear on the certificate"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  className="h-11"
+                  className="h-11 border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-[#565656] font-light">
                   This will appear on your training certificate
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="jobRole" className="text-sm font-semibold text-zinc-700">
+                <Label htmlFor="jobRole" className="text-sm font-light text-[#0e274e]">
                   Job Role / Title *
                 </Label>
                 <Input
@@ -797,31 +800,31 @@ export default function TakeTrainingPage() {
                   placeholder="e.g., Medical Assistant, Receptionist, Nurse, etc."
                   value={userRole}
                   onChange={(e) => setUserRole(e.target.value)}
-                  className="h-11"
+                  className="h-11 border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
-                <p className="text-xs text-zinc-500">
+                <p className="text-xs text-[#565656] font-light">
                   Your position/role within the organization
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-semibold text-zinc-700">
+                <Label className="text-sm font-light text-[#0e274e]">
                   Email Address
                 </Label>
                 <Input
                   type="email"
                   value={userEmail}
                   disabled
-                  className="h-11 bg-zinc-50"
+                  className="h-11 bg-[#f3f5f9] border-gray-300 rounded-none font-light"
                 />
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-[#00bceb]/10 border border-[#00bceb]/20 rounded-none p-4">
               <div className="flex items-start gap-3">
-                <BookOpen className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
-                <div className="text-sm text-zinc-700 space-y-2">
-                  <p className="font-semibold text-zinc-900">What to expect:</p>
+                <BookOpen className="h-5 w-5 text-[#00bceb] shrink-0 mt-0.5" />
+                <div className="text-sm text-[#565656] space-y-2 font-light">
+                  <p className="font-light text-[#0e274e]">What to expect:</p>
                   <ul className="list-disc list-inside space-y-1 text-sm">
                     <li>8 training sections covering HIPAA fundamentals</li>
                     <li>Knowledge check questions after each section</li>
@@ -835,7 +838,7 @@ export default function TakeTrainingPage() {
 
             <Button 
               onClick={handleStartTraining}
-              className="w-full h-12 bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90 font-semibold"
+              className="w-full h-12 bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
               size="lg"
             >
               <CheckCircle2 className="mr-2 h-5 w-5" />
@@ -848,45 +851,45 @@ export default function TakeTrainingPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6 max-w-[1600px] mx-auto px-4 py-8">
+    <div className="flex min-h-screen w-full flex-col gap-6 max-w-[1600px] mx-auto px-4 py-8 bg-[#f3f5f9]">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">HIPAA Employee Training</h1>
-        <p className="text-zinc-600">
-          Training for: <strong>{userName}</strong> ({userRole})
+        <h1 className="text-3xl font-light text-[#0e274e]">HIPAA Employee Training</h1>
+        <p className="text-[#565656] font-light">
+          Training for: <strong className="font-light text-[#0e274e]">{userName}</strong> ({userRole})
         </p>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-zinc-600">
+          <span className="text-[#565656] font-light">
             Section {currentSection + 1} of {trainingSections.length}
           </span>
-          <span className="text-zinc-600">{Math.round(progress)}% Complete</span>
+          <span className="text-[#565656] font-light">{Math.round(progress)}% Complete</span>
         </div>
         <Progress value={progress} className="h-2" />
       </div>
 
-      <Card>
-        <CardHeader>
+      <Card className="border-0 shadow-sm bg-white rounded-none">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg text-primary">
+            <div className="p-2 bg-[#00bceb]/10 rounded-none text-[#00bceb]">
               {currentSectionData.icon}
             </div>
             <div>
-              <CardTitle className="text-2xl">{currentSectionData.title}</CardTitle>
-              <CardDescription className="mt-1">
+              <CardTitle className="text-2xl font-light text-[#0e274e]">{currentSectionData.title}</CardTitle>
+              <CardDescription className="mt-1 text-[#565656] font-light">
                 Read the content below and answer the quiz questions to proceed.
               </CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           <div className="prose max-w-none">
             {currentSectionData.content}
           </div>
 
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-zinc-900 mb-4 flex items-center gap-2">
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-light text-[#0e274e] mb-4 flex items-center gap-2">
               <ClipboardCheck className="h-5 w-5" />
               Knowledge Check
             </h3>
@@ -899,7 +902,7 @@ export default function TakeTrainingPage() {
 
                 return (
                   <div key={qIdx} className="space-y-3">
-                    <p className="font-medium text-zinc-900">
+                    <p className="font-light text-[#0e274e]">
                       {qIdx + 1}. {question.question}
                     </p>
                     <div className="space-y-2">
@@ -910,40 +913,40 @@ export default function TakeTrainingPage() {
                         return (
                           <div
                             key={oIdx}
-                            className={`flex items-start gap-3 p-3 rounded-lg border-2 transition-all ${
+                            className={`flex items-start gap-3 p-3 rounded-none border-2 transition-all ${
                               showFeedback
                                 ? isRightAnswer
-                                  ? 'border-green-500 bg-green-50'
+                                  ? 'border-[#71bc48] bg-[#71bc48]/10'
                                   : isSelected && !isRightAnswer
                                   ? 'border-red-500 bg-red-50'
-                                  : 'border-zinc-200 bg-zinc-50'
+                                  : 'border-gray-200 bg-[#f3f5f9]'
                                 : isSelected
-                                ? 'border-primary bg-primary/5'
-                                : 'border-zinc-200 hover:border-zinc-300 cursor-pointer'
+                                ? 'border-[#00bceb] bg-[#00bceb]/5'
+                                : 'border-gray-200 hover:border-gray-300 cursor-pointer'
                             }`}
                             onClick={() => !showFeedback && handleQuizAnswer(currentSectionData.id, qIdx, oIdx)}
                           >
                             <div className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                               isSelected
-                                ? 'border-primary bg-primary'
-                                : 'border-zinc-300'
+                                ? 'border-[#00bceb] bg-[#00bceb]'
+                                : 'border-gray-300'
                             }`}>
                               {isSelected && (
                                 <div className="w-2 h-2 rounded-full bg-white" />
                               )}
                             </div>
-                            <span className={`flex-1 ${isSelected ? 'font-medium' : ''}`}>
+                            <span className={`flex-1 font-light ${isSelected ? 'text-[#0e274e]' : 'text-[#565656]'}`}>
                               {option}
                             </span>
                             {showFeedback && isRightAnswer && (
-                              <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+                              <CheckCircle2 className="h-5 w-5 text-[#71bc48] shrink-0" />
                             )}
                           </div>
                         );
                       })}
                     </div>
                     {showFeedback && !isCorrect && (
-                      <p className="text-sm text-red-600 font-medium">
+                      <p className="text-sm text-red-600 font-light">
                         Incorrect. The correct answer is: {question.options[question.correctAnswer]}
                       </p>
                     )}
@@ -954,8 +957,8 @@ export default function TakeTrainingPage() {
           </div>
 
           {isLastSection && (
-            <div className="border-t pt-6">
-              <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="border-t border-gray-200 pt-6">
+              <div className="flex items-start gap-3 p-4 bg-[#00bceb]/10 border border-[#00bceb]/20 rounded-none">
                 <Checkbox
                   id="acknowledgement"
                   checked={acknowledged}
@@ -964,9 +967,9 @@ export default function TakeTrainingPage() {
                 />
                 <Label
                   htmlFor="acknowledgement"
-                  className="text-sm leading-relaxed cursor-pointer"
+                  className="text-sm leading-relaxed cursor-pointer font-light text-[#565656]"
                 >
-                  <strong>I acknowledge that I have completed HIPAA training and understand my responsibilities.</strong>{' '}
+                  <strong className="font-light text-[#0e274e]">I acknowledge that I have completed HIPAA training and understand my responsibilities.</strong>{' '}
                   I understand that I must protect patient health information, follow all HIPAA policies and procedures, 
                   report any suspected breaches immediately, and that violations may result in disciplinary action, including 
                   termination and potential legal consequences.
@@ -982,7 +985,7 @@ export default function TakeTrainingPage() {
           variant="outline"
           onClick={handlePrevious}
           disabled={currentSection === 0}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto border-gray-300 text-[#565656] hover:bg-gray-50 rounded-none font-light"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Previous
@@ -990,7 +993,7 @@ export default function TakeTrainingPage() {
         <Button
           onClick={handleNext}
           disabled={!canProceed || isSubmitting}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
         >
           {isSubmitting ? (
             'Submitting...'

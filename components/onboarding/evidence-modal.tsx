@@ -69,7 +69,7 @@ export function EvidenceModal({
           <Button
             onClick={() => onOpenChange(false)}
             disabled={uploading}
-            className="bg-[#1ad07a] text-[#0d1122]"
+            className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
           >
             {uploading ? 'Uploading...' : 'Done'}
           </Button>

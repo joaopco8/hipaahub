@@ -12,10 +12,10 @@ export function NotificationSettings() {
   return (
     <div className="space-y-3">
       <div
-        className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
+        className={`flex items-center justify-between p-4 rounded-none border transition-colors ${
           isEverythingToggled 
-            ? 'border-[#1ad07a] bg-green-50/50' 
-            : 'border-zinc-200 bg-white hover:border-zinc-300'
+            ? 'border-[#00bceb] bg-[#00bceb]/10' 
+            : 'border-gray-200 bg-white hover:border-gray-300'
         }`}
       >
         <div className="flex items-center gap-3">
@@ -37,10 +37,10 @@ export function NotificationSettings() {
       </div>
       
       <div
-        className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
+        className={`flex items-center justify-between p-4 rounded-none border transition-colors ${
           isAvailableToggled 
-            ? 'border-[#1ad07a] bg-green-50/50' 
-            : 'border-zinc-200 bg-white hover:border-zinc-300'
+            ? 'border-[#00bceb] bg-[#00bceb]/10' 
+            : 'border-gray-200 bg-white hover:border-gray-300'
         }`}
       >
         <div className="flex items-center gap-3">
@@ -62,10 +62,10 @@ export function NotificationSettings() {
       </div>
       
       <div
-        className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
+        className={`flex items-center justify-between p-4 rounded-none border transition-colors ${
           isNotificationToggled 
-            ? 'border-[#1ad07a] bg-green-50/50' 
-            : 'border-zinc-200 bg-white hover:border-zinc-300'
+            ? 'border-[#00bceb] bg-[#00bceb]/10' 
+            : 'border-gray-200 bg-white hover:border-gray-300'
         }`}
       >
         <div className="flex items-center gap-3">

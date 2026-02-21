@@ -75,10 +75,10 @@ export function UploadZone({
   return (
     <div
       className={cn(
-        'relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200',
+        'relative border-2 border-dashed rounded-none p-8 text-center transition-all duration-200',
         isDragging
-          ? 'border-[#1ad07a] bg-[#1ad07a]/5'
-          : 'border-zinc-300 bg-white hover:border-zinc-400 hover:bg-zinc-50',
+          ? 'border-[#00bceb] bg-[#00bceb]/10'
+          : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50',
         className
       )}
       onDragOver={handleDragOver}
@@ -96,18 +96,18 @@ export function UploadZone({
       <label htmlFor="file-upload" className="cursor-pointer">
         {isUploading ? (
           <div className="flex flex-col items-center gap-3">
-            <Loader2 className="h-8 w-8 text-[#1ad07a] animate-spin" />
-            <p className="text-sm text-zinc-600">Uploading...</p>
+            <Loader2 className="h-8 w-8 text-[#00bceb] animate-spin" />
+            <p className="text-sm text-[#565656] font-light">Uploading...</p>
           </div>
         ) : uploaded ? (
           <div className="flex flex-col items-center gap-3">
             <div
-              className="rounded-full bg-[#1ad07a] p-2 checkmark-enter"
+              className="rounded-full bg-[#00bceb] p-2 checkmark-enter"
               style={{ animation: 'scaleIn 200ms ease-out' }}
             >
               <Check className="h-6 w-6 text-white" />
             </div>
-            <p className="text-sm font-medium text-[#1ad07a]">
+            <p className="text-sm font-light text-[#00bceb]">
               Uploaded successfully
             </p>
           </div>

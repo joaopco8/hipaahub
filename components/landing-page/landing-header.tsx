@@ -61,7 +61,7 @@ export default function LandingHeader() {
             <Link href="/" className="flex items-center gap-2 sm:gap-3 group relative z-[60]">
               <div className="relative w-24 sm:w-32 md:w-40 h-6 sm:h-8 md:h-10 transition-transform group-hover:scale-105">
                 <Image 
-                  src="/logohipa.png" 
+                  src="/logoescura.png" 
                   alt="HIPAA Hub" 
                   fill
                   priority

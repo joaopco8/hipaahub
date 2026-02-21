@@ -96,13 +96,13 @@ export default function StaffPage() {
       >
         <div className="space-y-6 max-w-2xl mx-auto w-full">
           <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-100 mb-4">
-              <Users className="h-10 w-10 text-zinc-600" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-[#f3f5f9] mb-4 rounded-none">
+              <Users className="h-10 w-10 text-[#00bceb]" />
             </div>
-            <h1 className="text-3xl font-extralight text-zinc-900">
+            <h1 className="text-3xl font-thin text-[#0e274e]">
               Do you have employees?
             </h1>
-            <p className="text-lg text-zinc-600">
+            <p className="text-lg text-[#565656] font-light">
               HIPAA requires all staff members to complete training. You can add
               them now or later.
             </p>
@@ -113,14 +113,14 @@ export default function StaffPage() {
               variant="outline"
               size="lg"
               onClick={handleSkip}
-              className="border-zinc-300 hover:bg-zinc-50"
+              className="border-gray-300 hover:bg-gray-50 rounded-none text-[#565656] font-light"
             >
               No employees / Skip for now
             </Button>
             <Button
               size="lg"
               onClick={() => setHasEmployees(true)}
-              className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+              className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
             >
               Yes, add employees
             </Button>
@@ -140,19 +140,19 @@ export default function StaffPage() {
     >
       <div className="space-y-6 max-w-2xl mx-auto w-full">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-extralight text-zinc-900">Add Staff Members</h1>
-          <p className="text-zinc-600">
+          <h1 className="text-3xl font-thin text-[#0e274e]">Add Staff Members</h1>
+          <p className="text-[#565656] font-light">
             Add employees who need HIPAA training. You can add more later.
           </p>
         </div>
 
-        <Card className="card-premium-enter stagger-item">
+        <Card className="card-premium-enter stagger-item rounded-none border-0 shadow-sm">
           <CardHeader>
-            <CardTitle>Add Staff Member</CardTitle>
+            <CardTitle className="text-[#0e274e] font-light">Add Staff Member</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="staff-email">Email Address</Label>
+              <Label htmlFor="staff-email" className="text-[#0e274e] font-light">Email Address</Label>
               <div className="flex gap-2">
                 <Input
                   id="staff-email"
@@ -165,6 +165,7 @@ export default function StaffPage() {
                       handleAddStaff();
                     }
                   }}
+                  className="rounded-none border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] font-light"
                 />
                 <Select
                   value={newStaffRole}
@@ -172,18 +173,18 @@ export default function StaffPage() {
                     setNewStaffRole(value as 'staff' | 'admin')
                   }
                 >
-                  <SelectTrigger className="w-[140px]">
+                  <SelectTrigger className="w-[140px] rounded-none border-gray-300 focus:border-[#00bceb] font-light">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="staff">Staff</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
+                  <SelectContent className="rounded-none">
+                    <SelectItem value="staff" className="font-light">Staff</SelectItem>
+                    <SelectItem value="admin" className="font-light">Admin</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button
                   onClick={handleAddStaff}
                   disabled={!newStaffEmail || !newStaffEmail.includes('@')}
-                  className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+                  className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -193,30 +194,30 @@ export default function StaffPage() {
         </Card>
 
         {staff.length > 0 && (
-          <Card className="card-premium-enter stagger-item">
+          <Card className="card-premium-enter stagger-item rounded-none border-0 shadow-sm">
             <CardHeader>
-              <CardTitle>Staff Members ({staff.length})</CardTitle>
+              <CardTitle className="text-[#0e274e] font-light">Staff Members ({staff.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {staff.map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 bg-white"
+                    className="flex items-center justify-between p-4 border border-gray-200 bg-white rounded-none"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-zinc-100">
-                        <Mail className="h-4 w-4 text-zinc-600" />
+                      <div className="p-2 bg-[#f3f5f9] rounded-none">
+                        <Mail className="h-4 w-4 text-[#565656]" />
                       </div>
                       <div>
-                        <div className="font-extralight text-zinc-900">
+                        <div className="font-light text-[#0e274e]">
                           {member.email}
                         </div>
                         <Badge
                           className={
                             member.role === 'admin'
-                              ? 'bg-blue-100 text-blue-700 border-blue-200'
-                              : 'bg-zinc-100 text-zinc-700 border-zinc-200'
+                              ? 'bg-[#00bceb]/10 text-[#00bceb] border-[#00bceb]/20 rounded-none font-light'
+                              : 'bg-gray-100 text-[#565656] border-gray-200 rounded-none font-light'
                           }
                         >
                           {member.role}
@@ -227,7 +228,7 @@ export default function StaffPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRemoveStaff(member.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded-none font-light"
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -239,10 +240,10 @@ export default function StaffPage() {
         )}
 
         {staff.length === 0 && (
-          <Card className="card-premium-enter stagger-item border-dashed">
+          <Card className="card-premium-enter stagger-item border-dashed border-gray-300 rounded-none shadow-none bg-transparent">
             <CardContent className="py-12 text-center">
-              <Users className="h-12 w-12 text-zinc-400 mx-auto mb-4" />
-              <p className="text-zinc-600">
+              <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-[#565656] font-light">
                 No staff members added yet. You can add them later from the
                 dashboard.
               </p>
@@ -250,15 +251,15 @@ export default function StaffPage() {
           </Card>
         )}
 
-        <Card className="card-premium-enter stagger-item bg-zinc-50 border-zinc-200">
+        <Card className="card-premium-enter stagger-item bg-[#f3f5f9] border border-gray-200 rounded-none shadow-none">
           <CardContent className="p-6">
             <div className="flex items-start gap-3">
-              <Users className="h-5 w-5 text-zinc-600 shrink-0 mt-0.5" />
+              <Users className="h-5 w-5 text-[#00bceb] shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h4 className="font-extralight text-zinc-900 mb-1">
+                <h4 className="font-light text-[#0e274e] mb-1">
                   What happens next?
                 </h4>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Staff members will receive an email invitation to complete
                   HIPAA training. You can track their progress from the
                   dashboard.
@@ -271,4 +272,3 @@ export default function StaffPage() {
     </OnboardingLayout>
   );
 }
-

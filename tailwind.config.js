@@ -55,15 +55,7 @@ module.exports = {
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
-        violetColor: 'rgb(33, 134, 234)',
         foreground: 'hsl(var(--foreground))',
-        pricingBackground: 'rgb(39, 45, 52)',
-        customColor: 'rgb(76, 45, 235)',
-        statsColor: 'rgb(39, 45, 52)',
-        grayColor: 'rgb(149, 158, 169)',
-        blackColor: 'rgb(21, 24, 27)',
-        white: 'rgb(255, 255, 255)',
-        greenColor: 'rgb(95, 207, 192)',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))'
@@ -92,12 +84,17 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
         },
+        // Legacy colors mapped or kept for compatibility
         footer: 'hsl(var(--footer))',
         ollabot: 'hsl(var(--ollabot))',
         'hipaa-dark': 'hsl(var(--hipaa-dark))',
         'hipaa-green': 'hsl(var(--hipaa-green))',
         'hipaa-gray': 'hsl(var(--hipaa-gray))',
-        'hipaa-white': 'hsl(var(--hipaa-white))'
+        'hipaa-white': 'hsl(var(--hipaa-white))',
+        // Cisco Brand Colors
+        'cisco-blue': '#00bceb',
+        'cisco-navy': '#0e274e',
+        'cisco-green': '#71BC48'
       },
       borderRadius: {
         lg: `var(--radius)`,
@@ -155,6 +152,16 @@ module.exports = {
           from: { opacity: '0' },
           to: { opacity: '1' }
         },
+        'fade-in-up': {
+          from: {
+            opacity: '0',
+            transform: 'translateY(20px)'
+          },
+          to: {
+            opacity: '1',
+            transform: 'translateY(0)'
+          }
+        },
         'slide-in-from-bottom': {
           from: { transform: 'translateY(10px)', opacity: '0' },
           to: { transform: 'translateY(0)', opacity: '1' }
@@ -180,6 +187,7 @@ module.exports = {
         'slide-in-from-bottom': 'slide-in-from-bottom 0.5s ease-out',
         'scale-in': 'scale-in 0.3s ease-out',
         scroll: 'scroll 3s linear infinite',
+        reveal: 'fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
       }
     }
   },

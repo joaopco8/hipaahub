@@ -7,9 +7,11 @@ import { uploadImage } from "@/utils/supabase/storage/client";
 import { convertBlobUrlToFile } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
+import { UserCircle } from 'lucide-react';
 
 export function ImageUpload({ user }: { user: any }) {
-  const [avatarUrl, setAvatarUrl] = useState(`${user.avatar_url}?t=${Date.now()}`);
+  const userAvatarUrl = user?.user_metadata?.avatar_url || user?.avatar_url || null;
+  const [avatarUrl, setAvatarUrl] = useState(userAvatarUrl ? `${userAvatarUrl}?t=${Date.now()}` : null);
   const [imageUrl, setImageUrl] = useState("");
   const imageInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
@@ -64,57 +66,48 @@ export function ImageUpload({ user }: { user: any }) {
           variant: "default",
         });
         setImageUrl("");
+        // Refresh to update profile picture display
         router.refresh();
       }
     });
   };
 
+  const displayImageUrl = imageUrl || avatarUrl;
+
   return (
-    <div className="flex flex-col gap-4 justify-center items-left py-6">
-      <span className="text-sm font-medium">Avatar Image</span>
-      <div className="ml-1 w-24 h-24 rounded-lg overflow-hidden border-2 border-primary p-0.5">
-      <Image 
-        src={imageUrl || avatarUrl || '/default-avatar.png'} 
-        width={96} 
-        height={96} 
-        alt="User Avatar" 
-        className="object-cover rounded-lg"
-        unoptimized
-        key={avatarUrl}
-      />
-      </div>
+    <div className="flex flex-col gap-4">
       <input
         type="file"
         hidden
         ref={imageInputRef}
         onChange={handleImageChange}
         disabled={isPending}
+        accept="image/*"
       />
-      <div className="space-y-2">
+      <div className="space-y-3">
         <Button
           variant="outline"
           onClick={() => imageInputRef.current?.click()}
           disabled={isPending}
-          className="mt-2"
+          className="border-gray-300 text-[#565656] hover:bg-gray-50 rounded-none font-light"
         >
-          Select New Image
+          {displayImageUrl ? "Change Photo" : "Upload Photo"}
         </Button>
 
         {imageUrl && (
           <Button
             onClick={handleClickUploadImagesButton}
-            variant="default"
             disabled={isPending}
-            className="ml-2"
+            className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
           >
-            {isPending ? "Uploading..." : "Upload Image"}
+            {isPending ? "Uploading..." : "Save Photo"}
           </Button>
         )}
       </div>
-      <p className="text-sm text-gray-500">
-        {!imageUrl && !isPending && "Select a new image to update your avatar."}
-        {imageUrl && !isPending && "Click 'Upload Image' to set your new avatar."}
-        {isPending && "Uploading your new avatar..."}
+      <p className="text-xs text-[#565656] font-light">
+        {!imageUrl && !isPending && "Upload a profile picture to personalize your account."}
+        {imageUrl && !isPending && "Click 'Save Photo' to update your profile picture."}
+        {isPending && "Uploading your profile picture..."}
       </p>
     </div>
   );

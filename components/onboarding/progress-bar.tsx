@@ -31,17 +31,16 @@ export function OnboardingProgressBar() {
   }
 
   return (
-    <div className="w-full space-y-2 px-4 py-4 bg-white border-b border-zinc-200">
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-zinc-600">
+    <div className="w-full space-y-2 px-4 py-4 bg-white border-b border-gray-200">
+      <div className="flex items-center justify-between text-sm font-light">
+        <span className="text-gray-400">
           Step {displayStep} of {TOTAL_STEPS}
         </span>
-        <span className="text-zinc-600">
+        <span className="text-[#0e274e]">
           {stepLabel}
         </span>
       </div>
-      <Progress value={progress} className="h-2" />
+      <Progress value={progress} className="h-1 rounded-none bg-gray-100" />
     </div>
   );
 }
-

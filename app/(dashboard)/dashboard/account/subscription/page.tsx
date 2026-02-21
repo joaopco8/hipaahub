@@ -89,7 +89,7 @@ export default async function ManageSubscriptionPage() {
           <form action={openBillingPortal} className="space-y-3">
             <Button
               type="submit"
-              className="w-full bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+              className="w-full bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
             >
               <ExternalLink className="mr-2 h-4 w-4" />
               Open Stripe Billing Portal

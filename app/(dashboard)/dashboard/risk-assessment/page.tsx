@@ -26,133 +26,128 @@ export default async function RiskAssessmentPage() {
     : null;
 
   return (
-    <div className="flex w-full flex-col gap-6 page-transition-premium">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">HIPAA Risk Assessment</h1>
-        <p className="text-zinc-600 text-base">
-          Review, edit, or retake the full assessment to keep your compliance model accurate.
+    <div className="flex w-full flex-col gap-6">
+      {/* Cisco Header */}
+      <div className="mb-2">
+        <h2 className="text-2xl font-light text-[#0e274e]">HIPAA Risk Assessment</h2>
+        <p className="text-sm text-gray-400 font-light">
+          Manage your Security Risk Analysis (SRA)
         </p>
       </div>
 
       {!hasCompletedAssessment ? (
-        <Card className="card-premium-enter stagger-item">
-          <CardHeader>
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardHeader className="pb-2">
             <div className="flex items-center gap-3">
-              <Shield className="h-8 w-8 text-primary" />
+              <div className="h-10 w-10 rounded-full bg-[#00bceb]/10 flex items-center justify-center">
+                <Shield className="h-5 w-5 text-[#00bceb]" />
+              </div>
               <div>
-                <CardTitle className="text-2xl">Start the Full Assessment (150 Questions)</CardTitle>
-                <CardDescription>
-                  Your answers are saved automatically. You can leave and continue later at any time.
+                <CardTitle className="text-lg font-light text-[#0e274e]">Start Assessment</CardTitle>
+                <CardDescription className="text-xs text-gray-400">
+                  Comprehensive 150-question analysis
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h3 className="font-semibold mb-2">What this updates:</h3>
-                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                  <li>Your HIPAA risk level and risk score</li>
-                  <li>Priority action items generated from gaps</li>
-                  <li>Evidence requirements tied to your answers</li>
+              <div className="p-4 bg-[#f3f5f9] border border-gray-100">
+                <h3 className="text-sm font-medium text-[#0e274e] mb-2">Why this matters:</h3>
+                <ul className="list-disc list-inside space-y-1 text-xs text-[#565656] font-light">
+                  <li>Determines your HIPAA risk score</li>
+                  <li>Generates priority action items</li>
+                  <li>Identifies required evidence</li>
                 </ul>
               </div>
-              <Button asChild size="lg" className="w-full bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90">
+              <Button asChild size="lg" className="w-full bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-light">
                 <Link href="/onboarding/risk-assessment">Start Assessment</Link>
               </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                “If OCR shows up tomorrow, do we have defensible controls — or gaps?”
-              </p>
             </div>
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="border-0 shadow-sm bg-white rounded-none">
           <CardHeader>
-            <CardTitle>Update Your Answers (150 Questions)</CardTitle>
-            <CardDescription>
-              {lastUpdated ? `Last updated ${lastUpdated}.` : 'Your previous answers are saved.'}{' '}
-              You can change them anytime to update your risk model and action plan.
+            <CardTitle className="text-lg font-light text-[#0e274e]">Assessment Status</CardTitle>
+            <CardDescription className="text-xs text-gray-400">
+              {lastUpdated ? `Last updated ${lastUpdated}.` : 'Your answers are saved.'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-4 rounded-lg border">
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 p-4 bg-[#f3f5f9] border-l-4 border-[#0e274e]">
                 {riskLevel === 'low' && (
                   <>
-                    <CheckCircle2 className="h-8 w-8 text-green-600" />
+                    <CheckCircle2 className="h-8 w-8 text-[#71bc48]" />
                     <div>
-                      <div className="font-semibold text-lg">Low Risk</div>
-                      <div className="text-sm text-muted-foreground">
-                        Your practice is in good compliance with HIPAA requirements
+                      <div className="font-medium text-[#0e274e]">Low Risk</div>
+                      <div className="text-sm text-[#565656] font-light">
+                        Good compliance posture
                       </div>
                     </div>
                   </>
                 )}
                 {riskLevel === 'medium' && (
                   <>
-                    <AlertTriangle className="h-8 w-8 text-yellow-600" />
+                    <AlertTriangle className="h-8 w-8 text-yellow-500" />
                     <div>
-                      <div className="font-semibold text-lg">Medium Risk</div>
-                      <div className="text-sm text-muted-foreground">
-                        Some areas need attention to ensure full compliance
+                      <div className="font-medium text-[#0e274e]">Medium Risk</div>
+                      <div className="text-sm text-[#565656] font-light">
+                        Attention needed in some areas
                       </div>
                     </div>
                   </>
                 )}
                 {riskLevel === 'high' && (
                   <>
-                    <XCircle className="h-8 w-8 text-red-600" />
+                    <XCircle className="h-8 w-8 text-red-500" />
                     <div>
-                      <div className="font-semibold text-lg">High Risk</div>
-                      <div className="text-sm text-muted-foreground">
-                        Immediate action required to avoid potential violations
+                      <div className="font-medium text-[#0e274e]">High Risk</div>
+                      <div className="text-sm text-[#565656] font-light">
+                        Immediate action required
                       </div>
                     </div>
                   </>
                 )}
                 {!riskLevel && (
                   <>
-                    <AlertTriangle className="h-8 w-8 text-zinc-500" />
+                    <AlertTriangle className="h-8 w-8 text-gray-400" />
                     <div>
-                      <div className="font-semibold text-lg">Assessment In Progress</div>
-                      <div className="text-sm text-muted-foreground">
-                        Continue where you left off and complete all questions to refresh your results.
+                      <div className="font-medium text-[#0e274e]">In Progress</div>
+                      <div className="text-sm text-[#565656] font-light">
+                        Complete all questions to see results
                       </div>
                     </div>
                   </>
                 )}
               </div>
+              
               <Button
                 asChild
                 size="lg"
-                className="w-full bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90"
+                className="w-full bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-light"
               >
-                <Link href="/onboarding/risk-assessment">Continue / Edit Answers</Link>
+                <Link href="/onboarding/risk-assessment">Update Answers</Link>
               </Button>
-              <p className="text-xs text-muted-foreground">
-                Completing the assessment recalculates your risk score and may update action items.
-              </p>
             </div>
           </CardContent>
         </Card>
       )}
 
-      <Card>
+      <Card className="border-0 shadow-sm bg-white rounded-none">
         <CardHeader>
-          <CardTitle>Why Risk Assessment Matters</CardTitle>
+          <CardTitle className="text-base font-light text-[#0e274e]">Risk Analysis Overview</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3 text-sm text-muted-foreground">
+          <div className="space-y-3 text-sm text-[#565656] font-light">
             <p>
-              HIPAA violations can result in fines ranging from $100 to $50,000 per violation, 
-              with a maximum annual penalty of $1.5 million. A simple risk assessment helps you:
+              HIPAA violations can result in significant fines. A regular risk assessment helps you:
             </p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>Identify gaps in your compliance before an audit</li>
-              <li>Prioritize which areas need immediate attention</li>
-              <li>Document your compliance efforts</li>
-              <li>Reduce the risk of costly violations</li>
+            <ul className="list-disc list-inside space-y-1 ml-2">
+              <li>Identify compliance gaps</li>
+              <li>Prioritize remediation efforts</li>
+              <li>Document due diligence for auditors</li>
             </ul>
           </div>
         </CardContent>
@@ -160,6 +155,3 @@ export default async function RiskAssessmentPage() {
     </div>
   );
 }
-
-
-

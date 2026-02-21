@@ -303,22 +303,22 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Organization Identity */}
-      <Card className="border-zinc-200">
-        <CardHeader>
+      <Card className="border-0 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-[#1ad07a]" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <Building2 className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               Organization Identity
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Legal information about your organization
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="country" className="text-zinc-900">
+              <Label htmlFor="country" className="text-[#0e274e] font-light">
                 Country / Jurisdiction <span className="text-red-500">*</span>
               </Label>
               <Select
@@ -326,21 +326,21 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 disabled
                 required
               >
-                <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a] bg-zinc-50">
+                <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] bg-gray-50 rounded-none font-light">
                   <SelectValue placeholder="Select country" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="US">United States (US)</SelectItem>
+                <SelectContent className="rounded-none">
+                  <SelectItem value="US" className="font-light">United States (US)</SelectItem>
                 </SelectContent>
               </Select>
               <input type="hidden" name="country" value="US" />
-              <p className="text-xs text-zinc-500">HIPAA compliance is only applicable to United States organizations.</p>
+              <p className="text-xs text-[#565656] font-light">HIPAA compliance is only applicable to United States organizations.</p>
               {validationErrors.country && (
-                <p className="text-sm text-red-500">{validationErrors.country}</p>
+                <p className="text-sm text-red-500 font-light">{validationErrors.country}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="legal_name" className="text-zinc-900">
+              <Label htmlFor="legal_name" className="text-[#0e274e] font-light">
                 Legal Organization Name <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -348,14 +348,14 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="legal_name"
                 defaultValue={initialData?.legal_name || initialData?.name || ''}
                 placeholder="Enter legal organization name"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="dba" className="text-zinc-900">
+              <Label htmlFor="dba" className="text-[#0e274e] font-light">
                 DBA (Doing Business As)
               </Label>
               <Input
@@ -363,11 +363,11 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="dba"
                 defaultValue={initialData?.dba || ''}
                 placeholder="Optional"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="practice_type_primary" className="text-zinc-900">
+              <Label htmlFor="practice_type_primary" className="text-[#0e274e] font-light">
                 Practice Type (Primary) <span className="text-red-500">*</span>
               </Label>
               <Select
@@ -375,12 +375,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 onValueChange={setPracticeTypePrimary}
                 required
               >
-                <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                   <SelectValue placeholder="Select practice type" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-none">
                   {PRACTICE_TYPES.map((pt) => (
-                    <SelectItem key={pt.value} value={pt.value}>
+                    <SelectItem key={pt.value} value={pt.value} className="font-light">
                       {pt.label}
                     </SelectItem>
                   ))}
@@ -394,10 +394,10 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           
           {/* Specialties (Multiple) */}
           <div className="space-y-2">
-            <Label className="text-zinc-900">
+            <Label className="text-[#0e274e] font-light">
               Medical Specialties (Select all that apply)
             </Label>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 border border-zinc-200 rounded-lg max-h-64 overflow-y-auto">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 border border-gray-200 rounded-none max-h-64 overflow-y-auto">
               {MEDICAL_SPECIALTIES.map((specialty) => (
                 <div key={specialty} className="flex items-center space-x-2">
                   <Checkbox
@@ -410,10 +410,11 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                         setSpecialties(specialties.filter(s => s !== specialty));
                       }
                     }}
+                    className="rounded-none border-gray-400 data-[state=checked]:bg-[#00bceb] data-[state=checked]:border-[#00bceb]"
                   />
                   <Label
                     htmlFor={`specialty-${specialty}`}
-                    className="text-sm font-normal cursor-pointer"
+                    className="text-sm font-light cursor-pointer text-[#565656]"
                   >
                     {specialty}
                   </Label>
@@ -425,7 +426,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           
           {country === 'US' && (
             <div className="space-y-2">
-              <Label htmlFor="state" className="text-zinc-900">
+              <Label htmlFor="state" className="text-[#0e274e] font-light">
                 State (US) <span className="text-red-500">*</span>
               </Label>
               <Select
@@ -440,12 +441,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 }}
                 required
               >
-                <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                   <SelectValue placeholder="Select state" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-none">
                   {US_STATES.map((stateOption) => (
-                    <SelectItem key={stateOption} value={stateOption}>
+                    <SelectItem key={stateOption} value={stateOption} className="font-light">
                       {stateOption}
                     </SelectItem>
                   ))}
@@ -458,21 +459,21 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* Primary Business Address */}
-      <Card className="border-zinc-200">
-        <CardHeader>
+      <Card className="border-0 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-[#1ad07a]" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <MapPin className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               Primary Business Address
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Juridically critical for contracts and breach notifications
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="space-y-2">
-            <Label htmlFor="address_street" className="text-zinc-900">
+            <Label htmlFor="address_street" className="text-[#0e274e] font-light">
               Street Address <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -480,13 +481,13 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
               name="address_street"
               defaultValue={initialData?.address_street || ''}
               placeholder="Enter street address"
-              className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+              className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               required
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="address_city" className="text-zinc-900">
+              <Label htmlFor="address_city" className="text-[#0e274e] font-light">
                 City <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -494,12 +495,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="address_city"
                 defaultValue={initialData?.address_city || ''}
                 placeholder="Enter city"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="address_state" className="text-zinc-900">
+              <Label htmlFor="address_state" className="text-[#0e274e] font-light">
                 State <span className="text-red-500">*</span>
               </Label>
               {country === 'US' ? (
@@ -515,12 +516,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                   }}
                   required
                 >
-                  <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                  <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                     <SelectValue placeholder="Select state" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-none">
                     {US_STATES.map((stateOption) => (
-                      <SelectItem key={stateOption} value={stateOption}>
+                      <SelectItem key={stateOption} value={stateOption} className="font-light">
                         {stateOption}
                       </SelectItem>
                     ))}
@@ -534,17 +535,17 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                   onChange={(e) => setAddressState(e.target.value)}
                   defaultValue={initialData?.address_state || ''}
                   placeholder="Enter state/province"
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               )}
               <input type="hidden" name="address_state" value={addressState} />
               {validationErrors.address_state && (
-                <p className="text-sm text-red-500">{validationErrors.address_state}</p>
+                <p className="text-sm text-red-500 font-light">{validationErrors.address_state}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="address_zip" className="text-zinc-900">
+              <Label htmlFor="address_zip" className="text-[#0e274e] font-light">
                 ZIP Code <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -570,13 +571,13 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 }}
                 defaultValue={initialData?.address_zip || ''}
                 placeholder={country === 'US' ? '12345 or 12345-6789' : 'Enter ZIP/Postal Code'}
-                className={`border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a] ${
+                className={`border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light ${
                   validationErrors.address_zip ? 'border-red-500' : ''
                 }`}
                 required
               />
               {validationErrors.address_zip && (
-                <p className="text-sm text-red-500">{validationErrors.address_zip}</p>
+                <p className="text-sm text-red-500 font-light">{validationErrors.address_zip}</p>
               )}
             </div>
           </div>
@@ -584,22 +585,22 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* Security Officer */}
-      <Card className="border-zinc-200">
-        <CardHeader>
+      <Card className="border-0 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-[#1ad07a]" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <Shield className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               Security Officer
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             HIPAA requires names, not generic titles
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="security_officer_name" className="text-zinc-900">
+              <Label htmlFor="security_officer_name" className="text-[#0e274e] font-light">
                 Full Name <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -607,12 +608,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="security_officer_name"
                 defaultValue={initialData?.security_officer_name || ''}
                 placeholder="Enter full name"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="security_officer_email" className="text-zinc-900">
+              <Label htmlFor="security_officer_email" className="text-[#0e274e] font-light">
                 Email <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -621,12 +622,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 type="email"
                 defaultValue={initialData?.security_officer_email || ''}
                 placeholder="Enter email"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="security_officer_role" className="text-zinc-900">
+              <Label htmlFor="security_officer_role" className="text-[#0e274e] font-light">
                 Role / Title <span className="text-red-500">*</span>
               </Label>
               <Select
@@ -634,12 +635,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 onValueChange={setSecurityOfficerRole}
                 required
               >
-                <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-none">
                   {OFFICER_ROLES.security.map((role) => (
-                    <SelectItem key={role.value} value={role.value}>
+                    <SelectItem key={role.value} value={role.value} className="font-light">
                       {role.label}
                     </SelectItem>
                   ))}
@@ -652,7 +653,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                   placeholder="Specify role"
                   value={securityOfficerRoleOther}
                   onChange={(e) => setSecurityOfficerRoleOther(e.target.value)}
-                  className="mt-2 border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="mt-2 border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               )}
               <input type="hidden" name="security_officer_role_other" value={securityOfficerRoleOther} />
@@ -662,22 +663,22 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* Privacy Officer */}
-      <Card className="border-zinc-200">
-        <CardHeader>
+      <Card className="border-0 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-[#1ad07a]" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <Shield className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               Privacy Officer
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Can be the same person as Security Officer, but name must exist
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="privacy_officer_name" className="text-zinc-900">
+              <Label htmlFor="privacy_officer_name" className="text-[#0e274e] font-light">
                 Full Name <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -685,12 +686,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="privacy_officer_name"
                 defaultValue={initialData?.privacy_officer_name || ''}
                 placeholder="Enter full name"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="privacy_officer_email" className="text-zinc-900">
+              <Label htmlFor="privacy_officer_email" className="text-[#0e274e] font-light">
                 Email <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -699,12 +700,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 type="email"
                 defaultValue={initialData?.privacy_officer_email || ''}
                 placeholder="Enter email"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="privacy_officer_role" className="text-zinc-900">
+              <Label htmlFor="privacy_officer_role" className="text-[#0e274e] font-light">
                 Role / Title <span className="text-red-500">*</span>
               </Label>
               <Select
@@ -712,12 +713,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 onValueChange={setPrivacyOfficerRole}
                 required
               >
-                <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded-none">
                   {OFFICER_ROLES.privacy.map((role) => (
-                    <SelectItem key={role.value} value={role.value}>
+                    <SelectItem key={role.value} value={role.value} className="font-light">
                       {role.label}
                     </SelectItem>
                   ))}
@@ -730,7 +731,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                   placeholder="Specify role"
                   value={privacyOfficerRoleOther}
                   onChange={(e) => setPrivacyOfficerRoleOther(e.target.value)}
-                  className="mt-2 border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="mt-2 border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               )}
               <input type="hidden" name="privacy_officer_role_other" value={privacyOfficerRoleOther} />
@@ -740,26 +741,26 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* Organization Structure */}
-      <Card className="border-zinc-200">
-        <CardHeader>
+      <Card className="border-0 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-[#1ad07a]" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <Users className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               Organization Structure
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Information about your workforce
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="employee_count" className="text-zinc-900">
+                <Label htmlFor="employee_count" className="text-[#0e274e] font-light">
                   Number of Employees
                 </Label>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Current: {employeeCount} {employeeCount === 1 ? 'employee' : 'employees'}
                 </p>
               </div>
@@ -783,10 +784,10 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="has_employees" className="text-zinc-900">
+                <Label htmlFor="has_employees" className="text-[#0e274e] font-light">
                   Do you have employees?
                 </Label>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Select if your organization has employees
                 </p>
               </div>
@@ -794,14 +795,15 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 id="has_employees"
                 name="has_employees"
                 defaultChecked={initialData?.has_employees !== false}
+                className="data-[state=checked]:bg-[#00bceb]"
               />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="uses_contractors" className="text-zinc-900">
+                <Label htmlFor="uses_contractors" className="text-[#0e274e] font-light">
                   Uses Contractors / Vendors with PHI?
                 </Label>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Select if you work with contractors or vendors who handle PHI
                 </p>
               </div>
@@ -809,13 +811,14 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 id="uses_contractors"
                 name="uses_contractors"
                 defaultChecked={initialData?.uses_contractors || false}
+                className="data-[state=checked]:bg-[#00bceb]"
               />
             </div>
           </div>
           <Separator />
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="number_of_locations" className="text-zinc-900">
+              <Label htmlFor="number_of_locations" className="text-[#0e274e] font-light">
                 Number of Locations
               </Label>
               <Input
@@ -825,16 +828,16 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 min="1"
                 value={numberOfLocations}
                 onChange={(e) => setNumberOfLocations(parseInt(e.target.value) || 1)}
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
               <input type="hidden" name="number_of_locations" value={numberOfLocations} />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="multi_state_operations" className="text-zinc-900">
+                <Label htmlFor="multi_state_operations" className="text-[#0e274e] font-light">
                   Multi-State Operations
                 </Label>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Does your organization operate in multiple states?
                 </p>
               </div>
@@ -843,15 +846,16 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="multi_state_operations"
                 checked={multiStateOperations}
                 onCheckedChange={setMultiStateOperations}
+                className="data-[state=checked]:bg-[#00bceb]"
               />
               <input type="hidden" name="multi_state_operations" value={multiStateOperations ? 'on' : 'off'} />
             </div>
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="remote_workforce" className="text-zinc-900">
+                <Label htmlFor="remote_workforce" className="text-[#0e274e] font-light">
                   Remote Workforce
                 </Label>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Does your organization have remote workforce members?
                 </p>
               </div>
@@ -860,6 +864,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="remote_workforce"
                 checked={remoteWorkforce}
                 onCheckedChange={setRemoteWorkforce}
+                className="data-[state=checked]:bg-[#00bceb]"
               />
               <input type="hidden" name="remote_workforce" value={remoteWorkforce ? 'on' : 'off'} />
             </div>
@@ -868,25 +873,25 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* Technology */}
-      <Card className="border-zinc-200">
-        <CardHeader>
+      <Card className="border-0 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Laptop className="h-5 w-5 text-[#1ad07a]" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <Laptop className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               Technology Infrastructure
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Detailed information about your technology systems (impacts Security Policy)
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pt-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="stores_phi_electronically" className="text-zinc-900">
+              <Label htmlFor="stores_phi_electronically" className="text-[#0e274e] font-light">
                 Do you store or process PHI electronically?
               </Label>
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[#565656] font-light">
                 Almost always Yes for modern practices
               </p>
             </div>
@@ -894,6 +899,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
               id="stores_phi_electronically"
               name="stores_phi_electronically"
               defaultChecked={initialData?.stores_phi_electronically !== false}
+              className="data-[state=checked]:bg-[#00bceb]"
             />
           </div>
           
@@ -901,17 +907,17 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           
           {/* EHR System */}
           <div className="space-y-2">
-            <Label htmlFor="ehr_system" className="text-zinc-900">
+            <Label htmlFor="ehr_system" className="text-[#0e274e] font-light">
               EHR System (Electronic Health Records)
             </Label>
             <Select value={ehrSystem} onValueChange={setEhrSystem}>
-              <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+              <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                 <SelectValue placeholder="Select EHR system (if applicable)" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="not-applicable">Not Applicable</SelectItem>
+              <SelectContent className="rounded-none">
+                <SelectItem value="not-applicable" className="font-light">Not Applicable</SelectItem>
                 {EHR_SYSTEMS.map((ehr) => (
-                  <SelectItem key={ehr} value={ehr}>
+                  <SelectItem key={ehr} value={ehr} className="font-light">
                     {ehr}
                   </SelectItem>
                 ))}
@@ -922,17 +928,17 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           
           {/* Email Provider */}
           <div className="space-y-2">
-            <Label htmlFor="email_provider" className="text-zinc-900">
+            <Label htmlFor="email_provider" className="text-[#0e274e] font-light">
               Email Provider
             </Label>
             <Select value={emailProvider} onValueChange={setEmailProvider}>
-              <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+              <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                 <SelectValue placeholder="Select email provider" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="not-specified">Not Specified</SelectItem>
+              <SelectContent className="rounded-none">
+                <SelectItem value="not-specified" className="font-light">Not Specified</SelectItem>
                 {EMAIL_PROVIDERS.map((provider) => (
-                  <SelectItem key={provider} value={provider}>
+                  <SelectItem key={provider} value={provider} className="font-light">
                     {provider}
                   </SelectItem>
                 ))}
@@ -943,17 +949,17 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           
           {/* Cloud Storage Provider */}
           <div className="space-y-2">
-            <Label htmlFor="cloud_storage_provider" className="text-zinc-900">
+            <Label htmlFor="cloud_storage_provider" className="text-[#0e274e] font-light">
               Cloud Storage Provider
             </Label>
             <Select value={cloudStorageProvider} onValueChange={setCloudStorageProvider}>
-              <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+              <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                 <SelectValue placeholder="Select cloud storage provider (if applicable)" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="not-using-cloud">Not Using Cloud Storage</SelectItem>
+              <SelectContent className="rounded-none">
+                <SelectItem value="not-using-cloud" className="font-light">Not Using Cloud Storage</SelectItem>
                 {CLOUD_STORAGE_PROVIDERS.map((provider) => (
-                  <SelectItem key={provider} value={provider}>
+                  <SelectItem key={provider} value={provider} className="font-light">
                     {provider}
                   </SelectItem>
                 ))}
@@ -968,10 +974,10 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="uses_vpn" className="text-zinc-900">
+                <Label htmlFor="uses_vpn" className="text-[#0e274e] font-light">
                   Uses VPN for Remote Access?
                 </Label>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Virtual Private Network for secure remote access
                 </p>
               </div>
@@ -980,22 +986,23 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="uses_vpn"
                 checked={usesVpn}
                 onCheckedChange={setUsesVpn}
+                className="data-[state=checked]:bg-[#00bceb]"
               />
               <input type="hidden" name="uses_vpn" value={usesVpn ? 'on' : 'off'} />
             </div>
             {usesVpn && (
               <div className="space-y-2">
-                <Label htmlFor="vpn_provider" className="text-zinc-900">
+                <Label htmlFor="vpn_provider" className="text-[#0e274e] font-light">
                   VPN Provider
                 </Label>
                 <Select value={vpnProvider} onValueChange={setVpnProvider}>
-                  <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                  <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                     <SelectValue placeholder="Select VPN provider" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="not-specified">Not Specified</SelectItem>
+                  <SelectContent className="rounded-none">
+                    <SelectItem value="not-specified" className="font-light">Not Specified</SelectItem>
                     {VPN_PROVIDERS.map((provider) => (
-                      <SelectItem key={provider} value={provider}>
+                      <SelectItem key={provider} value={provider} className="font-light">
                         {provider}
                       </SelectItem>
                     ))}
@@ -1008,10 +1015,10 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           
           {/* Device Types */}
           <div className="space-y-2">
-            <Label className="text-zinc-900">
+            <Label className="text-[#0e274e] font-light">
               Device Types Used (Select all that apply)
             </Label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 border border-zinc-200 rounded-lg">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 border border-gray-200 rounded-none">
               {DEVICE_TYPES.map((device) => (
                 <div key={device} className="flex items-center space-x-2">
                   <Checkbox
@@ -1024,10 +1031,11 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                         setDeviceTypes(deviceTypes.filter(d => d !== device));
                       }
                     }}
+                    className="rounded-none border-gray-400 data-[state=checked]:bg-[#00bceb] data-[state=checked]:border-[#00bceb]"
                   />
                   <Label
                     htmlFor={`device-${device}`}
-                    className="text-sm font-normal cursor-pointer"
+                    className="text-sm font-light cursor-pointer text-[#565656]"
                   >
                     {device}
                   </Label>
@@ -1040,22 +1048,22 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* Optional Contact Information */}
-      <Card className="border-zinc-200">
-        <CardHeader>
+      <Card className="border-0 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Mail className="h-5 w-5 text-[#1ad07a]" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <Mail className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               Contact Information
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Optional institutional contact details
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="primary_contact_name" className="text-zinc-900">
+              <Label htmlFor="primary_contact_name" className="text-[#0e274e] font-light">
                 Primary Contact Name
               </Label>
               <Input
@@ -1064,11 +1072,11 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 value={primaryContactName}
                 onChange={(e) => setPrimaryContactName(e.target.value)}
                 placeholder="Optional"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="compliance_contact_email" className="text-zinc-900">
+              <Label htmlFor="compliance_contact_email" className="text-[#0e274e] font-light">
                 Compliance Contact Email
               </Label>
               <Input
@@ -1078,11 +1086,11 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 value={complianceContactEmail}
                 onChange={(e) => setComplianceContactEmail(e.target.value)}
                 placeholder="Optional"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="compliance_contact_phone" className="text-zinc-900">
+              <Label htmlFor="compliance_contact_phone" className="text-[#0e274e] font-light">
                 Compliance Contact Phone
               </Label>
               <Input
@@ -1092,7 +1100,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 value={complianceContactPhone}
                 onChange={(e) => setComplianceContactPhone(e.target.value)}
                 placeholder="Optional"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
           </div>
@@ -1100,22 +1108,22 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* US HIPAA Required Legal Identifiers */}
-      <Card className="border-blue-200 bg-blue-50/50">
-        <CardHeader>
+      <Card className="border-l-4 border-[#00bceb] shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <FileText className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               US Legal Identifiers (Required)
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Mandatory identifiers for HIPAA compliance documents in the United States
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="ein" className="text-zinc-900">
+              <Label htmlFor="ein" className="text-[#0e274e] font-light">
                 EIN (Employer Identification Number) <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1123,13 +1131,13 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="ein"
                 defaultValue={initialData?.ein || ''}
                 placeholder="XX-XXXXXXX"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
-              <p className="text-xs text-zinc-600">Format: XX-XXXXXXX (9 digits)</p>
+              <p className="text-xs text-[#565656] font-light">Format: XX-XXXXXXX (9 digits)</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="npi" className="text-zinc-900">
+              <Label htmlFor="npi" className="text-[#0e274e] font-light">
                 NPI (National Provider Identifier) <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1137,15 +1145,15 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="npi"
                 defaultValue={initialData?.npi || ''}
                 placeholder="1234567890"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
-              <p className="text-xs text-zinc-600">10 digits</p>
+              <p className="text-xs text-[#565656] font-light">10 digits</p>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="state_license_number" className="text-zinc-900">
+              <Label htmlFor="state_license_number" className="text-[#0e274e] font-light">
                 State License Number <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1153,12 +1161,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="state_license_number"
                 defaultValue={initialData?.state_license_number || ''}
                 placeholder="Enter state license number"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="state_tax_id" className="text-zinc-900">
+              <Label htmlFor="state_tax_id" className="text-[#0e274e] font-light">
                 State Tax ID <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1166,7 +1174,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="state_tax_id"
                 defaultValue={initialData?.state_tax_id || ''}
                 placeholder="Enter state tax ID"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
@@ -1175,22 +1183,22 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* CEO / Authorized Representative */}
-      <Card className="border-zinc-200">
-        <CardHeader>
+      <Card className="border-0 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-[#1ad07a]" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <Users className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               CEO / Authorized Representative
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Person authorized to sign legal documents and approve policies
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="ceo_name" className="text-zinc-900">
+              <Label htmlFor="ceo_name" className="text-[#0e274e] font-light">
                 CEO / Authorized Representative Name <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1198,12 +1206,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="ceo_name"
                 defaultValue={initialData?.ceo_name || ''}
                 placeholder="Enter full name"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ceo_title" className="text-zinc-900">
+              <Label htmlFor="ceo_title" className="text-[#0e274e] font-light">
                 CEO / Authorized Representative Title <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1211,7 +1219,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="ceo_title"
                 defaultValue={initialData?.ceo_title || ''}
                 placeholder="e.g., Chief Executive Officer, President"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
@@ -1220,25 +1228,25 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* Conditional Requirements */}
-      <Card className="border-amber-200 bg-amber-50/50">
-        <CardHeader>
+      <Card className="border-l-4 border-amber-400 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-amber-600" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <FileText className="h-5 w-5 text-amber-600" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               Conditional Requirements
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Required only if applicable to your organization
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="performs_laboratory_tests" className="text-zinc-900">
+              <Label htmlFor="performs_laboratory_tests" className="text-[#0e274e] font-light">
                 Does your organization perform laboratory tests?
               </Label>
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[#565656] font-light">
                 If yes, CLIA Certificate Number is required
               </p>
             </div>
@@ -1247,6 +1255,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 id="performs_laboratory_tests"
                 checked={performsLaboratoryTests}
                 onCheckedChange={setPerformsLaboratoryTests}
+                className="data-[state=checked]:bg-[#00bceb]"
               />
               <input
                 type="hidden"
@@ -1257,7 +1266,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           </div>
           {performsLaboratoryTests && (
             <div className="space-y-2">
-              <Label htmlFor="clia_certificate_number" className="text-zinc-900">
+              <Label htmlFor="clia_certificate_number" className="text-[#0e274e] font-light">
                 CLIA Certificate Number <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1265,16 +1274,16 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="clia_certificate_number"
                 defaultValue={initialData?.clia_certificate_number || ''}
                 placeholder="Enter CLIA certificate number"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
           )}
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="serves_medicare_patients" className="text-zinc-900">
+              <Label htmlFor="serves_medicare_patients" className="text-[#0e274e] font-light">
                 Does your organization serve Medicare patients?
               </Label>
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[#565656] font-light">
                 If yes, Medicare Provider Number is required
               </p>
             </div>
@@ -1283,6 +1292,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 id="serves_medicare_patients"
                 checked={servesMedicarePatients}
                 onCheckedChange={setServesMedicarePatients}
+                className="data-[state=checked]:bg-[#00bceb]"
               />
               <input
                 type="hidden"
@@ -1293,7 +1303,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
           </div>
           {servesMedicarePatients && (
             <div className="space-y-2">
-              <Label htmlFor="medicare_provider_number" className="text-zinc-900">
+              <Label htmlFor="medicare_provider_number" className="text-[#0e274e] font-light">
                 Medicare Provider Number <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -1301,7 +1311,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="medicare_provider_number"
                 defaultValue={initialData?.medicare_provider_number || ''}
                 placeholder="Enter Medicare provider number"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
           )}
@@ -1309,22 +1319,22 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       </Card>
 
       {/* Optional but Recommended */}
-      <Card className="border-zinc-200">
-        <CardHeader>
+      <Card className="border-0 shadow-sm rounded-none bg-white">
+        <CardHeader className="border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <Mail className="h-5 w-5 text-zinc-600" />
-            <CardTitle className="text-xl font-semibold text-zinc-900">
+            <Mail className="h-5 w-5 text-[#00bceb]" fill="currentColor" fillOpacity={0.3} strokeWidth={1.5} />
+            <CardTitle className="text-xl font-light text-[#0e274e]">
               Optional but Recommended
             </CardTitle>
           </div>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             These fields enhance your compliance documentation
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="phone_number" className="text-zinc-900">
+              <Label htmlFor="phone_number" className="text-[#0e274e] font-light">
                 Primary Phone Number
               </Label>
               <Input
@@ -1333,11 +1343,11 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 type="tel"
                 defaultValue={initialData?.phone_number || ''}
                 placeholder="(555) 123-4567"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email_address" className="text-zinc-900">
+              <Label htmlFor="email_address" className="text-[#0e274e] font-light">
                 Primary Email Address
               </Label>
               <Input
@@ -1346,12 +1356,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 type="email"
                 defaultValue={initialData?.email_address || ''}
                 placeholder="contact@example.com"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="website" className="text-zinc-900">
+            <Label htmlFor="website" className="text-[#0e274e] font-light">
               Website
             </Label>
             <Input
@@ -1360,12 +1370,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
               type="url"
               defaultValue={initialData?.website || ''}
               placeholder="https://www.example.com"
-              className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+              className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="accreditation_status" className="text-zinc-900">
+              <Label htmlFor="accreditation_status" className="text-[#0e274e] font-light">
                 Accreditation Status
               </Label>
               <Input
@@ -1373,11 +1383,11 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="accreditation_status"
                 defaultValue={initialData?.accreditation_status || ''}
                 placeholder="e.g., AAAHC, CLIA"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="types_of_services" className="text-zinc-900">
+              <Label htmlFor="types_of_services" className="text-[#0e274e] font-light">
                 Types of Services
               </Label>
               <Input
@@ -1385,12 +1395,12 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
                 name="types_of_services"
                 defaultValue={initialData?.types_of_services || ''}
                 placeholder="e.g., Primary Care, Cardiology"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="insurance_coverage" className="text-zinc-900">
+            <Label htmlFor="insurance_coverage" className="text-[#0e274e] font-light">
               Insurance Coverage
             </Label>
             <Input
@@ -1398,7 +1408,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
               name="insurance_coverage"
               defaultValue={initialData?.insurance_coverage || ''}
               placeholder="e.g., Cyber insurance, Malpractice"
-              className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+              className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
             />
           </div>
         </CardContent>
@@ -1409,7 +1419,7 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
         <Button
           type="submit"
           disabled={isSubmitting}
-          className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90 min-w-[200px]"
+          className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 min-w-[200px] rounded-none font-bold"
         >
           {isSubmitting ? 'Saving...' : 'Save Organization Information'}
         </Button>

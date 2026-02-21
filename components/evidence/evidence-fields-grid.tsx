@@ -12,16 +12,16 @@ import {
   Link as LinkIcon, 
   CheckCircle2,
   Upload,
-  AlertCircle
+  Eye, 
+  Download 
 } from 'lucide-react';
 import { 
-  EVIDENCE_FIELDS, 
   getEvidenceFieldsByCategory,
-  getEvidenceCategories,
-  type EvidenceFieldConfig 
+  getEvidenceCategories
 } from '@/lib/evidence-fields-config';
 import { EvidenceUploadModal } from './evidence-upload-modal';
 import { useRouter } from 'next/navigation';
+import { type ComplianceEvidence } from '@/app/actions/compliance-evidence';
 
 const EVIDENCE_TYPE_ICONS = {
   document: FileText,
@@ -32,15 +32,12 @@ const EVIDENCE_TYPE_ICONS = {
 };
 
 const EVIDENCE_TYPE_COLORS = {
-  document: 'bg-blue-50 text-blue-700 border-blue-100',
-  screenshot: 'bg-purple-50 text-purple-700 border-purple-100',
-  log: 'bg-amber-50 text-amber-700 border-amber-100',
-  link: 'bg-indigo-50 text-indigo-700 border-indigo-100',
-  attestation: 'bg-[#1ad07a]/10 text-[#0c0b1d] border-[#1ad07a]/20',
+  document: 'bg-blue-50/50 text-blue-600 border-0',
+  screenshot: 'bg-purple-50/50 text-purple-600 border-0',
+  log: 'bg-amber-50/50 text-amber-600 border-0',
+  link: 'bg-indigo-50/50 text-indigo-600 border-0',
+  attestation: 'bg-[#71bc48]/5 text-[#71bc48] border-0',
 };
-
-import { type ComplianceEvidence } from '@/app/actions/compliance-evidence';
-import { Eye, Download } from 'lucide-react';
 
 interface EvidenceFieldsGridProps {
   existingEvidence?: Array<{ field_id: string; uploaded: boolean }>;
@@ -69,36 +66,31 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
 
         return (
           <div key={category} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${catIndex * 100}ms` }}>
-            <Card className="bg-[#f3f5f9] border-zinc-200">
+            <Card className="bg-[#f3f5f9] border-0 rounded-none shadow-sm">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h2 className="text-xl font-bold text-[#0c0b1d] mb-2">{category}</h2>
+                    <h2 className="text-xl font-light text-[#0e274e] mb-2">{category}</h2>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
-                        <div className="h-2 w-40 bg-zinc-200 rounded-full overflow-hidden">
+                        <div className="h-2 w-40 bg-gray-200 rounded-none overflow-hidden">
                           <div 
-                            className="h-full bg-[#1ad07a] transition-all duration-1000" 
+                            className="h-full bg-[#71bc48] transition-all duration-1000" 
                             style={{ width: `${progress}%` }}
                           />
                         </div>
-                        <span className="text-sm font-semibold text-zinc-700">
+                        <span className="text-sm font-light text-gray-500">
                           {uploadedCount} of {fields.length} complete
                         </span>
                       </div>
-                      {requiredCount > 0 && (
-                        <Badge className="bg-amber-50 text-amber-700 border-amber-200 text-xs font-semibold">
-                          {fields.filter(f => f.required && hasEvidence(f.id)).length} / {requiredCount} required
-                        </Badge>
-                      )}
                     </div>
                   </div>
                   <Badge 
                     className={cn(
-                      "text-base font-bold px-5 py-2 rounded-lg",
+                      "text-base font-light px-5 py-2 rounded-none border-0",
                       progress === 100 
-                        ? "bg-[#1ad07a] text-[#0c0b1d] border-[#1ad07a]" 
-                        : "bg-white text-[#0c0b1d] border-zinc-300"
+                        ? "bg-[#71bc48] text-white" 
+                        : "bg-[#f3f5f9] text-[#565656]"
                     )}
                   >
                     {progress}%
@@ -117,38 +109,38 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                   <Card 
                     key={field.id}
                     className={cn(
-                      "group transition-all duration-300 border-zinc-200 hover:border-[#1ad07a] hover:shadow-xl hover:-translate-y-1 overflow-hidden relative",
-                      hasUploaded ? "bg-white border-[#1ad07a]/30" : "bg-white"
+                      "group transition-all duration-300 border-0 shadow-sm rounded-none overflow-hidden relative",
+                      hasUploaded ? "bg-white border-[#71bc48]/30" : "bg-white"
                     )}
                   >
                     {hasUploaded && (
                       <div className="absolute top-0 right-0 p-2">
-                        <CheckCircle2 className="h-5 w-5 text-[#1ad07a] animate-in zoom-in duration-300" />
+                        <CheckCircle2 className="h-5 w-5 text-[#71bc48] animate-in zoom-in duration-300" />
                       </div>
                     )}
                     
                     <CardHeader className="pb-3 pt-6 px-6">
                       <div className="flex items-center gap-3 mb-4">
                         <div className={cn(
-                          "p-2.5 rounded-lg transition-colors",
-                          hasUploaded ? "bg-[#1ad07a]/10 text-[#1ad07a]" : "bg-zinc-100 text-zinc-500 group-hover:bg-[#1ad07a]/10 group-hover:text-[#1ad07a]"
+                          "p-2.5 rounded-none transition-colors",
+                          hasUploaded ? "bg-[#71bc48]/10 text-[#71bc48]" : "bg-gray-100 text-gray-500 group-hover:bg-[#00bceb]/10 group-hover:text-[#00bceb]"
                         )}>
                           <IconComponent className="h-5 w-5" />
                         </div>
                         <Badge 
                           className={cn(
-                            "text-xs font-semibold px-2.5 py-0.5",
+                            "text-xs font-light px-2.5 py-0.5 rounded-none",
                             EVIDENCE_TYPE_COLORS[field.evidence_type]
                           )}
                         >
                           {field.evidence_type}
                         </Badge>
                       </div>
-                      <CardTitle className="text-base font-bold text-[#0c0b1d] leading-snug group-hover:text-[#1ad07a] transition-colors line-clamp-2 mb-2">
+                      <CardTitle className="text-base font-light text-[#0e274e] leading-snug group-hover:text-[#00bceb] transition-colors line-clamp-2 mb-2">
                         {field.name}
                       </CardTitle>
                       {field.description && (
-                        <CardDescription className="text-xs text-zinc-600 line-clamp-2 leading-relaxed">
+                        <CardDescription className="text-xs text-gray-400 line-clamp-2 leading-relaxed font-light">
                           {field.description}
                         </CardDescription>
                       )}
@@ -158,54 +150,44 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                       <div className="flex flex-wrap gap-2">
                         {isRequired && (
                           <Badge 
-                            className="text-xs font-semibold bg-amber-50 text-amber-700 border-amber-200"
+                            className="text-xs font-light bg-[#00bceb]/5 text-[#00bceb] border-0 rounded-none px-2 py-1"
                           >
                             Required
                           </Badge>
                         )}
                         {field.frequency && (
                           <Badge 
-                            className="text-xs font-semibold bg-zinc-100 text-zinc-700 border-zinc-200"
+                            className="text-xs font-light bg-[#f3f5f9] text-[#565656] border-0 rounded-none px-2 py-1"
                           >
                             {field.frequency.replace('_', ' ')}
                           </Badge>
                         )}
                       </div>
 
-                      <div className="space-y-2 text-xs">
+                      <div className="space-y-2 text-xs font-light">
                         <div className="flex items-start gap-2">
-                          <span className="font-semibold text-zinc-500 shrink-0">Policies:</span>
-                          <span className="text-zinc-700 font-medium line-clamp-1">{field.related_policies.join(', ')}</span>
+                          <span className="font-light text-[#565656] shrink-0">Policies:</span>
+                          <span className="text-[#565656] line-clamp-1">{field.related_policies.join(', ')}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-zinc-500">Retention:</span>
-                          <span className="text-zinc-700 font-medium">{field.retention_years} years</span>
+                          <span className="font-light text-[#565656]">Retention:</span>
+                          <span className="text-[#565656]">{field.retention_years} years</span>
                         </div>
                       </div>
 
                       {/* Show saved documents with view/download options */}
                       {evidenceByFieldId[field.id] && evidenceByFieldId[field.id].length > 0 && (
-                        <div className="space-y-2 pt-2 border-t border-zinc-100">
-                          <p className="text-xs font-semibold text-zinc-500 mb-2">Saved Documents:</p>
+                        <div className="space-y-2 pt-2 border-t border-gray-100">
+                          <p className="text-xs font-light text-[#565656] mb-2">Saved Documents:</p>
                           {evidenceByFieldId[field.id].map((ev) => (
                             <div 
                               key={ev.id} 
-                              className="flex items-center justify-between gap-2 p-2 bg-zinc-50 rounded-md border border-zinc-200"
+                              className="flex items-center justify-between gap-2 p-2 bg-gray-50 rounded-none border border-gray-200"
                             >
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium text-zinc-800 truncate">
+                                <p className="text-xs font-medium text-[#0e274e] truncate">
                                   {ev.title}
                                 </p>
-                                {ev.file_name && (
-                                  <p className="text-[10px] text-zinc-500 truncate">
-                                    {ev.file_name}
-                                  </p>
-                                )}
-                                {(ev as any).external_link && (
-                                  <p className="text-[10px] text-zinc-500 truncate">
-                                    {(ev as any).external_link}
-                                  </p>
-                                )}
                               </div>
                               <div className="flex items-center gap-1 shrink-0">
                                 {ev.file_url && (
@@ -213,25 +195,18 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-7 w-7 p-0 hover:bg-zinc-200"
+                                      className="h-7 w-7 p-0 hover:bg-gray-200 rounded-none"
                                       onClick={async () => {
                                         try {
-                                          const fileUrl = ev.file_url!;
                                           const bucket = ev.storage_bucket || 'evidence';
-                                          
                                           const response = await fetch(
-                                            `/api/compliance-evidence/view?file_url=${encodeURIComponent(fileUrl)}&bucket=${encodeURIComponent(bucket)}`
+                                            `/api/compliance-evidence/view?file_url=${encodeURIComponent(ev.file_url || '')}&bucket=${encodeURIComponent(bucket)}`
                                           );
                                           
                                           if (!response.ok) {
                                             const errorData = await response.json();
-                                            console.error('View API error:', errorData);
-                                            
-                                            if (response.status === 404) {
-                                              alert(`File not found. The file may have been deleted.\n\nFile: ${ev.file_name || fileUrl}\n\nPlease re-upload the document.`);
-                                            } else {
-                                              alert(`Failed to view document: ${errorData.error || 'Unknown error'}`);
-                                            }
+                                            console.error('Failed to get view URL:', errorData);
+                                            alert('Failed to open document. Please try downloading it instead.');
                                             return;
                                           }
                                           
@@ -239,87 +214,51 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                                           if (data.view_url) {
                                             window.open(data.view_url, '_blank');
                                           } else {
-                                            alert('Failed to generate view URL. Please try again.');
+                                            alert('Failed to generate view URL. Please try downloading the document.');
                                           }
-                                        } catch (error: any) {
-                                          console.error('Failed to view document:', error);
-                                          alert(`Failed to view document: ${error.message || 'Network error'}`);
+                                        } catch (error) {
+                                          console.error('Error viewing document:', error);
+                                          alert('An error occurred while trying to view the document. Please try downloading it instead.');
                                         }
                                       }}
                                       title="View Document"
                                     >
-                                      <Eye className="h-3.5 w-3.5 text-zinc-600" />
+                                      <Eye className="h-3.5 w-3.5 text-gray-500" />
                                     </Button>
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-7 w-7 p-0 hover:bg-zinc-200"
+                                      className="h-7 w-7 p-0 hover:bg-gray-200 rounded-none"
                                       onClick={async () => {
                                         try {
-                                          const fileUrl = ev.file_url!;
                                           const bucket = ev.storage_bucket || 'evidence';
-                                          
                                           const response = await fetch(
-                                            `/api/compliance-evidence/download?file_url=${encodeURIComponent(fileUrl)}&bucket=${encodeURIComponent(bucket)}`
+                                            `/api/compliance-evidence/download?file_url=${encodeURIComponent(ev.file_url || '')}&bucket=${encodeURIComponent(bucket)}`
                                           );
                                           
                                           if (!response.ok) {
                                             const errorData = await response.json();
-                                            console.error('Download API error:', errorData);
-                                            
-                                            if (response.status === 404) {
-                                              alert(`File not found. The file may have been deleted.\n\nFile: ${ev.file_name || fileUrl}\n\nPlease re-upload the document.`);
-                                            } else {
-                                              alert(`Failed to download document: ${errorData.error || 'Unknown error'}`);
-                                            }
+                                            console.error('Failed to get download URL:', errorData);
+                                            alert('Failed to download document.');
                                             return;
                                           }
                                           
                                           const data = await response.json();
                                           if (data.download_url) {
-                                            // Fetch the file as blob and force download
-                                            const fileResponse = await fetch(data.download_url);
-                                            if (!fileResponse.ok) {
-                                              throw new Error('Failed to fetch file');
-                                            }
-                                            
-                                            const blob = await fileResponse.blob();
-                                            const blobUrl = window.URL.createObjectURL(blob);
-                                            
-                                            // Create download link
-                                            const link = document.createElement('a');
-                                            link.href = blobUrl;
-                                            link.download = ev.file_name || fileUrl.split('/').pop() || 'document';
-                                            document.body.appendChild(link);
-                                            link.click();
-                                            
-                                            // Cleanup
-                                            document.body.removeChild(link);
-                                            window.URL.revokeObjectURL(blobUrl);
+                                            window.open(data.download_url, '_blank');
                                           } else {
-                                            alert('Failed to generate download URL. Please try again.');
+                                            alert('Failed to generate download URL.');
                                           }
-                                        } catch (error: any) {
-                                          console.error('Failed to download document:', error);
-                                          alert(`Failed to download document: ${error.message || 'Network error'}`);
+                                        } catch (error) {
+                                          console.error('Error downloading document:', error);
+                                          alert('An error occurred while trying to download the document.');
                                         }
                                       }}
                                       title="Download Document"
                                     >
-                                      <Download className="h-3.5 w-3.5 text-zinc-600" />
+                                      <Download className="h-3.5 w-3.5 text-gray-500" />
                                     </Button>
                                   </>
-                                )}
-                                {(ev as any).external_link && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-7 w-7 p-0 hover:bg-zinc-200"
-                                    onClick={() => window.open((ev as any).external_link, '_blank')}
-                                    title="Open Link"
-                                  >
-                                    <LinkIcon className="h-3.5 w-3.5 text-zinc-600" />
-                                  </Button>
                                 )}
                               </div>
                             </div>
@@ -333,10 +272,10 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                             variant={hasUploaded ? 'outline' : 'default'}
                             size="sm"
                             className={cn(
-                              "w-full h-10 font-bold transition-all rounded-lg",
+                              "w-full h-10 font-light transition-all rounded-none",
                               hasUploaded 
-                                ? "border-[#0c0b1d] text-[#0c0b1d] hover:bg-[#0c0b1d] hover:text-white" 
-                                : "bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90"
+                                ? "border-[#0e274e] text-[#0e274e] hover:bg-[#0e274e] hover:text-white" 
+                                : "bg-[#00bceb] text-white hover:bg-[#00bceb]/90"
                             )}
                           >
                             {hasUploaded ? (

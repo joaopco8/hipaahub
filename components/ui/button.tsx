@@ -6,12 +6,12 @@ import { Spinner } from '@radix-ui/themes';
 import { cn } from '@/utils/cn';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-white btn-premium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1ad07a] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-none text-sm font-medium ring-offset-white btn-premium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00bceb] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
         default:
-          'bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90 font-medium',
+          'bg-[#00bceb] text-white hover:bg-[#00bceb]/90 font-bold',
         destructive:
           'bg-red-500 text-white hover:bg-red-500/90',
         outline:
@@ -24,14 +24,14 @@ const buttonVariants = cva(
       },
       size: {
         default: 'h-10 px-4 py-2',
-        xxs: 'h-7 rounded-sm px-1',
-        xs: 'h-8 rounded-md px-2',
-        sm: 'h-9 rounded-md px-3',
-        md: 'h-10 rounded-md px-5',
-        lg: 'h-11 rounded-md px-8',
-        xl: 'h-12 rounded-md px-10',
-        xxl: 'h-14 rounded-md px-12',
-        xxxl: 'h-16 rounded-md px-14',
+        xxs: 'h-7 rounded-none px-1',
+        xs: 'h-8 rounded-none px-2',
+        sm: 'h-9 rounded-none px-3',
+        md: 'h-10 rounded-none px-5',
+        lg: 'h-11 rounded-none px-8',
+        xl: 'h-12 rounded-none px-10',
+        xxl: 'h-14 rounded-none px-12',
+        xxxl: 'h-16 rounded-none px-14',
         icon: 'h-10 w-10',
         iconsmall: 'h-5 w-5'
       }

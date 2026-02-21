@@ -28,8 +28,8 @@ export default async function ContactPage() {
         <Card className="border-zinc-200">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#1ad07a]/10 flex items-center justify-center">
-                <Mail className="w-6 h-6 text-[#1ad07a]" />
+              <div className="w-12 h-12 rounded-none bg-[#00bceb]/10 flex items-center justify-center">
+                <Mail className="w-6 h-6 text-[#00bceb]" />
               </div>
               <div>
                 <CardTitle className="text-xl">Email</CardTitle>
@@ -48,7 +48,7 @@ export default async function ContactPage() {
               </div>
             </div>
             <a href="mailto:contact@hipaahubhealth.com">
-              <Button className="w-full bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#0c0b1d] hover:text-white">
+              <Button className="w-full bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold">
                 <Mail className="mr-2 h-4 w-4" />
                 Open Email Client
               </Button>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, FileText, Download, Eye } from 'lucide-react';
+import { CheckCircle2, FileText, Download, Eye, AlertCircle } from 'lucide-react';
 import { PolicyAttachmentUpload } from '@/components/policies/policy-attachment-upload';
 import { AdditionalDocumentsSection } from '@/components/policies/additional-documents-section';
 
@@ -97,84 +97,103 @@ export default async function PoliciesPage() {
   const totalCount = policies.length;
 
   return (
-    <div className="flex w-full flex-col gap-6 page-transition-premium">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Policies & Templates</h1>
-          <p className="text-zinc-600 text-base">
-            Professional HIPAA policy templates ready to use
-          </p>
-        </div>
-        <div className="text-left sm:text-right">
-          <div className="text-2xl font-bold text-zinc-900">{completedCount}/{totalCount}</div>
-          <div className="text-sm text-zinc-600">Policies Complete</div>
-        </div>
+    <div className="flex w-full flex-col gap-6">
+      {/* Cisco Header */}
+      <div className="mb-2">
+        <h2 className="text-2xl font-light text-[#0e274e]">Policies & Documents</h2>
+        <p className="text-sm text-gray-400 font-light">
+          Manage HIPAA policy templates and documentation
+        </p>
       </div>
 
+      {/* Status Summary Card */}
+      <Card className="border-0 shadow-sm bg-white rounded-none">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+               <div className="h-12 w-12 rounded-full border-2 border-[#00bceb] flex items-center justify-center">
+                 <FileText className="h-6 w-6 text-[#00bceb]" />
+               </div>
+               <div>
+                 <p className="text-sm text-[#565656] font-light">Completion Status</p>
+                 <p className="text-2xl font-light text-[#0e274e]">
+                   {completedCount} <span className="text-lg text-[#565656]">/ {totalCount} Policies</span>
+                 </p>
+               </div>
+            </div>
+            <div className="hidden sm:block">
+               {/* Optional chart or extra metric here */}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Policies Grid */}
       <div className="grid gap-4 md:grid-cols-2">
         {policies.map((policy, index) => (
-          <Card key={policy.id} className="card-premium-enter stagger-item" style={{ animationDelay: `${index * 50}ms` }}>
-            <CardHeader>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <Card key={policy.id} className="border-0 shadow-sm bg-white rounded-none hover:shadow-md transition-shadow">
+            <CardHeader className="border-b border-gray-100 py-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <FileText className="h-5 w-5 text-primary" />
-                    <CardTitle className="text-lg">{policy.name}</CardTitle>
+                  <div className="flex items-center gap-2 mb-1">
+                    <CardTitle className="text-base font-normal text-[#0e274e]">{policy.name}</CardTitle>
                   </div>
-                  <CardDescription>{policy.description}</CardDescription>
+                  <CardDescription className="text-xs text-gray-400 font-light">{policy.description}</CardDescription>
                 </div>
                 {policy.status === 'completed' ? (
-                  <Badge className="bg-green-100 text-green-800 border-green-200 w-fit">
+                  <Badge className="bg-[#71bc48]/10 text-[#71bc48] border-0 rounded-none font-normal">
                     <CheckCircle2 className="h-3 w-3 mr-1" />
                     Complete
                   </Badge>
                 ) : (
-                  <Badge className="bg-amber-100 text-amber-800 border-amber-200 w-fit">
+                  <Badge className="bg-yellow-50 text-yellow-600 border-0 rounded-none font-normal">
+                    <AlertCircle className="h-3 w-3 mr-1" />
                     Pending
                   </Badge>
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               <div className="space-y-3">
                 {policy.status === 'completed' && policy.lastUpdated && (
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-xs text-gray-400">
                     Last updated: {new Date(policy.lastUpdated).toLocaleDateString()}
                   </div>
                 )}
+                
                 <div className="flex gap-2 flex-wrap">
                   {policy.status === 'completed' ? (
                     <>
-                      <Button variant="outline" size="sm">
-                        <Eye className="mr-2 h-4 w-4" />
+                      <Button variant="outline" size="sm" className="h-8 rounded-none border-gray-200 text-gray-600 hover:text-[#00bceb]">
+                        <Eye className="mr-2 h-3.5 w-3.5" />
                         View
                       </Button>
-                      <Button variant="outline" size="sm">
-                        <Download className="mr-2 h-4 w-4" />
+                      <Button variant="outline" size="sm" className="h-8 rounded-none border-gray-200 text-gray-600 hover:text-[#00bceb]">
+                        <Download className="mr-2 h-3.5 w-3.5" />
                         Download
                       </Button>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="h-8 rounded-none border-gray-200 text-gray-600 hover:text-[#00bceb]">
                         Edit
                       </Button>
                     </>
                   ) : (
-                    <>
-                      <Link href={`/dashboard/policies/${policy.id}/preview`} className="flex-1 min-w-[140px]">
-                        <Button size="sm" className="w-full bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90">
-                          Generate Document
-                        </Button>
-                      </Link>
-                    </>
+                    <Link href={`/dashboard/policies/${policy.id}/preview`} className="flex-1">
+                      <Button size="sm" className="w-full bg-[#00bceb] text-white hover:bg-[#00a0c9] rounded-none h-8 font-light">
+                        Generate Document
+                      </Button>
+                    </Link>
                   )}
                 </div>
+                
                 <PolicyAttachmentUpload policyId={policy.id} policyName={policy.name} />
+                
                 {policy.status === 'completed' && (
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="w-full text-green-600 hover:text-green-700"
+                    className="w-full text-[#71bc48] hover:text-[#71bc48]/80 hover:bg-[#71bc48]/5 rounded-none h-8 font-light"
                   >
-                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                    <CheckCircle2 className="mr-2 h-3.5 w-3.5" />
                     Mark as Implemented
                   </Button>
                 )}
@@ -184,29 +203,7 @@ export default async function PoliciesPage() {
         ))}
       </div>
 
-      <Card className="bg-blue-50 border-blue-200 card-premium-enter stagger-item" style={{ animationDelay: `${policies.length * 50}ms` }}>
-        <CardHeader>
-          <CardTitle className="text-lg">Why These Policies Matter</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            HIPAA requires covered entities to have written policies and procedures. These templates 
-            are professionally written, include your practice name automatically, and can be 
-            customized to fit your specific needs. Each policy includes:
-          </p>
-          <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground mt-3">
-            <li>HIPAA-compliant language and requirements</li>
-            <li>Placeholders for your practice information</li>
-            <li>Implementation checklists</li>
-            <li>Review and update schedules</li>
-          </ul>
-        </CardContent>
-      </Card>
-
       <AdditionalDocumentsSection />
     </div>
   );
 }
-
-
-

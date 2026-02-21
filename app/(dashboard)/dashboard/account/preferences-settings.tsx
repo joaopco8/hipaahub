@@ -29,7 +29,7 @@ export function PreferencesSettings() {
       <div className="space-y-2">
         <Label htmlFor="language" className="text-zinc-900">Language</Label>
         <Select defaultValue="en">
-          <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+          <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
             <SelectValue placeholder="Select language" />
           </SelectTrigger>
           <SelectContent>
@@ -42,7 +42,7 @@ export function PreferencesSettings() {
       <div className="space-y-2">
         <Label htmlFor="theme" className="text-zinc-900">Theme</Label>
         <Select value={theme} onValueChange={(value) => setTheme(value)}>
-          <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+          <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
             <SelectValue placeholder="Select theme" />
           </SelectTrigger>
           <SelectContent>
@@ -71,7 +71,7 @@ export function PreferencesSettings() {
       <div className="space-y-2">
         <Label htmlFor="font" className="text-zinc-900">Font</Label>
         <Select defaultValue="sans">
-          <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+          <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
             <SelectValue placeholder="Select font" />
           </SelectTrigger>
           <SelectContent>

@@ -439,31 +439,31 @@ export default function OrganizationPage() {
     >
       <div className="space-y-6 max-w-[1600px] mx-auto w-full">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-extralight text-zinc-900">
+          <h1 className="text-3xl font-thin text-[#0e274e]">
             Tell us about your practice
           </h1>
-          <p className="text-zinc-600">
+          <p className="text-[#565656] font-light">
             This information is required for HIPAA compliance documentation
           </p>
         </div>
 
         {/* Organization Identity */}
-        <Card className="card-premium-enter stagger-item border-zinc-200">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-[#1ad07a]" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <Building2 className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 Organization Identity
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               Legal information about your organization
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="country" className="text-zinc-900">
+                <Label htmlFor="country" className="text-[#0e274e] font-light">
                   Country / Jurisdiction <span className="text-red-500">*</span>
                 </Label>
                 <Select
@@ -471,20 +471,20 @@ export default function OrganizationPage() {
                   disabled
                   required
                 >
-                  <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a] bg-zinc-50">
+                  <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] bg-gray-50 rounded-none font-light">
                     <SelectValue placeholder="Select country" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="US">United States (US)</SelectItem>
+                  <SelectContent className="rounded-none">
+                    <SelectItem value="US" className="font-light">United States (US)</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-zinc-500">HIPAA compliance is only applicable to United States organizations.</p>
+                <p className="text-xs text-[#565656] font-light">HIPAA compliance is only applicable to United States organizations.</p>
                 {validationErrors.country && (
-                  <p className="text-sm text-red-500">{validationErrors.country}</p>
+                  <p className="text-sm text-red-500 font-light">{validationErrors.country}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="legal_name" className="text-zinc-900">
+                <Label htmlFor="legal_name" className="text-[#0e274e] font-light">
                   Legal Organization Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -494,14 +494,14 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, legal_name: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-zinc-900">
+                <Label htmlFor="name" className="text-[#0e274e] font-light">
                   Clinic Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -511,12 +511,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="dba" className="text-zinc-900">
+                <Label htmlFor="dba" className="text-[#0e274e] font-light">
                   DBA (Doing Business As)
                 </Label>
                 <Input
@@ -526,13 +526,13 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, dba: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="practice_type_primary" className="text-zinc-900">
+                <Label htmlFor="practice_type_primary" className="text-[#0e274e] font-light">
                   Practice Type (Primary) <span className="text-red-500">*</span>
                 </Label>
                 <Select
@@ -540,12 +540,12 @@ export default function OrganizationPage() {
                   onValueChange={setPracticeTypePrimary}
                   required
                 >
-                  <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                  <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                     <SelectValue placeholder="Select practice type" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-none">
                     {PRACTICE_TYPES.map((pt) => (
-                      <SelectItem key={pt.value} value={pt.value}>
+                      <SelectItem key={pt.value} value={pt.value} className="font-light">
                         {pt.label}
                       </SelectItem>
                     ))}
@@ -554,7 +554,7 @@ export default function OrganizationPage() {
               </div>
               {country === 'US' && (
                 <div className="space-y-2">
-                  <Label htmlFor="state" className="text-zinc-900">
+                  <Label htmlFor="state" className="text-[#0e274e] font-light">
                     State (US) <span className="text-red-500">*</span>
                   </Label>
                   <Select
@@ -568,12 +568,12 @@ export default function OrganizationPage() {
                     }}
                     required
                   >
-                    <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                    <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                       <SelectValue placeholder="Select state" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-none">
                       {US_STATES.map((stateOption) => (
-                        <SelectItem key={stateOption} value={stateOption}>
+                        <SelectItem key={stateOption} value={stateOption} className="font-light">
                           {stateOption}
                         </SelectItem>
                       ))}
@@ -585,10 +585,10 @@ export default function OrganizationPage() {
             
             {/* Specialties (Multiple) */}
             <div className="space-y-2">
-              <Label className="text-zinc-900">
+              <Label className="text-[#0e274e] font-light">
                 Medical Specialties (Select all that apply)
               </Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 border border-zinc-200 rounded-lg max-h-64 overflow-y-auto">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 border border-gray-200 rounded-none max-h-64 overflow-y-auto">
                 {MEDICAL_SPECIALTIES.map((specialty) => (
                   <div key={specialty} className="flex items-center space-x-2">
                     <Checkbox
@@ -601,10 +601,11 @@ export default function OrganizationPage() {
                           setSpecialties(specialties.filter(s => s !== specialty));
                         }
                       }}
+                      className="rounded-none border-gray-400 data-[state=checked]:bg-[#00bceb] data-[state=checked]:border-[#00bceb]"
                     />
                     <Label
                       htmlFor={`specialty-${specialty}`}
-                      className="text-sm font-normal cursor-pointer"
+                      className="text-sm font-light cursor-pointer text-[#565656]"
                     >
                       {specialty}
                     </Label>
@@ -616,21 +617,21 @@ export default function OrganizationPage() {
         </Card>
 
         {/* Primary Business Address */}
-        <Card className="card-premium-enter stagger-item border-zinc-200">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-[#1ad07a]" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <MapPin className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 Primary Business Address
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               Juridically critical for contracts and breach notifications
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="address_street" className="text-zinc-900">
+              <Label htmlFor="address_street" className="text-[#0e274e] font-light">
                 Street Address <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -640,13 +641,13 @@ export default function OrganizationPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, address_street: e.target.value })
                 }
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 required
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="address_city" className="text-zinc-900">
+                <Label htmlFor="address_city" className="text-[#0e274e] font-light">
                   City <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -656,12 +657,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, address_city: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="address_state" className="text-zinc-900">
+                <Label htmlFor="address_state" className="text-[#0e274e] font-light">
                   State <span className="text-red-500">*</span>
                 </Label>
                 {country === 'US' ? (
@@ -677,12 +678,12 @@ export default function OrganizationPage() {
                     }}
                     required
                   >
-                    <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                    <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                       <SelectValue placeholder="Select state" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-none">
                       {US_STATES.map((stateOption) => (
-                        <SelectItem key={stateOption} value={stateOption}>
+                        <SelectItem key={stateOption} value={stateOption} className="font-light">
                           {stateOption}
                         </SelectItem>
                       ))}
@@ -694,16 +695,16 @@ export default function OrganizationPage() {
                     value={addressState}
                     onChange={(e) => setAddressState(e.target.value)}
                     placeholder="Enter state/province"
-                    className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                    className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                     required
                   />
                 )}
                 {validationErrors.address_state && (
-                  <p className="text-sm text-red-500">{validationErrors.address_state}</p>
+                  <p className="text-sm text-red-500 font-light">{validationErrors.address_state}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="address_zip" className="text-zinc-900">
+                <Label htmlFor="address_zip" className="text-[#0e274e] font-light">
                   ZIP Code <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -727,13 +728,13 @@ export default function OrganizationPage() {
                     }
                   }}
                   placeholder={country === 'US' ? '12345 or 12345-6789' : 'Enter ZIP/Postal Code'}
-                  className={`border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a] ${
+                  className={`border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light ${
                     validationErrors.address_zip ? 'border-red-500' : ''
                   }`}
                   required
                 />
                 {validationErrors.address_zip && (
-                  <p className="text-sm text-red-500">{validationErrors.address_zip}</p>
+                  <p className="text-sm text-red-500 font-light">{validationErrors.address_zip}</p>
                 )}
               </div>
             </div>
@@ -741,22 +742,22 @@ export default function OrganizationPage() {
         </Card>
 
         {/* Security Officer */}
-        <Card className="card-premium-enter stagger-item border-zinc-200">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#1ad07a]" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <Shield className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 Security Officer
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               HIPAA requires names, not generic titles
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="security_officer_name" className="text-zinc-900">
+                <Label htmlFor="security_officer_name" className="text-[#0e274e] font-light">
                   Full Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -766,12 +767,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, security_officer_name: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="security_officer_email" className="text-zinc-900">
+                <Label htmlFor="security_officer_email" className="text-[#0e274e] font-light">
                   Email <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -782,12 +783,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, security_officer_email: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="security_officer_role" className="text-zinc-900">
+                <Label htmlFor="security_officer_role" className="text-[#0e274e] font-light">
                   Role / Title <span className="text-red-500">*</span>
                 </Label>
                 <Select
@@ -795,12 +796,12 @@ export default function OrganizationPage() {
                   onValueChange={setSecurityOfficerRole}
                   required
                 >
-                  <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                  <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-none">
                     {OFFICER_ROLES.security.map((role) => (
-                      <SelectItem key={role.value} value={role.value}>
+                      <SelectItem key={role.value} value={role.value} className="font-light">
                         {role.label}
                       </SelectItem>
                     ))}
@@ -811,7 +812,7 @@ export default function OrganizationPage() {
                     placeholder="Specify role"
                     value={securityOfficerRoleOther}
                     onChange={(e) => setSecurityOfficerRoleOther(e.target.value)}
-                    className="mt-2 border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                    className="mt-2 border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   />
                 )}
               </div>
@@ -820,22 +821,22 @@ export default function OrganizationPage() {
         </Card>
 
         {/* Privacy Officer */}
-        <Card className="card-premium-enter stagger-item border-zinc-200">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#1ad07a]" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <Shield className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 Privacy Officer
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               Can be the same person as Security Officer, but name must exist
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="privacy_officer_name" className="text-zinc-900">
+                <Label htmlFor="privacy_officer_name" className="text-[#0e274e] font-light">
                   Full Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -845,12 +846,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, privacy_officer_name: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="privacy_officer_email" className="text-zinc-900">
+                <Label htmlFor="privacy_officer_email" className="text-[#0e274e] font-light">
                   Email <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -861,12 +862,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, privacy_officer_email: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="privacy_officer_role" className="text-zinc-900">
+                <Label htmlFor="privacy_officer_role" className="text-[#0e274e] font-light">
                   Role / Title <span className="text-red-500">*</span>
                 </Label>
                 <Select
@@ -874,12 +875,12 @@ export default function OrganizationPage() {
                   onValueChange={setPrivacyOfficerRole}
                   required
                 >
-                  <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                  <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-none">
                     {OFFICER_ROLES.privacy.map((role) => (
-                      <SelectItem key={role.value} value={role.value}>
+                      <SelectItem key={role.value} value={role.value} className="font-light">
                         {role.label}
                       </SelectItem>
                     ))}
@@ -890,7 +891,7 @@ export default function OrganizationPage() {
                     placeholder="Specify role"
                     value={privacyOfficerRoleOther}
                     onChange={(e) => setPrivacyOfficerRoleOther(e.target.value)}
-                    className="mt-2 border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                    className="mt-2 border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   />
                 )}
               </div>
@@ -899,15 +900,15 @@ export default function OrganizationPage() {
         </Card>
 
         {/* Organization Structure */}
-        <Card className="card-premium-enter stagger-item border-zinc-200">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-[#1ad07a]" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <Users className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 Organization Structure
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               Information about your workforce
             </CardDescription>
           </CardHeader>
@@ -915,10 +916,10 @@ export default function OrganizationPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="employee_count" className="text-zinc-900">
+                  <Label htmlFor="employee_count" className="text-[#0e274e] font-light">
                     Number of Employees
                   </Label>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-[#565656] font-light">
                     Current: {employeeCount} {employeeCount === 1 ? 'employee' : 'employees'}
                   </p>
                 </div>
@@ -937,10 +938,10 @@ export default function OrganizationPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="has_employees" className="text-zinc-900">
+                  <Label htmlFor="has_employees" className="text-[#0e274e] font-light">
                     Do you have employees?
                   </Label>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-[#565656] font-light">
                     Select if your organization has employees
                   </p>
                 </div>
@@ -950,14 +951,15 @@ export default function OrganizationPage() {
                   onCheckedChange={(checked) =>
                     setFormData({ ...formData, has_employees: checked })
                   }
+                  className="data-[state=checked]:bg-[#00bceb]"
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="uses_contractors" className="text-zinc-900">
+                  <Label htmlFor="uses_contractors" className="text-[#0e274e] font-light">
                     Uses Contractors / Vendors with PHI?
                   </Label>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-[#565656] font-light">
                     Select if you work with contractors or vendors who handle PHI
                   </p>
                 </div>
@@ -967,13 +969,14 @@ export default function OrganizationPage() {
                   onCheckedChange={(checked) =>
                     setFormData({ ...formData, uses_contractors: checked })
                   }
+                  className="data-[state=checked]:bg-[#00bceb]"
                 />
               </div>
             </div>
             <Separator />
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="number_of_locations" className="text-zinc-900">
+                <Label htmlFor="number_of_locations" className="text-[#0e274e] font-light">
                   Number of Locations
                 </Label>
                 <Input
@@ -982,15 +985,15 @@ export default function OrganizationPage() {
                   min="1"
                   value={numberOfLocations}
                   onChange={(e) => setNumberOfLocations(parseInt(e.target.value) || 1)}
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="multi_state_operations" className="text-zinc-900">
+                  <Label htmlFor="multi_state_operations" className="text-[#0e274e] font-light">
                     Multi-State Operations
                   </Label>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-[#565656] font-light">
                     Does your organization operate in multiple states?
                   </p>
                 </div>
@@ -998,14 +1001,15 @@ export default function OrganizationPage() {
                   id="multi_state_operations"
                   checked={multiStateOperations}
                   onCheckedChange={setMultiStateOperations}
+                  className="data-[state=checked]:bg-[#00bceb]"
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="remote_workforce" className="text-zinc-900">
+                  <Label htmlFor="remote_workforce" className="text-[#0e274e] font-light">
                     Remote Workforce
                   </Label>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-[#565656] font-light">
                     Does your organization have remote workforce members?
                   </p>
                 </div>
@@ -1013,6 +1017,7 @@ export default function OrganizationPage() {
                   id="remote_workforce"
                   checked={remoteWorkforce}
                   onCheckedChange={setRemoteWorkforce}
+                  className="data-[state=checked]:bg-[#00bceb]"
                 />
               </div>
             </div>
@@ -1020,25 +1025,25 @@ export default function OrganizationPage() {
         </Card>
 
         {/* Technology Infrastructure */}
-        <Card className="card-premium-enter stagger-item border-zinc-200">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Laptop className="h-5 w-5 text-[#1ad07a]" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <Laptop className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 Technology Infrastructure
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               Detailed information about your technology systems (impacts Security Policy)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="stores_phi_electronically" className="text-zinc-900">
+                <Label htmlFor="stores_phi_electronically" className="text-[#0e274e] font-light">
                   Do you store or process PHI electronically?
                 </Label>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Almost always Yes for modern practices
                 </p>
               </div>
@@ -1048,6 +1053,7 @@ export default function OrganizationPage() {
                 onCheckedChange={(checked) =>
                   setFormData({ ...formData, stores_phi_electronically: checked })
                 }
+                className="data-[state=checked]:bg-[#00bceb]"
               />
             </div>
             
@@ -1055,17 +1061,17 @@ export default function OrganizationPage() {
             
             {/* EHR System */}
             <div className="space-y-2">
-              <Label htmlFor="ehr_system" className="text-zinc-900">
+              <Label htmlFor="ehr_system" className="text-[#0e274e] font-light">
                 EHR System (Electronic Health Records)
               </Label>
               <Select value={ehrSystem} onValueChange={setEhrSystem}>
-                <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                   <SelectValue placeholder="Select EHR system (if applicable)" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="not-applicable">Not Applicable</SelectItem>
+                <SelectContent className="rounded-none">
+                  <SelectItem value="not-applicable" className="font-light">Not Applicable</SelectItem>
                   {EHR_SYSTEMS.map((ehr) => (
-                    <SelectItem key={ehr} value={ehr}>
+                    <SelectItem key={ehr} value={ehr} className="font-light">
                       {ehr}
                     </SelectItem>
                   ))}
@@ -1075,17 +1081,17 @@ export default function OrganizationPage() {
             
             {/* Email Provider */}
             <div className="space-y-2">
-              <Label htmlFor="email_provider" className="text-zinc-900">
+              <Label htmlFor="email_provider" className="text-[#0e274e] font-light">
                 Email Provider
               </Label>
               <Select value={emailProvider} onValueChange={setEmailProvider}>
-                <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                   <SelectValue placeholder="Select email provider" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="not-specified">Not Specified</SelectItem>
+                <SelectContent className="rounded-none">
+                  <SelectItem value="not-specified" className="font-light">Not Specified</SelectItem>
                   {EMAIL_PROVIDERS.map((provider) => (
-                    <SelectItem key={provider} value={provider}>
+                    <SelectItem key={provider} value={provider} className="font-light">
                       {provider}
                     </SelectItem>
                   ))}
@@ -1095,17 +1101,17 @@ export default function OrganizationPage() {
             
             {/* Cloud Storage Provider */}
             <div className="space-y-2">
-              <Label htmlFor="cloud_storage_provider" className="text-zinc-900">
+              <Label htmlFor="cloud_storage_provider" className="text-[#0e274e] font-light">
                 Cloud Storage Provider
               </Label>
               <Select value={cloudStorageProvider} onValueChange={setCloudStorageProvider}>
-                <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                   <SelectValue placeholder="Select cloud storage provider (if applicable)" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="not-using-cloud">Not Using Cloud Storage</SelectItem>
+                <SelectContent className="rounded-none">
+                  <SelectItem value="not-using-cloud" className="font-light">Not Using Cloud Storage</SelectItem>
                   {CLOUD_STORAGE_PROVIDERS.map((provider) => (
-                    <SelectItem key={provider} value={provider}>
+                    <SelectItem key={provider} value={provider} className="font-light">
                       {provider}
                     </SelectItem>
                   ))}
@@ -1117,10 +1123,10 @@ export default function OrganizationPage() {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label htmlFor="uses_vpn" className="text-zinc-900">
+                  <Label htmlFor="uses_vpn" className="text-[#0e274e] font-light">
                     Uses VPN for Remote Access?
                   </Label>
-                  <p className="text-sm text-zinc-600">
+                  <p className="text-sm text-[#565656] font-light">
                     Virtual Private Network for secure remote access
                   </p>
                 </div>
@@ -1128,21 +1134,22 @@ export default function OrganizationPage() {
                   id="uses_vpn"
                   checked={usesVpn}
                   onCheckedChange={setUsesVpn}
+                  className="data-[state=checked]:bg-[#00bceb]"
                 />
               </div>
               {usesVpn && (
                 <div className="space-y-2">
-                  <Label htmlFor="vpn_provider" className="text-zinc-900">
+                  <Label htmlFor="vpn_provider" className="text-[#0e274e] font-light">
                     VPN Provider
                   </Label>
                   <Select value={vpnProvider} onValueChange={setVpnProvider}>
-                    <SelectTrigger className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]">
+                    <SelectTrigger className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light">
                       <SelectValue placeholder="Select VPN provider" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="not-specified">Not Specified</SelectItem>
+                    <SelectContent className="rounded-none">
+                      <SelectItem value="not-specified" className="font-light">Not Specified</SelectItem>
                       {VPN_PROVIDERS.map((provider) => (
-                        <SelectItem key={provider} value={provider}>
+                        <SelectItem key={provider} value={provider} className="font-light">
                           {provider}
                         </SelectItem>
                       ))}
@@ -1154,10 +1161,10 @@ export default function OrganizationPage() {
             
             {/* Device Types */}
             <div className="space-y-2">
-              <Label className="text-zinc-900">
+              <Label className="text-[#0e274e] font-light">
                 Device Types Used (Select all that apply)
               </Label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 border border-zinc-200 rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 p-4 border border-gray-200 rounded-none">
                 {DEVICE_TYPES.map((device) => (
                   <div key={device} className="flex items-center space-x-2">
                     <Checkbox
@@ -1170,10 +1177,11 @@ export default function OrganizationPage() {
                           setDeviceTypes(deviceTypes.filter(d => d !== device));
                         }
                       }}
+                      className="rounded-none border-gray-400 data-[state=checked]:bg-[#00bceb] data-[state=checked]:border-[#00bceb]"
                     />
                     <Label
                       htmlFor={`device-${device}`}
-                      className="text-sm font-normal cursor-pointer"
+                      className="text-sm font-light cursor-pointer text-[#565656]"
                     >
                       {device}
                     </Label>
@@ -1185,22 +1193,22 @@ export default function OrganizationPage() {
         </Card>
 
         {/* Optional Contact Information */}
-        <Card className="card-premium-enter stagger-item border-zinc-200">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Mail className="h-5 w-5 text-[#1ad07a]" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <Mail className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 Contact Information
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               Optional institutional contact details
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="primary_contact_name" className="text-zinc-900">
+                <Label htmlFor="primary_contact_name" className="text-[#0e274e] font-light">
                   Primary Contact Name
                 </Label>
                 <Input
@@ -1210,11 +1218,11 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, primary_contact_name: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="compliance_contact_email" className="text-zinc-900">
+                <Label htmlFor="compliance_contact_email" className="text-[#0e274e] font-light">
                   Compliance Contact Email
                 </Label>
                 <Input
@@ -1225,11 +1233,11 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, compliance_contact_email: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="compliance_contact_phone" className="text-zinc-900">
+                <Label htmlFor="compliance_contact_phone" className="text-[#0e274e] font-light">
                   Compliance Contact Phone
                 </Label>
                 <Input
@@ -1240,7 +1248,7 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, compliance_contact_phone: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
             </div>
@@ -1248,22 +1256,22 @@ export default function OrganizationPage() {
         </Card>
 
         {/* US HIPAA Required Legal Identifiers */}
-        <Card className="card-premium-enter stagger-item border-blue-200 bg-blue-50/50">
+        <Card className="card-premium-enter stagger-item border-l-4 border-[#00bceb] bg-white rounded-none shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <FileText className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 US Legal Identifiers (Required)
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               Mandatory identifiers for HIPAA compliance documents in the United States
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="ein" className="text-zinc-900">
+                <Label htmlFor="ein" className="text-[#0e274e] font-light">
                   EIN (Employer Identification Number) <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -1278,13 +1286,13 @@ export default function OrganizationPage() {
                     setFormData({ ...formData, ein: value });
                   }}
                   maxLength={10}
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
-                <p className="text-xs text-zinc-600">Format: XX-XXXXXXX (9 digits)</p>
+                <p className="text-xs text-[#565656] font-light">Format: XX-XXXXXXX (9 digits)</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="npi" className="text-zinc-900">
+                <Label htmlFor="npi" className="text-[#0e274e] font-light">
                   NPI (National Provider Identifier) <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -1296,15 +1304,15 @@ export default function OrganizationPage() {
                     setFormData({ ...formData, npi: value });
                   }}
                   maxLength={10}
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
-                <p className="text-xs text-zinc-600">10 digits</p>
+                <p className="text-xs text-[#565656] font-light">10 digits</p>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="state_license_number" className="text-zinc-900">
+                <Label htmlFor="state_license_number" className="text-[#0e274e] font-light">
                   State License Number <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -1314,12 +1322,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, state_license_number: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="state_tax_id" className="text-zinc-900">
+                <Label htmlFor="state_tax_id" className="text-[#0e274e] font-light">
                   State Tax ID <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -1329,7 +1337,7 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, state_tax_id: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
@@ -1338,22 +1346,22 @@ export default function OrganizationPage() {
         </Card>
 
         {/* CEO / Authorized Representative */}
-        <Card className="card-premium-enter stagger-item border-zinc-200">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-[#1ad07a]" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <Users className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 CEO / Authorized Representative
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               Person authorized to sign legal documents and approve policies
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="ceo_name" className="text-zinc-900">
+                <Label htmlFor="ceo_name" className="text-[#0e274e] font-light">
                   CEO / Authorized Representative Name <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -1363,12 +1371,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, ceo_name: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="ceo_title" className="text-zinc-900">
+                <Label htmlFor="ceo_title" className="text-[#0e274e] font-light">
                   CEO / Authorized Representative Title <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -1378,7 +1386,7 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, ceo_title: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                   required
                 />
               </div>
@@ -1387,25 +1395,25 @@ export default function OrganizationPage() {
         </Card>
 
         {/* Conditional Requirements */}
-        <Card className="card-premium-enter stagger-item border-amber-200 bg-amber-50/50">
+        <Card className="card-premium-enter stagger-item border-l-4 border-amber-400 bg-white rounded-none shadow-sm">
           <CardHeader>
             <div className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-amber-600" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 Conditional Requirements
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               Required only if applicable to your organization
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="performs_laboratory_tests" className="text-zinc-900">
+                <Label htmlFor="performs_laboratory_tests" className="text-[#0e274e] font-light">
                   Does your organization perform laboratory tests?
                 </Label>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   If yes, CLIA Certificate Number is required
                 </p>
               </div>
@@ -1413,11 +1421,12 @@ export default function OrganizationPage() {
                 id="performs_laboratory_tests"
                 checked={performsLaboratoryTests}
                 onCheckedChange={setPerformsLaboratoryTests}
+                className="data-[state=checked]:bg-[#00bceb]"
               />
             </div>
             {performsLaboratoryTests && (
               <div className="space-y-2">
-                <Label htmlFor="clia_certificate_number" className="text-zinc-900">
+                <Label htmlFor="clia_certificate_number" className="text-[#0e274e] font-light">
                   CLIA Certificate Number <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -1427,16 +1436,16 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, clia_certificate_number: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
             )}
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="serves_medicare_patients" className="text-zinc-900">
+                <Label htmlFor="serves_medicare_patients" className="text-[#0e274e] font-light">
                   Does your organization serve Medicare patients?
                 </Label>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   If yes, Medicare Provider Number is required
                 </p>
               </div>
@@ -1444,11 +1453,12 @@ export default function OrganizationPage() {
                 id="serves_medicare_patients"
                 checked={servesMedicarePatients}
                 onCheckedChange={setServesMedicarePatients}
+                className="data-[state=checked]:bg-[#00bceb]"
               />
             </div>
             {servesMedicarePatients && (
               <div className="space-y-2">
-                <Label htmlFor="medicare_provider_number" className="text-zinc-900">
+                <Label htmlFor="medicare_provider_number" className="text-[#0e274e] font-light">
                   Medicare Provider Number <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -1458,7 +1468,7 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, medicare_provider_number: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
             )}
@@ -1466,22 +1476,22 @@ export default function OrganizationPage() {
         </Card>
 
         {/* Optional but Recommended */}
-        <Card className="card-premium-enter stagger-item border-zinc-200">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Mail className="h-5 w-5 text-zinc-600" />
-              <CardTitle className="text-xl font-extralight text-zinc-900">
+              <Mail className="h-5 w-5 text-[#00bceb]" />
+              <CardTitle className="text-xl font-light text-[#0e274e]">
                 Optional but Recommended
               </CardTitle>
             </div>
-            <CardDescription className="text-zinc-600">
+            <CardDescription className="text-[#565656] font-light">
               These fields enhance your compliance documentation
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="phone_number" className="text-zinc-900">
+                <Label htmlFor="phone_number" className="text-[#0e274e] font-light">
                   Primary Phone Number
                 </Label>
                 <Input
@@ -1492,11 +1502,11 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, phone_number: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email_address" className="text-zinc-900">
+                <Label htmlFor="email_address" className="text-[#0e274e] font-light">
                   Primary Email Address
                 </Label>
                 <Input
@@ -1507,12 +1517,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email_address: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="website" className="text-zinc-900">
+              <Label htmlFor="website" className="text-[#0e274e] font-light">
                 Website
               </Label>
               <Input
@@ -1523,12 +1533,12 @@ export default function OrganizationPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, website: e.target.value })
                 }
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="accreditation_status" className="text-zinc-900">
+                <Label htmlFor="accreditation_status" className="text-[#0e274e] font-light">
                   Accreditation Status
                 </Label>
                 <Input
@@ -1538,11 +1548,11 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, accreditation_status: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="types_of_services" className="text-zinc-900">
+                <Label htmlFor="types_of_services" className="text-[#0e274e] font-light">
                   Types of Services
                 </Label>
                 <Input
@@ -1552,12 +1562,12 @@ export default function OrganizationPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, types_of_services: e.target.value })
                   }
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="insurance_coverage" className="text-zinc-900">
+              <Label htmlFor="insurance_coverage" className="text-[#0e274e] font-light">
                 Insurance Coverage
               </Label>
               <Input
@@ -1567,7 +1577,7 @@ export default function OrganizationPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, insurance_coverage: e.target.value })
                 }
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
           </CardContent>

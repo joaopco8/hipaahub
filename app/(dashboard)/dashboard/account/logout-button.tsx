@@ -71,7 +71,7 @@ export function LogOutButton() {
           <AlertDialogAction
             onClick={handleLogOut}
             disabled={isLoading}
-            className="bg-[#1ad07a] hover:bg-[#1ad07a]/90 text-[#0c0b1d]"
+            className="bg-[#00bceb] hover:bg-[#00bceb]/90 text-white rounded-none font-bold"
           >
             {isLoading ? 'Signing out…' : 'Log out'}
           </AlertDialogAction>

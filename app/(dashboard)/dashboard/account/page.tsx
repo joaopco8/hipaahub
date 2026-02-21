@@ -72,12 +72,12 @@ export default async function AccountPage() {
                 name="fullName"
                 defaultValue={user.user_metadata.full_name || ''}
                 placeholder="Enter your full name"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
               />
             </div>
             <Button
               type="submit"
-              className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+              className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
             >
               Update Name
             </Button>
@@ -93,12 +93,12 @@ export default async function AccountPage() {
                   type="email"
                   defaultValue={user.email}
                   placeholder="Enter your email address"
-                  className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                  className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 />
               </div>
               <Button
                 type="submit"
-                className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+                className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
               >
                 Update Email
               </Button>
@@ -132,33 +132,33 @@ export default async function AccountPage() {
       <Card className="border-zinc-200 card-premium-enter stagger-item" style={{ animationDelay: '100ms' }}>
         <CardHeader>
           <CardTitle className="text-xl font-semibold text-zinc-900 flex items-center gap-2">
-            <Key className="h-5 w-5 text-[#1ad07a]" />
+            <Key className="h-5 w-5 text-[#00bceb]" />
             Password & Security
           </CardTitle>
-          <CardDescription className="text-zinc-600">
+          <CardDescription className="text-[#565656] font-light">
             Reset your password or update your security settings.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form action={requestPasswordReset} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="resetEmail" className="text-zinc-900">Email for Password Reset</Label>
+              <Label htmlFor="resetEmail" className="text-[#0e274e] font-light">Email for Password Reset</Label>
               <Input
                 id="resetEmail"
                 name="email"
                 type="email"
                 defaultValue={user.email || ''}
                 placeholder="Enter your email address"
-                className="border-zinc-200 focus:border-[#1ad07a] focus:ring-[#1ad07a]"
+                className="border-gray-300 focus:border-[#00bceb] focus:ring-[#00bceb] rounded-none font-light"
                 readOnly
               />
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[#565656] font-light">
                 We'll send a password reset link to this email address.
               </p>
             </div>
             <Button
               type="submit"
-              className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+              className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
             >
               Send Password Reset Email
             </Button>
@@ -217,7 +217,7 @@ export default async function AccountPage() {
                 <div className="text-sm text-zinc-600">Choose a plan to access the dashboard.</div>
               </div>
               <Link href="/#pricing">
-                <Button className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90">
+                <Button className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold">
                   View Pricing
                 </Button>
               </Link>
@@ -227,7 +227,7 @@ export default async function AccountPage() {
         {isSubscribed && (
           <CardFooter>
             <Link href="/dashboard/account/subscription">
-              <Button className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90">
+              <Button className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold">
                 Manage Subscription
               </Button>
             </Link>

@@ -115,8 +115,8 @@ export default function ExpectationPage() {
     return (
       <div className="min-h-screen bg-[#f3f5f9] flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="loading-spinner-premium mx-auto" />
-          <p className="text-zinc-600 animate-pulse">Verifying authentication...</p>
+          <div className="loading-spinner-premium mx-auto text-[#00bceb]" />
+          <p className="text-[#565656] animate-pulse font-light">Verifying authentication...</p>
         </div>
       </div>
     );
@@ -133,62 +133,62 @@ export default function ExpectationPage() {
         <div className="flex-1 page-transition-premium">
           <div className="space-y-6 max-w-2xl mx-auto w-full">
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#1ad07a]/10 mb-4">
-            <Clock className="h-8 w-8 text-[#1ad07a]" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#00bceb]/10 mb-4">
+            <Clock className="h-8 w-8 text-[#00bceb]" />
           </div>
-          <h1 className="text-3xl font-extralight text-zinc-900">
+          <h1 className="text-3xl font-thin text-[#0e274e]">
             What to Expect
           </h1>
-          <p className="text-lg text-zinc-600">
+          <p className="text-lg text-[#565656] font-light">
             Over the next 20-30 minutes, HIPAA Hub will:
           </p>
         </div>
 
-        <Card className="card-premium-enter stagger-item">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardContent className="pt-6 space-y-4">
             <div className="flex items-start gap-3">
-              <CheckCircle2 className="h-5 w-5 text-[#1ad07a] shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-5 w-5 text-[#00bceb] shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-extralight text-zinc-900 mb-1">
+                <h3 className="font-light text-[#0e274e] mb-1">
                   Assess your HIPAA risk
                 </h3>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Complete a quick questionnaire about your security practices
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <CheckCircle2 className="h-5 w-5 text-[#1ad07a] shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-5 w-5 text-[#00bceb] shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-extralight text-zinc-900 mb-1">
+                <h3 className="font-light text-[#0e274e] mb-1">
                   Identify compliance gaps
                 </h3>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Get a clear picture of what needs attention
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <CheckCircle2 className="h-5 w-5 text-[#1ad07a] shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-5 w-5 text-[#00bceb] shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-extralight text-zinc-900 mb-1">
+                <h3 className="font-light text-[#0e274e] mb-1">
                   Generate your compliance action plan
                 </h3>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Receive a prioritized list of tasks to become compliant
                 </p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <CheckCircle2 className="h-5 w-5 text-[#1ad07a] shrink-0 mt-0.5" />
+              <CheckCircle2 className="h-5 w-5 text-[#00bceb] shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-extralight text-zinc-900 mb-1">
+                <h3 className="font-light text-[#0e274e] mb-1">
                   Prepare audit-ready documentation
                 </h3>
-                <p className="text-sm text-zinc-600">
+                <p className="text-sm text-[#565656] font-light">
                   Generate professional HIPAA policies and documents instantly
                 </p>
               </div>
@@ -198,17 +198,17 @@ export default function ExpectationPage() {
 
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-zinc-600">Progress</span>
-            <span className="text-zinc-600">Estimated duration: 20-30 minutes</span>
+            <span className="text-[#565656] font-light">Progress</span>
+            <span className="text-[#565656] font-light">Estimated duration: 20-30 minutes</span>
           </div>
-          <Progress value={0} className="h-2" />
+          <Progress value={0} className="h-1 rounded-none bg-gray-100" />
         </div>
           </div>
         </div>
-        <div className="flex items-center justify-center pt-6 border-t border-zinc-200 mt-8">
+        <div className="flex items-center justify-center pt-6 border-t border-gray-200 mt-8">
           <Button
             onClick={handleContinue}
-            className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+            className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
             type="button"
           >
             Get Started
@@ -218,4 +218,3 @@ export default function ExpectationPage() {
     </div>
   );
 }
-

@@ -3,6 +3,7 @@ import { getUser } from '@/utils/supabase/queries';
 import { redirect } from 'next/navigation';
 import { OrganizationForm } from '@/components/organization/organization-form';
 import { getOrganizationData } from '@/app/actions/organization';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default async function OrganizationPage() {
   const supabase = createClient();
@@ -14,30 +15,28 @@ export default async function OrganizationPage() {
 
   const organization = await getOrganizationData();
 
-  // Debug: Log organization data to verify it's being loaded
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Organization data loaded:', JSON.stringify(organization, null, 2));
-  }
-
   return (
-    <div className="flex w-full flex-col gap-6 page-transition-premium">
-      {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Organization Information</h1>
-        <p className="text-zinc-600 text-base">
-          Manage your organization details required for HIPAA compliance documentation
+    <div className="flex w-full flex-col gap-6">
+      {/* Cisco Style Header */}
+      <div className="mb-2">
+        <h2 className="text-2xl font-light text-[#0e274e]">Organization Information</h2>
+        <p className="text-sm text-gray-400 font-light">
+          Manage your organization details for HIPAA compliance
         </p>
       </div>
 
-      {/* Organization Form */}
-      {organization ? (
-        <OrganizationForm key={organization.id || 'new'} initialData={organization} />
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-zinc-600">No organization data found. Please complete onboarding first.</p>
-        </div>
-      )}
+      {/* Content Card */}
+      <Card className="border-0 shadow-sm bg-white rounded-none">
+        <CardContent className="p-6">
+          {organization ? (
+            <OrganizationForm key={organization.id || 'new'} initialData={organization} />
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-[#565656] font-light">No organization data found. Please complete onboarding first.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
-

@@ -173,10 +173,10 @@ export function PolicyAttachmentUpload({ policyId, policyName }: PolicyAttachmen
           {/* Upload Section */}
           {!file && (
             <div
-              className={`mt-6 border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              className={`mt-6 border-2 border-dashed rounded-none p-8 text-center transition-colors ${
                 isDragging
-                  ? 'border-[#1ad07a] bg-[#1ad07a]/5'
-                  : 'border-zinc-300 bg-[#f3f5f9] hover:border-zinc-400'
+                  ? 'border-[#00bceb] bg-[#00bceb]/10'
+                  : 'border-gray-300 bg-[#f3f5f9] hover:border-gray-400'
               }`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -264,7 +264,7 @@ export function PolicyAttachmentUpload({ policyId, policyName }: PolicyAttachmen
               <Button
                 onClick={handleUpload}
                 disabled={uploading}
-                className="w-full bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90 h-11 font-medium"
+                className="w-full bg-[#00bceb] text-white hover:bg-[#00bceb]/90 h-11 rounded-none font-bold"
               >
                 {uploading ? (
                   <>

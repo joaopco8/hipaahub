@@ -1,4 +1,3 @@
-import FooterPrimary from '@/components/footer-primary';
 import { AuthStatusHandler } from '@/components/auth-status-handler';
 import React, { Suspense } from 'react';
 
@@ -14,10 +13,7 @@ export default function MarketingLayout({
       <Suspense fallback={null}>
         <AuthStatusHandler />
       </Suspense>
-      <main className="flex-1 w-full">
-        {children}
-      </main>
-      <FooterPrimary />
+      {children}
     </div>
   );
 }

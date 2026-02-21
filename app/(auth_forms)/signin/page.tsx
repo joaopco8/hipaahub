@@ -1,22 +1,19 @@
 'use client';
 
-// Force dynamic rendering to prevent build-time prerendering errors with useSearchParams
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { signInWithOAuth } from '@/utils/auth-helpers/client';
 import { handleRequest } from '@/utils/auth-helpers/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense } from 'react';
 import { AuthStatusHandler } from '@/components/auth-status-handler';
 import { OAuthErrorHandler } from '../oauth-error-handler';
+import { CiscoStyleLogo } from '@/components/auth/cisco-style-logo';
+import { Globe, Eye, EyeOff } from 'lucide-react';
+import { signInWithOAuth } from '@/utils/auth-helpers/client';
 import { GoogleLogo } from '@/components/google-logo';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 function SignInContent() {
   const router = useRouter();
@@ -31,196 +28,236 @@ function SignInContent() {
     setIsSubmitting(false);
   };
 
-  const oAuthProviders = [
-    {
-      name: 'google',
-      displayName: 'Google',
-      icon: <GoogleLogo className="w-5 h-5" />
-    }
-  ];
-  
-  const handleOAuthSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleGoogleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsSubmitting(true);
     await signInWithOAuth(e);
     setIsSubmitting(false);
   };
 
   return (
-    <div className="flex min-h-[100dvh] bg-[#f3f5f9]">
-      {/* Left Side - Login Form */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 sm:px-8 lg:px-12 xl:px-16 bg-[#0d1122]">
-        <div className="w-full max-w-md mx-auto space-y-8">
-          {/* Back Button */}
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-geologica font-light mb-4"
-            prefetch={false}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
-          </Link>
+    <div className="min-h-screen bg-[#e8ebf0] flex items-center justify-center px-4 py-12 relative">
+      {/* White Card */}
+      <div className="w-full max-w-md bg-white rounded-lg shadow-sm p-8 md:p-10">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-10">
+          <CiscoStyleLogo />
+          <div className="flex items-center gap-2 text-gray-600 text-sm font-thin cursor-pointer hover:text-gray-800 transition-colors">
+            <Globe size={16} />
+            <span>EN US</span>
+          </div>
+        </div>
 
-          {/* Logo */}
-          <div className="flex items-center justify-center mb-8">
-            <Image
-              src="/images/logohipa.png"
-              alt="HIPAA Hub"
-              width={120}
-              height={120}
-              className="object-contain"
+        {/* Form Title */}
+        <h1 className="text-2xl font-thin text-gray-800 text-center mb-10">
+          Sign in
+        </h1>
+
+        {/* Login Form */}
+        <form
+          noValidate={true}
+          className="space-y-6"
+          onSubmit={handleSubmit}
+        >
+          {searchParams.get('redirect') === 'checkout' && (
+            <input type="hidden" name="redirect" value="checkout" />
+          )}
+          
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-thin text-gray-700">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              name="email"
+              placeholder="Email"
+              autoCapitalize="none"
+              autoComplete="email"
+              autoCorrect="off"
+              required
+              className="h-11 border-gray-300 text-gray-900 placeholder:text-gray-400 rounded-md font-thin focus:ring-1"
+              style={{ 
+                '--tw-ring-color': '#0175a2',
+              } as React.CSSProperties}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#0175a2';
+                e.target.style.boxShadow = '0 0 0 1px #0175a2';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '';
+                e.target.style.boxShadow = '';
+              }}
             />
           </div>
 
-          {/* Form Title */}
           <div className="space-y-2">
-            <h2 className="text-3xl font-geologica font-light text-white">
-              Welcome back
-            </h2>
-            <p className="text-zinc-400 font-geologica font-light text-base">
-              Sign in to access your HIPAA compliance dashboard
-            </p>
-          </div>
-
-          {/* Login Form */}
-          <form
-            noValidate={true}
-            className="space-y-5"
-            onSubmit={handleSubmit}
-          >
-            {searchParams.get('redirect') === 'checkout' && (
-              <input type="hidden" name="redirect" value="checkout" />
-            )}
-            
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-zinc-300 font-geologica font-light text-sm">
-                Email address
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="you@example.com"
-                autoCapitalize="none"
-                autoComplete="email"
-                autoCorrect="off"
-                required
-                className="h-12 bg-white/10 border-zinc-600 text-white placeholder:text-zinc-500 rounded-lg font-geologica font-light focus:border-[#1ad07a] focus:ring-[#1ad07a] focus:bg-white/15"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-zinc-300 font-geologica font-light text-sm">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-sm font-thin text-gray-700">
                 Password
               </Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Enter your password"
-                  required
-                  className="h-12 bg-white/10 border-zinc-600 text-white placeholder:text-zinc-500 rounded-lg font-geologica font-light focus:border-[#1ad07a] focus:ring-[#1ad07a] focus:bg-white/15 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors focus:outline-none"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
               <Link
                 href="/forgot_password"
-                className="text-[#1ad07a] hover:text-[#1ad07a]/80 font-geologica font-light transition-colors"
-                prefetch={false}
+                className="text-sm font-thin hover:opacity-80 transition-opacity"
+                style={{ color: '#0175a2' }}
               >
                 Forgot password?
               </Link>
             </div>
-
-            <Button 
-              type="submit" 
-              className="w-full h-12 bg-[#1ad07a] text-[#0d1122] font-geologica font-medium hover:bg-[#1ad07a]/90 rounded-lg text-base"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Signing in...' : 'Sign in →'}
-            </Button>
-          </form>
-
-          {/* OAuth Separator */}
-          <div className="relative">
-            <Separator className="my-6 bg-zinc-700" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="bg-[#0d1122] px-4 text-sm text-zinc-400 font-geologica font-light">
-                or
-              </span>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                required
+                className="h-11 border-gray-300 text-gray-900 placeholder:text-gray-400 rounded-md font-thin focus:ring-1 pr-10"
+                style={{ 
+                  '--tw-ring-color': '#0175a2',
+                } as React.CSSProperties}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#0175a2';
+                  e.target.style.boxShadow = '0 0 0 1px #0175a2';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '';
+                  e.target.style.boxShadow = '';
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
           </div>
 
-          {/* OAuth Buttons */}
-          <div className="space-y-3">
-            {oAuthProviders.map((provider) => (
-              <form
-                key={provider.name}
-                onSubmit={(e) => handleOAuthSubmit(e)}
-              >
-                <input type="hidden" name="provider" value={provider.name} />
-                {searchParams.get('redirect') === 'checkout' && (
-                  <input type="hidden" name="redirect" value="checkout" />
-                )}
-                <Button
-                  variant="outline"
-                  type="submit"
-                  className="w-full h-12 flex items-center justify-center gap-3 border-zinc-600 bg-white/5 hover:bg-white/10 text-white transition-colors rounded-lg font-geologica font-light"
-                  disabled={isSubmitting}
-                >
-                  {provider.icon}
-                  <span className="text-[15px]">
-                    Continue with {provider.displayName}
-                  </span>
-                </Button>
-              </form>
-            ))}
+          <button 
+            type="submit" 
+            className="w-full h-11 text-white font-thin rounded-md"
+            style={{ 
+              backgroundColor: '#0175a2', 
+              border: 'none', 
+              cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              transition: 'none',
+              transform: 'none',
+              boxShadow: 'none'
+            }}
+            disabled={isSubmitting}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'none';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            {isSubmitting ? 'Signing in...' : 'Sign in'}
+          </button>
+        </form>
+
+        {/* Google Sign In */}
+        <div className="mt-6">
+          <form onSubmit={handleGoogleSignIn}>
+            {searchParams.get('redirect') === 'checkout' && (
+              <input type="hidden" name="redirect" value="checkout" />
+            )}
+            <input type="hidden" name="provider" value="google" />
+            <button
+              type="submit"
+              className="w-full h-11 border border-gray-300 bg-white text-gray-700 font-thin rounded-md flex items-center justify-center gap-2"
+              style={{ 
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'none',
+                transform: 'none',
+                boxShadow: 'none'
+              }}
+              disabled={isSubmitting}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.backgroundColor = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.backgroundColor = 'white';
+              }}
+            >
+              <GoogleLogo className="w-5 h-5" />
+              <span>Continue with Google</span>
+            </button>
+          </form>
+        </div>
+
+        {/* Links */}
+        <div className="mt-8 space-y-5">
+          <div className="flex items-center justify-center gap-4 text-sm">
+            <Link
+              href="#"
+              className="font-thin hover:opacity-80"
+              style={{ color: '#0175a2' }}
+            >
+              Help
+            </Link>
           </div>
 
-          {/* Sign Up Link */}
-          <div className="text-center pt-4">
-            <p className="text-zinc-400 font-geologica font-light text-sm">
-              Don't have an account?{' '}
-              <Link
-                href="/signup"
-                className="text-[#1ad07a] hover:text-[#1ad07a]/80 font-medium transition-colors"
-                prefetch={false}
-              >
-                Sign up
-              </Link>
-            </p>
+          <div className="text-center text-sm text-gray-600 font-thin">
+            Don't have an account?{' '}
+            <Link
+              href="/signup"
+              className="font-thin hover:opacity-80"
+              style={{ color: '#0175a2' }}
+              prefetch={false}
+            >
+              Sign up
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Right Side - Image */}
-      <div className="relative hidden md:block w-1/2">
-        <img
-          src="/seguro-rcp-enfermeiro-1920x0-c-default_upscayl_4x_ultramix-balanced-4x.png"
-          alt="Healthcare professional using a laptop"
-          className="absolute inset-0 h-full w-full object-cover"
-          loading="eager"
-        />
-        <div className="absolute inset-0 bg-black/10" />
+      {/* Footer Links */}
+      <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-6 text-xs font-thin">
+        <Link 
+          href="#" 
+          className="hover:opacity-80"
+          style={{ color: '#0175a2' }}
+        >
+          Contact support
+        </Link>
+        <Link 
+          href="/privacy" 
+          className="hover:opacity-80"
+          style={{ color: '#0175a2' }}
+        >
+          Privacy
+        </Link>
+        <Link 
+          href="/terms" 
+          className="hover:opacity-80"
+          style={{ color: '#0175a2' }}
+        >
+          Terms and conditions
+        </Link>
+        <Link 
+          href="/cookies" 
+          className="hover:opacity-80"
+          style={{ color: '#0175a2' }}
+        >
+          Cookie policy
+        </Link>
       </div>
     </div>
   );
 }
-
 
 export default function SignIn() {
   return (
@@ -229,7 +266,11 @@ export default function SignIn() {
         <AuthStatusHandler />
         <OAuthErrorHandler />
       </Suspense>
-      <Suspense fallback={<div className="flex min-h-[100dvh] bg-[#f3f5f9] items-center justify-center"><div className="text-white">Loading...</div></div>}>
+      <Suspense fallback={
+        <div className="min-h-screen bg-[#e8ebf0] flex items-center justify-center">
+          <div className="text-gray-600">Loading...</div>
+        </div>
+      }>
         <SignInContent />
       </Suspense>
     </>

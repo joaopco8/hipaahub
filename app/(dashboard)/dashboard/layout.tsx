@@ -68,6 +68,7 @@ export default async function DashboardLayout({
       <SidebarProvider>
         <SidebarLayout
           userDetails={userDetails}
+          organization={organization}
           navConfig={navConfig as NavItem[]}
         >
           {children}

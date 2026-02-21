@@ -5,15 +5,14 @@ import { useOnboarding } from '@/contexts/onboarding-context';
 import { useRouter } from 'next/navigation';
 import { OnboardingLayout } from '@/components/onboarding/onboarding-layout';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { FormCheckmark } from '@/components/ui/form-checkmark';
-import { Shield, Lock, Users, FileText, AlertTriangle } from 'lucide-react';
+import { Shield, Lock, Users, AlertTriangle } from 'lucide-react';
 import { saveRiskAssessment, autoSaveRiskAssessmentAnswers, loadSavedRiskAssessmentAnswers } from '@/app/actions/onboarding';
 import { calculateRiskScore } from '@/lib/risk-assessment-scoring';
-import { QUESTIONS, type Question } from './questions';
+import { QUESTIONS } from './questions';
 import { createClient } from '@/utils/supabase/client';
 
 const CATEGORY_ICONS = {
@@ -23,9 +22,9 @@ const CATEGORY_ICONS = {
 };
 
 const CATEGORY_COLORS = {
-  administrative: 'text-blue-600 bg-blue-50',
-  physical: 'text-green-600 bg-green-50',
-  technical: 'text-purple-600 bg-purple-50'
+  administrative: 'text-[#00bceb] bg-[#00bceb]/10',
+  physical: 'text-[#71bc48] bg-[#71bc48]/10',
+  technical: 'text-[#0e274e] bg-[#0e274e]/10'
 };
 
 export default function RiskAssessmentPage() {
@@ -166,10 +165,13 @@ export default function RiskAssessmentPage() {
     } else {
       // Last question - complete the assessment
       // Don't await here to avoid blocking, but ensure isSaving is set
-      handleComplete(newAnswers).catch((error) => {
-        console.error('Error completing assessment:', error);
-        setIsSaving(false);
-      });
+      // Wait a moment for visual feedback
+      setTimeout(() => {
+        handleComplete(newAnswers).catch((error) => {
+          console.error('Error completing assessment:', error);
+          setIsSaving(false);
+        });
+      }, 300);
     }
   };
 
@@ -241,70 +243,70 @@ export default function RiskAssessmentPage() {
     >
       <div className="space-y-6 max-w-2xl mx-auto w-full">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-extralight text-zinc-900">
+          <h1 className="text-3xl font-thin text-[#0e274e]">
             HIPAA Security Risk Assessment
           </h1>
-          <p className="text-zinc-600">
+          <p className="text-[#565656] font-light">
             Answer questions about your security practices to identify compliance gaps
           </p>
         </div>
 
         {/* Category Badge */}
         <div className="flex items-center justify-center">
-          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${categoryColor}`}>
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-none ${categoryColor}`}>
             <CategoryIcon className="h-4 w-4" />
-            <span className="text-sm font-extralight">{currentQuestion.categoryLabel}</span>
+            <span className="text-sm font-light">{currentQuestion.categoryLabel}</span>
           </div>
         </div>
 
         <div className="space-y-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-zinc-600">
+            <span className="text-[#565656] font-light">
               Question {currentQuestionIndex + 1} of {visibleQuestions.length}
             </span>
-            <span className="text-zinc-600 font-extralight">{estimatedTimeLeft} remaining</span>
+            <span className="text-[#565656] font-light">{estimatedTimeLeft} remaining</span>
           </div>
-          <Progress value={progress} className="h-2" />
+          <Progress value={progress} className="h-1 rounded-none bg-gray-100" />
         </div>
 
-        <Card className="card-premium-enter stagger-item">
+        <Card className="card-premium-enter stagger-item border-0 shadow-sm rounded-none">
           <CardContent className="pt-6">
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-extralight text-zinc-900 mb-2">
+                <h2 className="text-xl font-light text-[#0e274e] mb-2">
                   {currentQuestion.text}
                 </h2>
                 {currentQuestion.helpText && (
-                  <p className="text-sm text-zinc-500 mb-6 flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                  <p className="text-sm text-[#565656] mb-6 flex items-start gap-2 font-light">
+                    <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
                     {currentQuestion.helpText}
                   </p>
                 )}
 
                 <RadioGroup
                   value={answers[currentQuestion.id] || ''}
-                  onValueChange={handleAnswer}
+                  onValueChange={(value) => handleAnswer(value)}
                   className="space-y-3"
                 >
                   {currentQuestion.options.map((option) => (
                     <div
                       key={option.value}
-                      className="flex items-center space-x-3 p-4 rounded-lg border border-zinc-200 hover:border-[#1ad07a] hover:bg-zinc-50 transition-all cursor-pointer"
+                      className="flex items-center space-x-3 p-4 border border-gray-200 hover:border-[#00bceb] hover:bg-[#00bceb]/5 transition-all cursor-pointer rounded-none"
                       onClick={() => handleAnswer(option.value)}
                     >
                       <RadioGroupItem
                         value={option.value}
                         id={option.value}
-                        className="mt-0.5"
+                        className="mt-0.5 border-gray-400 text-[#00bceb]"
                       />
                       <Label
                         htmlFor={option.value}
-                        className="flex-1 cursor-pointer font-normal"
+                        className="flex-1 cursor-pointer font-light text-[#565656]"
                       >
                         {option.label}
                       </Label>
                       {answers[currentQuestion.id] === option.value && (
-                        <FormCheckmark checked={true} className="h-5 w-5" />
+                        <FormCheckmark checked={true} className="h-5 w-5 text-[#00bceb]" />
                       )}
                     </div>
                   ))}

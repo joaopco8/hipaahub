@@ -159,23 +159,23 @@ export default function DocumentsPage() {
     >
       <div className="space-y-6 max-w-[1600px] mx-auto w-full">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold text-zinc-900">
+          <h1 className="text-3xl font-thin text-[#0e274e]">
             Required HIPAA Documents
           </h1>
-          <p className="text-zinc-600">
+          <p className="text-[#565656] font-light">
             Compliance documentation required based on your risk assessment
           </p>
         </div>
 
         {/* Context Block - Always Visible */}
-        <Card className="border-zinc-200 bg-zinc-50 card-premium-enter stagger-item">
+        <Card className="border-0 bg-white shadow-sm rounded-none card-premium-enter stagger-item">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-zinc-900">
+            <CardTitle className="text-lg font-light text-[#0e274e]">
               Why these documents are required
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-zinc-600 leading-relaxed">
+            <p className="text-sm text-[#565656] leading-relaxed font-light">
               Based on your risk assessment, your organization is missing required HIPAA documentation under the Security and Privacy Rules.
               These documents are necessary to reduce legal exposure and demonstrate compliance if audited.
             </p>
@@ -186,10 +186,10 @@ export default function DocumentsPage() {
         {criticalDocuments.length > 0 && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-xl font-semibold text-zinc-900 mb-1">
+              <h2 className="text-xl font-light text-[#0e274e] mb-1">
                 🔴 Critical — Audit Blockers
               </h2>
-              <p className="text-sm text-zinc-600">
+              <p className="text-sm text-[#565656] font-light">
                 Missing these documents can result in penalties if audited.
               </p>
             </div>
@@ -198,37 +198,37 @@ export default function DocumentsPage() {
               {visibleCritical.map((doc, index) => (
                 <Card
                   key={doc.id}
-                  className="card-premium-enter stagger-item border-red-200 bg-red-50/50"
+                  className="card-premium-enter stagger-item border-red-200 bg-red-50/50 rounded-none"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <CardContent className="p-6">
                     <div className="space-y-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-start gap-4 flex-1">
-                          <div className="p-2 rounded-lg bg-red-100 text-red-600 shrink-0">
+                          <div className="p-2 bg-red-100 text-red-600 shrink-0">
                             <FileText className="h-5 w-5" />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold text-zinc-900 text-lg">
+                              <h3 className="font-light text-[#0e274e] text-lg">
                                 {doc.name}
                               </h3>
-                              <Badge className="bg-red-100 text-red-700 border-red-200">
+                              <Badge className="bg-red-100 text-red-700 border-red-200 rounded-none font-light">
                                 Required
                               </Badge>
                             </div>
-                            <p className="text-sm text-zinc-600 mb-3">
+                            <p className="text-sm text-[#565656] mb-3 font-light">
                               {doc.description}
                             </p>
                             
                             {/* Missing Reasons */}
-                            <div className="mt-3 p-3 bg-white border border-red-200 rounded-lg">
+                            <div className="mt-3 p-3 bg-white border border-red-200 rounded-none">
                               <p className="text-xs font-semibold text-red-900 mb-2">
                                 Missing due to:
                               </p>
                               <ul className="space-y-1">
                                 {doc.missingReasons.map((reason, idx) => (
-                                  <li key={idx} className="text-xs text-red-800 flex items-start gap-2">
+                                  <li key={idx} className="text-xs text-red-800 flex items-start gap-2 font-light">
                                     <span className="text-red-600 mt-0.5">•</span>
                                     <span>{reason}</span>
                                   </li>
@@ -243,7 +243,7 @@ export default function DocumentsPage() {
                         <Button
                           onClick={() => handleGenerate(doc.id)}
                           disabled={generating === doc.id}
-                          className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+                          className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
                         >
                           {generating === doc.id ? (
                             'Generating...'
@@ -264,7 +264,7 @@ export default function DocumentsPage() {
                 <Button
                   variant="outline"
                   onClick={() => setShowAllDocuments(true)}
-                  className="border-zinc-300 hover:bg-zinc-50"
+                  className="border-gray-300 hover:bg-gray-50 rounded-none font-light text-[#565656]"
                 >
                   <ChevronDown className="mr-2 h-4 w-4" />
                   View all required documents ({requiredDocuments.length})
@@ -278,7 +278,7 @@ export default function DocumentsPage() {
                 <Button
                   variant="outline"
                   onClick={() => setShowAllDocuments(false)}
-                  className="border-zinc-300 hover:bg-zinc-50"
+                  className="border-gray-300 hover:bg-gray-50 rounded-none font-light text-[#565656]"
                 >
                   <ChevronUp className="mr-2 h-4 w-4" />
                   Show less
@@ -292,7 +292,7 @@ export default function DocumentsPage() {
         {requiredDocumentsList.length > 0 && (showAllDocuments || criticalDocuments.length <= INITIAL_CRITICAL_COUNT) && (
           <div className="space-y-4">
             <div>
-              <h2 className="text-xl font-semibold text-zinc-900 mb-1">
+              <h2 className="text-xl font-light text-[#0e274e] mb-1">
                 🟡 Required for Compliance
               </h2>
             </div>
@@ -301,37 +301,37 @@ export default function DocumentsPage() {
               {requiredDocumentsList.map((doc, index) => (
                 <Card
                   key={doc.id}
-                  className="card-premium-enter stagger-item border-yellow-200 bg-yellow-50/50"
+                  className="card-premium-enter stagger-item border-yellow-200 bg-yellow-50/50 rounded-none"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <CardContent className="p-6">
                     <div className="space-y-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-start gap-4 flex-1">
-                          <div className="p-2 rounded-lg bg-yellow-100 text-yellow-600 shrink-0">
+                          <div className="p-2 bg-yellow-100 text-yellow-600 shrink-0">
                             <FileText className="h-5 w-5" />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold text-zinc-900 text-lg">
+                              <h3 className="font-light text-[#0e274e] text-lg">
                                 {doc.name}
                               </h3>
-                              <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">
+                              <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200 rounded-none font-light">
                                 Required
                               </Badge>
                             </div>
-                            <p className="text-sm text-zinc-600 mb-3">
+                            <p className="text-sm text-[#565656] mb-3 font-light">
                               {doc.description}
                             </p>
                             
                             {/* Missing Reasons */}
-                            <div className="mt-3 p-3 bg-white border border-yellow-200 rounded-lg">
+                            <div className="mt-3 p-3 bg-white border border-yellow-200 rounded-none">
                               <p className="text-xs font-semibold text-yellow-900 mb-2">
                                 Missing due to:
                               </p>
                               <ul className="space-y-1">
                                 {doc.missingReasons.map((reason, idx) => (
-                                  <li key={idx} className="text-xs text-yellow-800 flex items-start gap-2">
+                                  <li key={idx} className="text-xs text-yellow-800 flex items-start gap-2 font-light">
                                     <span className="text-yellow-600 mt-0.5">•</span>
                                     <span>{reason}</span>
                                   </li>
@@ -346,7 +346,7 @@ export default function DocumentsPage() {
                         <Button
                           onClick={() => handleGenerate(doc.id)}
                           disabled={generating === doc.id}
-                          className="bg-[#1ad07a] text-[#0d1122] hover:bg-[#1ad07a]/90"
+                          className="bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
                         >
                           {generating === doc.id ? (
                             'Generating...'
@@ -365,13 +365,13 @@ export default function DocumentsPage() {
 
         {/* Empty State */}
         {requiredDocuments.length === 0 && (
-          <Card className="card-premium-enter stagger-item border-green-200 bg-green-50">
+          <Card className="card-premium-enter stagger-item border-green-200 bg-green-50 rounded-none">
             <CardContent className="py-12 text-center">
-              <FileText className="h-12 w-12 text-green-600 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-zinc-900 mb-2">
+              <FileText className="h-12 w-12 text-[#71bc48] mx-auto mb-4" />
+              <h3 className="text-lg font-light text-[#0e274e] mb-2">
                 All required documents are in place
               </h3>
-              <p className="text-zinc-600">
+              <p className="text-[#565656] font-light">
                 Based on your risk assessment, you have the required documentation.
                 You can always generate additional documents from the dashboard.
               </p>
