@@ -41,3 +41,6 @@ yarn-error.log*
 # certificates
 certificates
 .env*.local
+
+# backup/old landing page folder
+components/landing-page/lp-oficial-hipaahub (2)/

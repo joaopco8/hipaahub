@@ -25,5 +25,5 @@
     ]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "rules"]
+  "exclude": ["node_modules", "rules", "components/landing-page/lp-oficial-hipaahub (2)"]
 }
