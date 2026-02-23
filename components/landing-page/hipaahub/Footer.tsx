@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Linkedin, Twitter, Globe, Mail, Phone, MapPin, Check } from 'lucide-react';
+import Image from 'next/image';
+import { Linkedin, Twitter, Globe, Mail, Phone, MapPin } from 'lucide-react';
 
 type LegalView = 'privacy-policy' | 'terms-of-service' | 'security' | 'hipaa-baa';
 
@@ -72,13 +73,44 @@ const Footer: React.FC<FooterProps> = ({ onNavigateLegal }) => {
 
           <div>
             <h4 className="text-[11px] font-thin text-cisco-blue mb-6">Trust</h4>
-            <ul className="space-y-3">
-              {["HIPAA Compliant", "SOC 2 Type II", "NIST Aligned", "HITRUST CSF"].map((item) => (
-                <li key={item} className="flex items-center text-[12px] text-gray-500 font-thin">
-                  <Check size={14} className="text-cisco-green mr-3 flex-shrink-0" /> {item}
-                </li>
-              ))}
-            </ul>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/yLWevTQjUl8ckOOua7U9HRkCY.png"
+                  alt="SOC 2 Type 2"
+                  width={80}
+                  height={80}
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/XIpzXmr735QBrMd2zKW6qCBMBaQ.png"
+                  alt="ISO 42001"
+                  width={80}
+                  height={80}
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/tBZpvW6AhYhkuyrCFWibAiSpA.png"
+                  alt="GCP Certified"
+                  width={80}
+                  height={80}
+                  className="object-contain"
+                />
+              </div>
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/rDLougW3lvlvBBNVWPnp7qm1AH8.png"
+                  alt="21 CFR Part 11"
+                  width={80}
+                  height={80}
+                  className="object-contain"
+                />
+              </div>
+            </div>
           </div>
         </div>
 
