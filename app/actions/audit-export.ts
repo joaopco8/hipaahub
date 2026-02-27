@@ -226,24 +226,25 @@ export async function getAuditExportData(): Promise<AuditExportData | null> {
   ];
   const complianceScore = Math.round(scoreComponents.reduce((a, b) => a + b, 0));
 
+  const orgAny = org as any;
   return {
     organization: {
       id: org.id,
       name: org.name || org.legal_name || 'Healthcare Organization',
-      legal_name: org.legal_name,
-      address_street: org.address_street,
-      address_city: org.address_city,
-      address_state: org.address_state,
-      address_zip: org.address_zip,
-      phone_number: org.phone_number,
-      email_address: org.email_address,
-      privacy_officer_name: org.privacy_officer_name,
-      privacy_officer_email: org.privacy_officer_email,
-      security_officer_name: org.security_officer_name || org.privacy_officer_name,
-      security_officer_email: org.security_officer_email || org.privacy_officer_email,
-      practice_type: org.practice_type,
-      npi: org.npi,
-      ein: org.ein
+      legal_name: org.legal_name ?? undefined,
+      address_street: org.address_street ?? undefined,
+      address_city: org.address_city ?? undefined,
+      address_state: org.address_state ?? undefined,
+      address_zip: org.address_zip ?? undefined,
+      phone_number: orgAny.phone_number ?? undefined,
+      email_address: orgAny.email_address ?? undefined,
+      privacy_officer_name: org.privacy_officer_name ?? undefined,
+      privacy_officer_email: org.privacy_officer_email ?? undefined,
+      security_officer_name: org.security_officer_name || org.privacy_officer_name || undefined,
+      security_officer_email: org.security_officer_email || org.privacy_officer_email || undefined,
+      practice_type: orgAny.practice_type ?? undefined,
+      npi: orgAny.npi ?? undefined,
+      ein: orgAny.ein ?? undefined
     },
     riskAssessment: {
       exists: !!riskAssessmentResult.data,

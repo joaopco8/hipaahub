@@ -88,12 +88,12 @@ export async function generatePatientNotificationPDF(options: PDFOptions): Promi
   };
 
   // Color constants - New design system
-  const CISCO_NAVY = [14, 39, 78]; // #0e274e
-  const CISCO_BLUE = [0, 188, 235]; // #00bceb
-  const GRAY_DARK = [60, 60, 60];
-  const GRAY_MEDIUM = [100, 100, 100];
-  const GRAY_LIGHT = [150, 150, 150];
-  const WHITE = [255, 255, 255];
+  const CISCO_NAVY: [number, number, number] = [14, 39, 78]; // #0e274e
+  const CISCO_BLUE: [number, number, number] = [0, 188, 235]; // #00bceb
+  const GRAY_DARK: [number, number, number] = [60, 60, 60];
+  const GRAY_MEDIUM: [number, number, number] = [100, 100, 100];
+  const GRAY_LIGHT: [number, number, number] = [150, 150, 150];
+  const WHITE: [number, number, number] = [255, 255, 255];
 
   // Helper function to add a section header
   const addSectionHeader = (text: string) => {

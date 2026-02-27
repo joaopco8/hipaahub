@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert lead into database
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('leads')
       .insert(leadData)
       .select()
