@@ -1,52 +1,21 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ChevronDown, User } from 'lucide-react';
+import { Menu, X, User, LayoutDashboard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { createClient } from '@/utils/supabase/client';
 
-const DropdownMenu: React.FC<{ 
-  label: string; 
-  items: { label: string; href?: string; id?: string }[];
-  onItemClick: (id?: string) => void;
-}> = ({ label, items, onItemClick }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div 
-      className="relative group h-full flex items-center"
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-    >
-      <button className="flex items-center space-x-1 text-gray-600 hover:text-cisco-blue transition-colors py-4">
-        <span>{label}</span>
-        <ChevronDown size={14} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-      
-      <div className={`
-        absolute top-full left-0 w-64 bg-white border border-gray-100 shadow-xl py-4 z-[120] transition-all duration-200
-        ${isOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'}
-      `}>
-        {items.map((item, idx) => (
-          <button
-            key={idx}
-            onClick={() => onItemClick(item.id)}
-            className="w-full text-left px-6 py-2.5 text-sm text-gray-500 hover:bg-gray-50 hover:text-cisco-blue transition-colors font-thin"
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const Navbar: React.FC<{ 
   onNavigate: (view: string) => void;
-}> = ({ onNavigate }) => {
+  onDemoClick?: () => void;
+}> = ({ onNavigate, onDemoClick }) => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -55,6 +24,34 @@ const Navbar: React.FC<{
       document.body.style.overflow = 'unset';
     }
   }, [isMenuOpen]);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        setIsAuthenticated(!!user);
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkAuth();
+
+    // Listen for auth state changes
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session?.user);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleNavigation = (id?: string) => {
     setIsMenuOpen(false);
@@ -76,45 +73,11 @@ const Navbar: React.FC<{
     onNavigate(id);
   };
 
-  const menuStructure = [
-    {
-      label: 'Platform',
-      id: 'platform',
-      items: [
-        { label: 'Risk Assessment Engine', id: 'risk-assessment' },
-        { label: 'Policy Generator', id: 'policy-generator' },
-        { label: 'Gap Analysis Dashboard', id: 'gap-analysis' },
-        { label: 'Breach Notification Builder', id: 'breach-builder' },
-        { label: 'Compliance Roadmap', id: 'roadmap' },
-        { label: 'Reporting & Documentation', id: 'reporting' }
-      ]
-    },
-    {
-      label: 'Solutions',
-      id: 'solutions',
-      items: [
-        { label: 'Independent Practices', id: 'independent-practices' },
-        { label: 'Implementation Services', id: 'implementation-services' },
-        { label: 'Compliance Assessment', id: 'compliance-assessment' }
-      ]
-    },
-    {
-      label: 'Research',
-      id: 'research',
-      items: [
-        { label: 'Intelligence Reports', id: 'intelligence-reports' },
-        { label: 'Regulatory Analysis', id: 'regulatory-analysis' },
-        { label: 'Library Overview', id: 'research' }
-      ]
-    },
-    {
-      label: 'Company',
-      id: 'company',
-      items: [
-        { label: 'Profile', id: 'company' },
-        { label: 'Methodology', id: 'methodology' }
-      ]
-    }
+  const navLinks = [
+    { label: 'Platform', id: 'platform' },
+    { label: 'Blog', id: 'blog' },
+    { label: 'Research', id: 'research' },
+    { label: 'Company', id: 'company' },
   ];
 
   return (
@@ -134,39 +97,54 @@ const Navbar: React.FC<{
         </div>
 
         <div className="hidden xl:flex items-center space-x-8 h-full">
-          {menuStructure.map((menu) => (
-            <DropdownMenu 
-              key={menu.label} 
-              label={menu.label} 
-              items={menu.items} 
-              onItemClick={(id) => handleNavigation(id || menu.id)}
-            />
+          {navLinks.map((link) => (
+            <button
+              key={link.id}
+              onClick={() => handleNavigation(link.id)}
+              className="text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin py-4 h-full flex items-center"
+            >
+              {link.label}
+            </button>
           ))}
-          
-          {/* Direct link for Pricing */}
           <button 
             onClick={() => handleNavigation('pricing-section')}
-            className="text-gray-600 hover:text-cisco-blue transition-colors py-4 h-full flex items-center"
+            className="text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin py-4 h-full flex items-center"
           >
             Pricing
           </button>
         </div>
 
         <div className="flex items-center space-x-4 md:space-x-6 shrink-0">
-          <Link 
-            href="/signin"
-            className="hidden sm:flex items-center space-x-2 text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin"
-          >
-            <User size={16} />
-            <span>Login</span>
-          </Link>
+          {!isCheckingAuth && (
+            <>
+              {isAuthenticated ? (
+                <Link 
+                  href="/dashboard"
+                  className="bg-cisco-green text-white px-4 md:px-6 py-3 text-xs md:text-sm font-thin hover:bg-[#17b86a] transition-all shadow-md shadow-cisco-green/10 flex items-center space-x-2"
+                >
+                  <LayoutDashboard size={16} />
+                  <span>Go to Dashboard</span>
+                </Link>
+              ) : (
+                <>
+                  <Link 
+                    href="/signin"
+                    className="hidden sm:flex items-center space-x-2 text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin"
+                  >
+                    <User size={16} />
+                    <span>Login</span>
+                  </Link>
 
-          <button 
-            onClick={() => onNavigate('compliance-assessment')}
-            className="bg-cisco-blue text-white px-4 md:px-6 py-3 text-xs md:text-sm font-thin hover:bg-cisco-navy transition-all shadow-md shadow-cisco-blue/10"
-          >
-            Request Demo
-          </button>
+                  <button 
+                    onClick={onDemoClick}
+                    className="bg-cisco-blue text-white px-4 md:px-6 py-3 text-xs md:text-sm font-thin hover:bg-cisco-navy transition-all shadow-md shadow-cisco-blue/10"
+                  >
+                    Request Demo
+                  </button>
+                </>
+              )}
+            </>
+          )}
           
           <button 
             className="xl:hidden text-gray-600 p-2"
@@ -182,31 +160,36 @@ const Navbar: React.FC<{
         ${isMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'}
       `}>
         <div className="h-full overflow-y-auto p-8 space-y-10">
-          <div className="sm:hidden border-b border-gray-100 pb-6">
-            <Link 
-              href="/signin"
-              className="flex items-center space-x-2 text-cisco-navy hover:text-cisco-blue transition-colors text-lg font-thin"
-            >
-              <User size={20} />
-              <span>Account Login</span>
-            </Link>
-          </div>
-
-          {menuStructure.map((menu) => (
-            <div key={menu.label} className="space-y-4">
-              <h4 className="text-xl font-thin text-cisco-navy border-b border-gray-50 pb-2">{menu.label}</h4>
-              <div className="grid grid-cols-1 gap-3 pl-4">
-                {menu.items.map((item, idx) => (
-                  <button 
-                    key={idx}
-                    onClick={() => handleNavigation(item.id || menu.id)}
-                    className="text-left text-sm text-gray-500 hover:text-cisco-blue"
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+          {!isCheckingAuth && (
+            <div className="sm:hidden border-b border-gray-100 pb-6">
+              {isAuthenticated ? (
+                <Link 
+                  href="/dashboard"
+                  className="flex items-center space-x-2 text-cisco-green hover:text-[#17b86a] transition-colors text-lg font-thin"
+                >
+                  <LayoutDashboard size={20} />
+                  <span>Go to Dashboard</span>
+                </Link>
+              ) : (
+                <Link 
+                  href="/signin"
+                  className="flex items-center space-x-2 text-cisco-navy hover:text-cisco-blue transition-colors text-lg font-thin"
+                >
+                  <User size={20} />
+                  <span>Account Login</span>
+                </Link>
+              )}
             </div>
+          )}
+
+          {navLinks.map((link) => (
+            <button
+              key={link.id}
+              onClick={() => handleNavigation(link.id)}
+              className="text-xl font-thin text-cisco-navy border-b border-gray-50 pb-2 w-full text-left hover:text-cisco-blue transition-colors"
+            >
+              {link.label}
+            </button>
           ))}
           
           <div className="space-y-4">
@@ -216,6 +199,23 @@ const Navbar: React.FC<{
             >
               Pricing
             </button>
+            {!isCheckingAuth && !isAuthenticated && (
+              <button 
+                onClick={onDemoClick}
+                className="w-full bg-cisco-blue text-white px-6 py-4 text-sm font-thin hover:bg-cisco-navy transition-all mt-6"
+              >
+                Request Demo
+              </button>
+            )}
+            {!isCheckingAuth && isAuthenticated && (
+              <Link 
+                href="/dashboard"
+                className="w-full bg-cisco-green text-white px-6 py-4 text-sm font-thin hover:bg-[#17b86a] transition-all mt-6 flex items-center justify-center space-x-2"
+              >
+                <LayoutDashboard size={18} />
+                <span>Go to Dashboard</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>

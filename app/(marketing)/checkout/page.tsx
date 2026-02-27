@@ -8,6 +8,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Shield, Loader2 } from 'lucide-react';
 
+// Retrieve the price ID the user selected before being sent to auth
+function getStoredPriceId(): string | undefined {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromUrl = urlParams.get('priceId');
+    if (fromUrl) return fromUrl;
+    const fromStorage = localStorage.getItem('hipaa_pending_price_id');
+    if (fromStorage) return fromStorage;
+  } catch {
+    // localStorage unavailable (e.g. SSR context)
+  }
+  return undefined;
+}
+
+function clearStoredPriceId() {
+  try {
+    localStorage.removeItem('hipaa_pending_price_id');
+  } catch {
+    // ignore
+  }
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -47,11 +69,15 @@ export default function CheckoutPage() {
     const startCheckout = async () => {
       try {
         console.log('CheckoutPage: Starting checkout process...');
+
+        // Recover the plan the user selected before they were sent to auth
+        const pendingPriceId = getStoredPriceId();
+        console.log('CheckoutPage: Pending price ID:', pendingPriceId ?? '(none – will use default)');
         
         // Add a small delay to ensure auth state is ready after OAuth redirect
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 800));
         
-        const result = await initiateCheckout();
+        const result = await initiateCheckout(pendingPriceId);
         
         console.log('CheckoutPage: Result received:', result.type);
         
@@ -59,9 +85,10 @@ export default function CheckoutPage() {
           // User needs to be redirected (not authenticated or already has subscription)
           console.log('CheckoutPage: Redirecting to:', result.path);
           
-          // Prevent redirect loops - if redirecting to checkout, show error instead
-          if (result.path === '/checkout' || result.path.startsWith('/checkout')) {
+          // Prevent redirect loops - if redirecting back to checkout, show error instead
+          if (result.path === '/checkout' || result.path.startsWith('/checkout?')) {
             console.error('CheckoutPage: Redirect loop detected! Redirecting to home instead.');
+            clearStoredPriceId();
             setError('Unable to proceed with checkout. Please try again from the home page.');
             setIsLoading(false);
             setTimeout(() => {
@@ -69,12 +96,21 @@ export default function CheckoutPage() {
             }, 3000);
             return;
           }
+
+          // If being sent back to auth, preserve the priceId in the URL so it survives the round-trip
+          if (pendingPriceId && (result.path.includes('/signin') || result.path.includes('/signup'))) {
+            const separator = result.path.includes('?') ? '&' : '?';
+            setHasRedirected(true);
+            window.location.href = `${result.path}${separator}redirect=checkout`;
+            return;
+          }
           
           setHasRedirected(true);
           // Use window.location for more reliable redirect
           window.location.href = result.path;
         } else if (result.type === 'checkout') {
-          // User can proceed to checkout
+          // User can proceed to checkout — clear the stored price selection
+          clearStoredPriceId();
           console.log('CheckoutPage: Proceeding to Stripe checkout...', {
             sessionId: result.sessionId,
             hasSessionUrl: !!result.sessionUrl,
@@ -159,38 +195,38 @@ export default function CheckoutPage() {
     return (
       <div className="flex min-h-[100dvh] flex-col bg-[#f3f5f9] px-4 py-12 sm:px-6 lg:px-8">
         <div className="flex items-center justify-center flex-1">
-          <Card className="w-full max-w-md border-zinc-200">
+          <Card className="w-full max-w-md border-gray-200 bg-white shadow-sm">
             <CardHeader>
-              <CardTitle className="text-xl font-semibold text-zinc-900">
+              <CardTitle className="text-xl font-thin text-[#0e274e]">
                 {isCurrencyError ? 'Currency Conflict' : 'Checkout Error'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <p className="text-zinc-600 leading-relaxed">{error}</p>
+                <p className="text-gray-600 leading-relaxed font-thin text-sm">{error}</p>
                 {isCurrencyError && (
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
-                    <p className="text-sm font-medium text-amber-900">How to resolve:</p>
-                    <ol className="text-sm text-amber-800 space-y-2 list-decimal list-inside">
+                    <p className="text-sm font-thin text-amber-900">How to resolve:</p>
+                    <ol className="text-sm text-amber-800 space-y-2 list-decimal list-inside font-thin">
                       <li>
-                        <strong>Open Stripe Dashboard</strong> (click button below)
+                        <strong className="font-thin">Open Stripe Dashboard</strong> (click button below)
                       </li>
                       <li>
                         Find your customer account (search by your email)
                       </li>
                       <li>
-                        Look for active subscriptions with currency <strong>{conflictingCurrency}</strong>
+                        Look for active subscriptions with currency <strong className="font-thin">{conflictingCurrency}</strong>
                       </li>
                       <li>
-                        Click on the subscription and select <strong>"Cancel subscription"</strong>
+                        Click on the subscription and select <strong className="font-thin">"Cancel subscription"</strong>
                       </li>
                       <li>
-                        Wait a few seconds, then <strong>return here and try again</strong>
+                        Wait a few seconds, then <strong className="font-thin">return here and try again</strong>
                       </li>
                     </ol>
                     <div className="mt-3 pt-3 border-t border-amber-200">
-                      <p className="text-xs text-amber-700">
-                        <strong>Note:</strong> Only active subscriptions cause this conflict. Canceled or expired subscriptions are automatically ignored.
+                      <p className="text-xs text-amber-700 font-thin">
+                        <strong className="font-thin">Note:</strong> Only active subscriptions cause this conflict. Canceled or expired subscriptions are automatically ignored.
                       </p>
                     </div>
                   </div>
@@ -200,7 +236,7 @@ export default function CheckoutPage() {
                 <Button
                   onClick={() => router.push('/')}
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 rounded-none border-gray-300 text-[#0e274e] hover:text-[#0175a2] font-thin"
                 >
                   Go to Home
                 </Button>
@@ -209,7 +245,7 @@ export default function CheckoutPage() {
                     onClick={() => {
                       window.open('https://dashboard.stripe.com/test/subscriptions', '_blank');
                     }}
-                    className="flex-1 bg-[#1ad07a] hover:bg-[#1ad07a]/90 text-[#0c0b1d]"
+                    className="flex-1 bg-[#0175a2] hover:bg-[#0e274e] text-white rounded-none font-thin"
                   >
                     Open Stripe Dashboard
                   </Button>
@@ -225,18 +261,18 @@ export default function CheckoutPage() {
   return (
     <div className="flex min-h-[100dvh] flex-col bg-[#f3f5f9] px-4 py-12 sm:px-6 lg:px-8">
       <div className="flex items-center justify-center flex-1">
-        <Card className="w-full max-w-md border-zinc-200">
-          <CardContent className="flex flex-col items-center justify-center py-12 space-y-4">
-            <Loader2 className="h-12 w-12 text-[#1ad07a] animate-spin" />
-            <div className="text-center space-y-2">
-              <h2 className="text-xl font-semibold text-zinc-900">
+        <Card className="w-full max-w-md border-gray-200 bg-white shadow-sm">
+          <CardContent className="flex flex-col items-center justify-center py-16 space-y-6">
+            <Loader2 className="h-10 w-10 text-[#0175a2] animate-spin" />
+            <div className="text-center space-y-3">
+              <h2 className="text-2xl font-thin text-[#0e274e]">
                 Redirecting to Checkout
               </h2>
-              <p className="text-zinc-600 text-sm">
+              <p className="text-gray-600 text-sm font-thin">
                 Please wait while we prepare your payment...
               </p>
               {isLoading && (
-                <p className="text-zinc-500 text-xs mt-2">
+                <p className="text-gray-400 text-xs mt-3 font-thin">
                   This may take a few seconds after login...
                 </p>
               )}

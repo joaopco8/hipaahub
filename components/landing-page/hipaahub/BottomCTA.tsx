@@ -1,7 +1,8 @@
 import React from 'react';
+import Image from 'next/image';
 import { CheckCircle2, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 
-const BottomCTA: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessmentClick }) => {
+const BottomCTA: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void }> = ({ onAssessmentClick, onDemoClick }) => {
   const trustItems = [
     "500+ healthcare organizations",
     "100% audit success rate",
@@ -10,8 +11,17 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessmentC
     "SOC 2 Type II certified",
     "HIPAA compliant",
     "24/7 support (Enterprise)",
-    "14-day free trial"
+    "Enterprise-grade security"
   ];
+
+  const handleGetStarted = () => {
+    const pricingSection = document.getElementById('pricing');
+    if (pricingSection) {
+      pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (onAssessmentClick) {
+      onAssessmentClick();
+    }
+  };
 
   return (
     <section className="bg-cisco-navy text-white py-24 md:py-32 overflow-hidden">
@@ -22,7 +32,7 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessmentC
               Transform Your <br /> Compliance Posture.
             </h2>
             <h3 className="text-xl md:text-2xl font-thin text-cisco-blue mb-10">
-              Start your free trial today. No credit card required.
+              Get started today. Transform your compliance infrastructure.
             </h3>
             <p className="text-gray-400 text-lg font-thin leading-relaxed mb-12">
               HIPAA Hub transforms compliance from reactive crisis management into continuous operational infrastructure. Centralized documentation. Automated risk assessment. Continuous audit readiness.
@@ -30,12 +40,15 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessmentC
             
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-6">
               <button 
-                onClick={onAssessmentClick}
+                onClick={handleGetStarted}
                 className="bg-cisco-blue text-white px-12 py-6 text-xs font-thin hover:bg-white hover:text-cisco-navy transition-all shadow-2xl shadow-cisco-blue/20"
               >
-                Start 14-Day Free Trial
+                Get Started
               </button>
-              <button className="text-white flex items-center justify-center text-sm font-thin hover:text-cisco-blue transition-colors group">
+              <button 
+                onClick={onDemoClick}
+                className="text-white flex items-center justify-center text-sm font-thin hover:text-cisco-blue transition-colors group"
+              >
                 Request Platform Demo <ArrowRight size={18} className="ml-3 transition-transform group-hover:translate-x-1" />
               </button>
             </div>
@@ -57,7 +70,23 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessmentC
             
             <div className="mt-12 pt-8 border-t border-white/5 flex items-center gap-6">
                <div className="flex -space-x-3">
-                  {[1,2,3,4].map(i => <div key={i} className="w-10 h-10 rounded-full bg-gray-600 border-2 border-gray-400 overflow-hidden"><img src={`https://i.pravatar.cc/100?img=${i+20}`} alt="User" className="grayscale" /></div>)}
+                  {[
+                    "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200",
+                    "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=200",
+                    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
+                    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200"
+                  ].map((img, i) => (
+                    <div key={i} className="relative w-10 h-10 rounded-full bg-gray-600 border-2 border-white/20 overflow-hidden">
+                      <Image 
+                        src={img} 
+                        alt={`Healthcare professional ${i + 1}`} 
+                        fill
+                        className="object-cover grayscale brightness-95" 
+                        quality={90}
+                        sizes="40px"
+                      />
+                    </div>
+                  ))}
                </div>
                <p className="text-xs text-gray-500 font-thin leading-tight">Join 500+ <br /> Secure Clinics</p>
             </div>

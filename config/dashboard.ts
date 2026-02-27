@@ -23,7 +23,8 @@ import {
   AlertCircle,
   BarChart3,
   FolderOpen,
-  BookOpen
+  BookOpen,
+  Download
 } from 'lucide-react';
 
 export interface NavItem {
@@ -59,7 +60,8 @@ export const iconComponents = {
   AlertCircle,
   BarChart3,
   FolderOpen,
-  BookOpen
+  BookOpen,
+  Download
 };
 
 export const navConfig = [
@@ -70,5 +72,6 @@ export const navConfig = [
   { href: '/dashboard/training', icon: 'Users', label: 'Training & Employees', group: 'compliance' },
   { href: '/dashboard/risk-assessment', icon: 'ShieldAlert', label: 'Risk Assessment', group: 'compliance' },
   { href: '/dashboard/breach-notifications', icon: 'Mail', label: 'Breach Notifications', group: 'compliance' },
-  { href: '/dashboard/evidence', icon: 'Archive', label: 'Evidence Center', group: 'compliance' }
+  { href: '/dashboard/evidence', icon: 'Archive', label: 'Evidence Center', group: 'compliance' },
+  { href: '/dashboard/audit-export', icon: 'Download', label: 'Export Audit', group: 'compliance' }
 ];

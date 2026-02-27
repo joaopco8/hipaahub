@@ -48,7 +48,7 @@ const WhyChooseUs: React.FC = () => {
              DIY spreadsheets cost $0 in licensing, but require 40+ hours of labor and leave critical gaps in your compliance posture.
            </p>
            <button className="bg-cisco-blue text-white px-12 py-5 text-sm font-thin hover:bg-cisco-navy transition-all flex items-center gap-3">
-             Start 14-day free trial <ArrowRight size={18} />
+             Get Started <ArrowRight size={18} />
            </button>
         </div>
       </div>

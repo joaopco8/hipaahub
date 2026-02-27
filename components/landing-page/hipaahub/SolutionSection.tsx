@@ -10,7 +10,7 @@ const CircularProgress: React.FC<{ percentage: number; label: string; valueDispl
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-[120px] h-[120px] flex items-center justify-center mb-8">
+      <div className="relative w-[156px] h-[156px] flex items-center justify-center mb-8">
         <svg className="w-full h-full -rotate-90 block" viewBox="0 0 128 128">
           <circle
             cx="64"
@@ -44,8 +44,8 @@ const CircularProgress: React.FC<{ percentage: number; label: string; valueDispl
 const SolidCircleStat: React.FC<{ value: string; label: string }> = ({ value, label }) => {
   return (
     <div className="flex flex-col items-center">
-      <div className="w-[120px] h-[120px] flex items-center justify-center mb-8">
-        <div className="w-[112px] h-[112px] rounded-full bg-cisco-green flex items-center justify-center text-white shadow-sm overflow-hidden group">
+      <div className="w-[156px] h-[156px] flex items-center justify-center mb-8">
+        <div className="w-[146px] h-[146px] rounded-full bg-cisco-green flex items-center justify-center text-white shadow-sm overflow-hidden group">
           <span className="text-4xl font-thin">{value}</span>
         </div>
       </div>
@@ -64,7 +64,7 @@ const SolutionSection: React.FC = () => {
           {/* Left: Main Heading */}
           <div className="lg:col-span-4">
             <h2 className="text-[42px] font-thin text-cisco-navy leading-[1.1]">
-              Compliance <br /> Documentation is <br /> Fragmented. <br /> Audit Risk is High.
+              The Healthcare Compliance Challenge
             </h2>
           </div>
 
@@ -76,10 +76,7 @@ const SolutionSection: React.FC = () => {
                 <FileText className="text-gray-400" size={18} strokeWidth={1.5} />
               </div>
               <p className="text-gray-500 text-[15px] font-thin leading-relaxed max-w-2xl">
-                Become the expert that enables teams to connect, communicate, and collaborate like 
-                never before -- seamlessly and securely.
-                <br /><br />
-                Healthcare organizations typically store compliance documentation across multiple systems. When OCR requests documentation, retrieval takes weeks. Gaps emerge. Violations accumulate.
+                Most healthcare organizations store compliance documentation across Google Drive, email, and paper files. When regulators request documentation, retrieval takes weeks. Gaps emerge. Violations accumulate.
               </p>
             </div>
           </div>
@@ -89,20 +86,20 @@ const SolutionSection: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-4 border-t border-gray-50 pt-20">
           <CircularProgress 
             percentage={72} 
-            label="Healthcare organizations have documentation gaps" 
+            label="of healthcare organizations have documentation gaps" 
           />
           <CircularProgress 
             percentage={40} 
             valueDisplay="40%"
-            label="OCR audit activity (2023-2024) - 40% Increase" 
+            label="increase in OCR audits (2023-2024)" 
           />
           <SolidCircleStat 
             value="$50k" 
-            label="Average fine per violation: $50,000" 
+            label="average fine per violation" 
           />
           <SolidCircleStat 
             value="4-8w" 
-            label="Average time to retrieve audit documentation: 4-8 Weeks" 
+            label="to retrieve documentation across multiple systems" 
           />
         </div>
       </div>

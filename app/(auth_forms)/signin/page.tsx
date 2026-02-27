@@ -213,7 +213,7 @@ function SignInContent() {
           <div className="text-center text-sm text-gray-600 font-thin">
             Don't have an account?{' '}
             <Link
-              href="/signup"
+              href={searchParams.get('redirect') ? `/signup?redirect=${searchParams.get('redirect')}` : '/signup'}
               className="font-thin hover:opacity-80"
               style={{ color: '#0175a2' }}
               prefetch={false}

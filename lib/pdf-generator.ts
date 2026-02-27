@@ -1,6 +1,7 @@
 /**
  * Professional PDF Generator for HIPAA Breach Notification Letters
  * Creates legally compliant, professionally formatted PDF documents
+ * Uses new design system: Cisco Navy (#0e274e) and Cisco Blue (#00bceb)
  */
 
 interface PDFOptions {
@@ -9,6 +10,30 @@ interface PDFOptions {
   content: string;
   recipientName?: string;
   breachId?: string;
+  organization?: {
+    legal_name?: string;
+    dba?: string;
+    address_street?: string;
+    address_city?: string;
+    address_state?: string;
+    address_zip?: string;
+    phone_number?: string;
+    email_address?: string;
+    website?: string;
+    ein?: string;
+    npi?: string;
+    state_license_number?: string;
+    privacy_officer_name?: string;
+    privacy_officer_email?: string;
+    privacy_officer_phone?: string;
+    privacy_officer_role?: string;
+  };
+  breachDetails?: {
+    discoveryDate?: string;
+    incidentDate?: string;
+    numberOfIndividuals?: number;
+    breachType?: string;
+  };
 }
 
 /**
@@ -62,11 +87,19 @@ export async function generatePatientNotificationPDF(options: PDFOptions): Promi
     });
   };
 
+  // Color constants - New design system
+  const CISCO_NAVY = [14, 39, 78]; // #0e274e
+  const CISCO_BLUE = [0, 188, 235]; // #00bceb
+  const GRAY_DARK = [60, 60, 60];
+  const GRAY_MEDIUM = [100, 100, 100];
+  const GRAY_LIGHT = [150, 150, 150];
+  const WHITE = [255, 255, 255];
+
   // Helper function to add a section header
   const addSectionHeader = (text: string) => {
     checkPageBreak(15);
     yPosition += 8;
-    addWrappedText(text, 14, true, [12, 11, 29]); // #0c0b1d
+    addWrappedText(text, 14, true, CISCO_NAVY);
     yPosition += 3;
   };
 
@@ -74,52 +107,135 @@ export async function generatePatientNotificationPDF(options: PDFOptions): Promi
   const addSubsection = (title: string, content: string) => {
     checkPageBreak(20);
     yPosition += 5;
-    addWrappedText(title, 11, true, [12, 11, 29]);
+    addWrappedText(title, 11, true, CISCO_NAVY);
     yPosition += 2;
-    addWrappedText(content, 10, false, [60, 60, 60]);
+    addWrappedText(content, 10, false, GRAY_DARK);
     yPosition += 3;
   };
 
-  // Page 1: Cover/Header
-  // Top border line
-  doc.setDrawColor(26, 208, 122); // #1ad07a
-  doc.setLineWidth(2);
+  // Helper function to format address
+  const formatAddress = () => {
+    if (!options.organization) return '';
+    const org = options.organization;
+    const parts: string[] = [];
+    if (org.address_street) parts.push(org.address_street);
+    if (org.address_city || org.address_state || org.address_zip) {
+      const cityStateZip = [];
+      if (org.address_city) cityStateZip.push(org.address_city);
+      if (org.address_state) cityStateZip.push(org.address_state);
+      if (org.address_zip) cityStateZip.push(org.address_zip);
+      parts.push(cityStateZip.join(', '));
+    }
+    return parts.join('\n') || '';
+  };
+
+  // Page 1: Professional Letterhead
+  // Top accent line (Cisco Blue)
+  doc.setDrawColor(CISCO_BLUE[0], CISCO_BLUE[1], CISCO_BLUE[2]);
+  doc.setLineWidth(3);
   doc.line(margin, margin, pageWidth - margin, margin);
-  yPosition = margin + 8;
+  yPosition = margin + 12;
 
-  // Organization name (large)
-  addWrappedText(options.organizationName, 18, true, [12, 11, 29]);
-  yPosition += 5;
+  // Organization name (large, Navy)
+  const orgName = options.organization?.legal_name || options.organizationName;
+  addWrappedText(orgName, 20, true, CISCO_NAVY);
+  yPosition += 2;
 
-  // Document title
-  addWrappedText(options.documentTitle, 16, true, [26, 208, 122]);
+  // DBA if exists
+  if (options.organization?.dba) {
+    addWrappedText(`DBA: ${options.organization.dba}`, 10, false, GRAY_MEDIUM);
+    yPosition += 4;
+  }
+
+  // Organization address
+  const address = formatAddress();
+  if (address) {
+    addWrappedText(address, 10, false, GRAY_DARK);
+    yPosition += 4;
+  }
+
+  // Contact information
+  const contactInfo: string[] = [];
+  if (options.organization?.phone_number) {
+    contactInfo.push(`Phone: ${options.organization.phone_number}`);
+  }
+  if (options.organization?.email_address) {
+    contactInfo.push(`Email: ${options.organization.email_address}`);
+  }
+  if (options.organization?.website) {
+    contactInfo.push(`Website: ${options.organization.website}`);
+  }
+  if (contactInfo.length > 0) {
+    addWrappedText(contactInfo.join(' | '), 9, false, GRAY_MEDIUM);
+    yPosition += 5;
+  }
+
+  // Organization identifiers
+  const identifiers: string[] = [];
+  if (options.organization?.ein) {
+    identifiers.push(`EIN: ${options.organization.ein}`);
+  }
+  if (options.organization?.npi) {
+    identifiers.push(`NPI: ${options.organization.npi}`);
+  }
+  if (options.organization?.state_license_number) {
+    identifiers.push(`State License: ${options.organization.state_license_number}`);
+  }
+  if (identifiers.length > 0) {
+    addWrappedText(identifiers.join(' | '), 9, false, GRAY_MEDIUM);
+    yPosition += 6;
+  }
+
+  // Divider line
+  doc.setDrawColor(220, 220, 220);
+  doc.setLineWidth(0.5);
+  doc.line(margin, yPosition, pageWidth - margin, yPosition);
   yPosition += 8;
 
+  // Document title (Cisco Blue accent)
+  addWrappedText(options.documentTitle, 16, true, CISCO_BLUE);
+  yPosition += 3;
+
   // Legal reference
-  addWrappedText('Required for all breaches (45 CFR §164.404)', 9, false, [100, 100, 100]);
+  addWrappedText('Required Notification - 45 CFR §164.404', 9, false, GRAY_MEDIUM);
   yPosition += 10;
 
-  // Document metadata box
+  // Document metadata section (clean box)
   const metadataY = yPosition;
-  doc.setDrawColor(200, 200, 200);
+  doc.setDrawColor(230, 230, 230);
   doc.setLineWidth(0.5);
-  doc.rect(margin, metadataY, contentWidth, 25);
+  doc.setFillColor(248, 249, 250);
+  doc.roundedRect(margin, metadataY, contentWidth, 30, 2, 2, 'FD');
   
   yPosition = metadataY + 8;
-  addWrappedText('Document Information', 10, true, [12, 11, 29]);
+  addWrappedText('Document Information', 10, true, CISCO_NAVY);
   yPosition += 5;
   
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  addWrappedText(`Generated: ${dateStr}`, 9, false, [100, 100, 100]);
+  addWrappedText(`Generated: ${dateStr}`, 9, false, GRAY_DARK);
   yPosition += 4;
   
   if (options.breachId) {
-    addWrappedText(`Breach ID: ${options.breachId}`, 9, false, [100, 100, 100]);
+    addWrappedText(`Breach ID: ${options.breachId}`, 9, false, GRAY_DARK);
     yPosition += 4;
   }
+
+  if (options.breachDetails?.discoveryDate) {
+    const discoveryDate = new Date(options.breachDetails.discoveryDate).toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    addWrappedText(`Discovery Date: ${discoveryDate}`, 9, false, GRAY_DARK);
+    yPosition += 4;
+  }
+
+  if (options.breachDetails?.numberOfIndividuals) {
+    addWrappedText(`Individuals Affected: ${options.breachDetails.numberOfIndividuals}`, 9, false, GRAY_DARK);
+  }
   
-  yPosition = metadataY + 28;
+  yPosition = metadataY + 32;
 
   // Parse and format the content
   const sections = parseLetterContent(options.content);
@@ -145,16 +261,27 @@ export async function generatePatientNotificationPDF(options: PDFOptions): Promi
     }
   });
 
-  // Footer on each page
+  // Footer on each page (professional, minimal)
   const addFooter = () => {
     const pageCount = doc.getNumberOfPages();
+    const orgName = options.organization?.legal_name || options.organizationName;
+    
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
+      
+      // Footer line
+      doc.setDrawColor(230, 230, 230);
+      doc.setLineWidth(0.5);
+      doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+      
+      // Footer text
       doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
+      doc.setTextColor(GRAY_LIGHT[0], GRAY_LIGHT[1], GRAY_LIGHT[2]);
       doc.setFont('helvetica', 'normal');
+      
+      const footerText = `Page ${i} of ${pageCount} | ${orgName} | Confidential - HIPAA Breach Notification`;
       doc.text(
-        `Page ${i} of ${pageCount} | ${options.organizationName} | Confidential - HIPAA Breach Notification`,
+        footerText,
         pageWidth / 2,
         pageHeight - 10,
         { align: 'center' }

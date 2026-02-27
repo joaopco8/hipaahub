@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Hero: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessmentClick }) => {
+const Hero: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void }> = ({ onAssessmentClick, onDemoClick }) => {
   return (
     <section className="relative min-h-[600px] md:min-h-[700px] w-full bg-cisco-navy overflow-hidden flex items-center py-20 md:py-0">
       {/* Background image */}
@@ -24,14 +24,13 @@ const Hero: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessmentClick 
           </div>
           <div className="animate-reveal [animation-delay:400ms] opacity-0">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-thin mb-6 md:mb-8 leading-[1.1]">
-              HIPAA Compliance <br className="hidden md:block" /> Infrastructure. <br className="hidden md:block" /> Operationalized Continuously.
+              Complete HIPAA Compliance.<br className="hidden md:block" /> Structured. Automated. Audit Ready.
             </h1>
           </div>
           <div className="animate-reveal [animation-delay:600ms] opacity-0">
             <div className="max-w-2xl text-base md:text-lg text-gray-300 font-thin leading-relaxed mb-10 md:mb-12 space-y-6">
               <p className="text-white font-thin opacity-90">
-                Enterprise-grade compliance platform for healthcare organizations. 
-                Centralized policies, automated documentation, continuous audit readiness.
+                Centralize policies, automate risk assessments, track vendors and incidents, and maintain continuous audit readiness in one secure platform.
               </p>
             </div>
           </div>
@@ -41,13 +40,16 @@ const Hero: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessmentClick 
                 onClick={onAssessmentClick}
                 className="w-full sm:w-auto bg-cisco-blue text-white px-8 md:px-12 py-4 md:py-6 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all border-none rounded-none shadow-2xl shadow-cisco-blue/20"
               >
-                Start Free Trial
+                Get Started
               </button>
-              <button className="w-full sm:w-auto border border-white/20 text-white px-8 md:px-12 py-4 md:py-6 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all rounded-none">
+              <button 
+                onClick={onDemoClick}
+                className="w-full sm:w-auto border border-white/20 text-white px-8 md:px-12 py-4 md:py-6 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all rounded-none"
+              >
                 Request Platform Demo
               </button>
             </div>
-            <p className="mt-6 text-[10px] text-gray-500 font-thin">No credit card required. Cancel anytime.</p>
+            <p className="mt-6 text-[10px] text-gray-500 font-thin">Cancel anytime.</p>
           </div>
         </div>
       </div>

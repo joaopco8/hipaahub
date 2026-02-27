@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Printer, Loader2 } from 'lucide-react';
 import { generatePolicyPDF, downloadPolicyPDF } from '@/lib/policy-pdf-generator';
+import { markPolicyAsGenerated } from '@/app/actions/policy-documents';
 import { toast } from 'sonner';
 
 interface DocumentActionsProps {
@@ -13,15 +14,18 @@ interface DocumentActionsProps {
   documentContent?: string;
   organizationName?: string;
   policyId?: string;
+  /** Numeric ID (1–9) used to mark generation status in the DB */
+  policyNumericId?: number;
 }
 
-export function DocumentActions({ 
-  onPrint, 
+export function DocumentActions({
+  onPrint,
   onDownload,
   documentTitle = 'HIPAA Policy Document',
   documentContent = '',
   organizationName = 'Organization',
-  policyId
+  policyId,
+  policyNumericId
 }: DocumentActionsProps) {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
@@ -39,7 +43,6 @@ export function DocumentActions({
       return;
     }
 
-    // If no custom handler, generate PDF
     if (!documentContent) {
       toast.error('Document content is not available for download');
       return;
@@ -55,10 +58,18 @@ export function DocumentActions({
         generatedDate: new Date()
       });
 
-      // Create filename from document title
       const filename = `${documentTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date().toISOString().split('T')[0]}.pdf`;
-      
       downloadPolicyPDF(pdfBlob, filename);
+
+      // Mark as generated in DB if we have a numeric policy ID
+      if (policyNumericId) {
+        try {
+          await markPolicyAsGenerated(policyNumericId, documentTitle);
+        } catch {
+          // Non-blocking — download already succeeded
+        }
+      }
+
       toast.success('PDF downloaded successfully');
     } catch (error) {
       console.error('Error generating PDF:', error);

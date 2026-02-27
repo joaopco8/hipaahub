@@ -96,60 +96,24 @@ export async function GET(request: NextRequest) {
         getOrganization(supabase, user.id),
         getComplianceCommitment(supabase, user.id)
       ]);
-      
+
       if (process.env.NODE_ENV === 'development') {
-        console.log('Auth callback: Checking subscription for user:', user.id);
-        console.log('Auth callback: Subscription found:', subscription ? 'YES' : 'NO');
-        console.log('Auth callback: Onboarding complete:', (organization && commitment) ? 'YES' : 'NO');
+        console.log('Auth callback: user:', user.id, '| sub:', !!subscription, '| org:', !!organization, '| commitment:', !!commitment);
       }
-      
-      // If user has active subscription, ALWAYS allow access (never redirect to checkout)
-      if (subscription) {
-        // User has subscription, check onboarding status
-        if (organization && commitment) {
-          // Onboarding complete → go to dashboard
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Auth callback: User has subscription and onboarding complete, redirecting to dashboard');
-          }
-          return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
-        } else {
-          // Onboarding incomplete → go to onboarding
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Auth callback: User has subscription but onboarding incomplete, redirecting to onboarding');
-          }
-          return NextResponse.redirect(`${requestUrl.origin}/onboarding/expectation`);
-        }
-      }
-      
-      // User doesn't have subscription yet
-      // Check if user came from checkout flow (check redirect parameter)
-      const redirectParam = requestUrl.searchParams.get('redirect');
-      
-      if (redirectParam === 'checkout') {
-        // User came from checkout flow but doesn't have subscription yet
-        // Allow them to proceed to checkout
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Auth callback: User came from checkout flow, redirecting to checkout');
-        }
-        return NextResponse.redirect(`${requestUrl.origin}/checkout`);
-      }
-      
-      // No redirect param - check onboarding status FIRST
-      // If onboarding is complete, ALWAYS allow dashboard access (never redirect to checkout)
+
       if (organization && commitment) {
-        // Onboarding complete → ALWAYS go to dashboard (even without subscription)
-        // Webhook may still be processing, but user should have access
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Auth callback: Onboarding complete, allowing dashboard access (subscription may be processing)');
-        }
+        // Onboarding fully complete → dashboard (regardless of subscription state — webhook may still be in-flight)
         return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
-      } else {
-        // Onboarding incomplete and no subscription → redirect to checkout
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Auth callback: No subscription and onboarding incomplete, redirecting to checkout');
-        }
-        return NextResponse.redirect(`${requestUrl.origin}/checkout`);
       }
+
+      if (subscription) {
+        // Has subscription but onboarding not done → resume onboarding
+        return NextResponse.redirect(`${requestUrl.origin}/onboarding/expectation`);
+      }
+
+      // No subscription yet → send to checkout.
+      // The checkout page recovers the selected plan from localStorage (set by PricingSection before redirect to auth).
+      return NextResponse.redirect(`${requestUrl.origin}/checkout`);
     }
   }
 

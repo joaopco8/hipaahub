@@ -1,20 +1,20 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   CheckCircle2,
   AlertCircle,
-  Info,
   Shield,
   FileText,
   Users,
-  Archive,
-  ListChecks,
-  ChevronRight,
-  Clock,
+  AlertTriangle,
+  TrendingDown,
   TrendingUp,
-  AlertTriangle
+  Clock,
+  Calendar,
+  Building2,
+  Activity
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -42,15 +42,19 @@ export default async function DashboardPage() {
 
   const supabase = createClient();
 
+  // Get organization ID
+  const orgId = (organization as any).id;
+
   // Fetch all data in parallel
   const [
     { total: policiesTotal, completed: policiesCompleted },
-    activityFeed,
-    evidenceStats,
-    trainingResult
+    evidenceStatsResult,
+    trainingResult,
+    businessAssociatesResult,
+    incidentsResult,
+    breachNotificationsResult
   ] = await Promise.all([
     getPolicyDocumentsCount(supabase, user.id),
-    getActivityFeed(supabase, user.id, 5),
     getEvidenceStatistics().catch(() => ({
       total: 0, by_status: {} as any, by_type: {} as any,
       by_category: {} as any, expiring_soon: 0, requires_review: 0
@@ -59,10 +63,41 @@ export default async function DashboardPage() {
       .from('training_records')
       .select('completion_status, expiration_date, user_id, staff_member_id, full_name, training_date')
       .eq('user_id', user.id)
-      .order('training_date', { ascending: false })
+      .order('training_date', { ascending: false }),
+    (supabase as any)
+      .from('vendors')
+      .select('*')
+      .eq('organization_id', orgId)
+      .order('created_at', { ascending: false })
+      .then((result: any) => result.error ? { data: [] } : result)
+      .catch(() => ({ data: [] })),
+    (supabase as any)
+      .from('incident_logs')
+      .select('*')
+      .eq('organization_id', orgId)
+      .order('date_discovered', { ascending: false })
+      .then((result: any) => result.error ? { data: [] } : result)
+      .catch(() => ({ data: [] })),
+    (supabase as any)
+      .from('breach_notifications')
+      .select('*')
+      .eq('organization_id', orgId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .then((result: any) => result.error ? { data: [] } : result)
+      .catch(() => ({ data: [] }))
   ]);
 
-  const trainingRecords: any[] = trainingResult.data || [];
+  // Handle results with error checking
+  const evidenceStats = evidenceStatsResult || {
+    total: 0, by_status: {} as any, by_type: {} as any,
+    by_category: {} as any, expiring_soon: 0, requires_review: 0
+  };
+
+  const trainingRecords: any[] = trainingResult?.data || [];
+  const vendors: any[] = businessAssociatesResult?.data || [];
+  const incidents: any[] = incidentsResult?.data || [];
+  const lastBreachNotification = breachNotificationsResult?.data?.[0] || null;
 
   // ── Training Metrics ──────────────────────────────────────────────────────
   const now = new Date();
@@ -81,73 +116,169 @@ export default async function DashboardPage() {
   const criticalItems = pendingActionItems.filter(item => item.priority === 'critical');
   const highItems = pendingActionItems.filter(item => item.priority === 'high');
   const completedItems = actionItems.filter(item => item.status === 'completed');
-  const actionItemsRate = actionItems.length > 0
-    ? Math.round((completedItems.length / actionItems.length) * 100)
-    : 0;
-
-  // ── Evidence Metrics ──────────────────────────────────────────────────────
-  const validEvidence = (evidenceStats.by_status as any)['VALID'] || 0;
-  const expiredEvidence = (evidenceStats.by_status as any)['EXPIRED'] || 0;
-  const evidenceCoverage = evidenceStats.total > 0
-    ? Math.round((validEvidence / evidenceStats.total) * 100)
-    : 0;
 
   // ── Risk Level ────────────────────────────────────────────────────────────
   const riskLevel = riskAssessment?.risk_level || 'high';
   const riskColor = riskLevel === 'low' ? '#71bc48' : riskLevel === 'medium' ? '#fbab18' : '#e2231a';
-  const riskBg = riskLevel === 'low' ? 'bg-[#71bc48]/10 text-[#71bc48]' : riskLevel === 'medium' ? 'bg-[#fbab18]/10 text-[#fbab18]' : 'bg-[#e2231a]/10 text-[#e2231a]';
+  const riskLabel = riskLevel === 'low' ? 'Low Risk' : riskLevel === 'medium' ? 'Moderate Risk' : 'High Risk';
 
-  // ── Compliance Score ──────────────────────────────────────────────────────
+  // ── Compliance Score Calculation ─────────────────────────────────────────
   const policyScore = Math.round((policiesCompleted / policiesTotal) * 30);
   const trainingScore = Math.round((trainingRate / 100) * 25);
   const actionScore = actionItems.length > 0
     ? Math.round((1 - pendingActionItems.length / actionItems.length) * 25)
     : 25;
+  const validEvidence = (evidenceStats.by_status as any)['VALID'] || 0;
   const evidenceScore = evidenceStats.total > 0
     ? Math.round((validEvidence / evidenceStats.total) * 20)
     : 0;
   const complianceScore = Math.min(100, policyScore + trainingScore + actionScore + evidenceScore);
   const scoreColor = complianceScore >= 80 ? '#71bc48' : complianceScore >= 60 ? '#fbab18' : '#e2231a';
-  const scoreBg = complianceScore >= 80 ? 'bg-[#71bc48]/10 text-[#71bc48]' : complianceScore >= 60 ? 'bg-[#fbab18]/10 text-[#fbab18]' : 'bg-[#e2231a]/10 text-[#e2231a]';
-  const scoreLabel = complianceScore >= 80 ? 'Compliant' : complianceScore >= 60 ? 'Attention Needed' : 'At Risk';
+  const scoreLabel = complianceScore >= 80 ? 'Compliant' : complianceScore >= 60 ? 'Moderate Risk' : 'At Risk';
 
-  // SVG circle circumference for score ring
-  const radius = 52;
-  const circumference = 2 * Math.PI * radius;
-  const scoreOffset = circumference - (complianceScore / 100) * circumference;
+  // ── Top 3 Active Risks ────────────────────────────────────────────────────
+  const topRisks = [...criticalItems, ...highItems].slice(0, 3).map(item => ({
+    title: item.title,
+    priority: item.priority
+  }));
 
-  // ── Top Priority Action Items ─────────────────────────────────────────────
-  const topActions = [...criticalItems, ...highItems].slice(0, 4);
+  // ── Open Mitigation Items ─────────────────────────────────────────────────
+  const openMitigations = pendingActionItems.length;
 
-  // ── Safeguard area progress (based on evidence categories) ────────────────
-  const adminEvidence = (evidenceStats.by_category as any)['ADMINISTRATIVE_SAFEGUARDS'] || 0;
-  const techEvidence = (evidenceStats.by_category as any)['TECHNICAL_SAFEGUARDS'] || 0;
-  const physEvidence = (evidenceStats.by_category as any)['PHYSICAL_SAFEGUARDS'] || 0;
-  const totalCatEvidence = adminEvidence + techEvidence + physEvidence || 1;
+  // ── Documentation Health ───────────────────────────────────────────────────
+  const riskAssessmentCurrent = !!riskAssessment;
+  const nextReviewDate = organization.next_review_date 
+    ? new Date(organization.next_review_date)
+    : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // Default: 1 year from now
 
-  // Use policies + training as part of Admin Safeguards score
-  const adminScore = Math.min(100, Math.round(
-    ((policiesCompleted / policiesTotal) * 50) +
-    ((trainingRate / 100) * 30) +
-    ((adminEvidence / Math.max(totalCatEvidence, 1)) * 20)
-  ));
-  const techScore = evidenceStats.total > 0
-    ? Math.min(100, Math.round((techEvidence / Math.max(totalCatEvidence, 1)) * 100))
-    : 0;
-  const physScore = evidenceStats.total > 0
-    ? Math.min(100, Math.round((physEvidence / Math.max(totalCatEvidence, 1)) * 100))
-    : 0;
+  // ── Vendor & BAA Status ────────────────────────────────────────────────────
+  const totalVendors = vendors.length;
+  const today = new Date();
+  const validBAAs = vendors.filter((v: any) => {
+    if (!v.baa_signed || !v.baa_expiration_date) return false;
+    const expDate = new Date(v.baa_expiration_date);
+    return expDate > today;
+  }).length;
+  const expiringBAAs = vendors.filter((v: any) => {
+    if (!v.baa_expiration_date) return false;
+    const expDate = new Date(v.baa_expiration_date);
+    const daysUntilExpiry = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
+  }).length;
+  const expiredBAAs = vendors.filter((v: any) => {
+    if (!v.baa_expiration_date) return false;
+    const expDate = new Date(v.baa_expiration_date);
+    return expDate < today;
+  }).length;
 
-  const activityIconColor: Record<string, string> = {
-    success: '#71bc48',
-    info: '#00bceb',
-    warning: '#fbab18',
-    error: '#e2231a'
-  };
+  // ── Incident Status ───────────────────────────────────────────────────────
+  const openIncidents = incidents.filter((inc: any) => inc.status === 'open').length;
+  const highSeverityIncidents = incidents.filter((inc: any) => inc.severity === 'high' && inc.status === 'open').length;
+  const lastIncident = incidents.length > 0 ? incidents[0] : null;
+
+  // ── Action Center Items ────────────────────────────────────────────────────
+  const actionCenterItems: Array<{
+    type: 'warning' | 'info';
+    text: string;
+    link?: string;
+  }> = [];
+
+  // Staff training overdue
+  if (expiredTrainings.length > 0) {
+    actionCenterItems.push({
+      type: 'warning',
+      text: `Staff training overdue (${expiredTrainings.length} employees)`,
+      link: '/dashboard/training'
+    });
+  }
+
+  // Vendor BAA issues
+  if (expiredBAAs > 0) {
+    actionCenterItems.push({
+      type: 'warning',
+      text: `${expiredBAAs} vendor BAA${expiredBAAs > 1 ? 's' : ''} expired`,
+      link: '/dashboard/policies/vendors'
+    });
+  }
+  if (expiringBAAs > 0) {
+    actionCenterItems.push({
+      type: 'warning',
+      text: `${expiringBAAs} vendor BAA${expiringBAAs > 1 ? 's' : ''} expiring soon`,
+      link: '/dashboard/policies/vendors'
+    });
+  }
+  const missingBAAs = vendors.filter((v: any) => !v.baa_signed && v.has_phi_access).length;
+  if (missingBAAs > 0) {
+    actionCenterItems.push({
+      type: 'warning',
+      text: `${missingBAAs} vendor${missingBAAs > 1 ? 's' : ''} with missing BAA${missingBAAs > 1 ? 's' : ''}`,
+      link: '/dashboard/policies/vendors'
+    });
+  }
+
+  // High severity incidents
+  if (highSeverityIncidents > 0) {
+    actionCenterItems.push({
+      type: 'warning',
+      text: `${highSeverityIncidents} high severity incident${highSeverityIncidents > 1 ? 's' : ''} requiring attention`,
+      link: '/dashboard/breach-notifications/incidents'
+    });
+  }
+  
+  // Open incidents older than 7 days
+  const staleIncidents = incidents.filter((inc: any) => {
+    if (inc.status !== 'open') return false;
+    const discoveredDate = new Date(inc.date_discovered);
+    const daysSinceDiscovery = (now.getTime() - discoveredDate.getTime()) / (1000 * 60 * 60 * 24);
+    return daysSinceDiscovery > 7;
+  }).length;
+  if (staleIncidents > 0) {
+    actionCenterItems.push({
+      type: 'warning',
+      text: `${staleIncidents} incident${staleIncidents > 1 ? 's' : ''} open for more than 7 days`,
+      link: '/dashboard/breach-notifications/incidents'
+    });
+  }
+
+  // Risk reassessment recommended
+  if (riskAssessment) {
+    const assessmentDate = new Date(riskAssessment.updated_at || riskAssessment.created_at);
+    const monthsSinceAssessment = (now.getTime() - assessmentDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+    if (monthsSinceAssessment >= 11) {
+      actionCenterItems.push({
+        type: 'warning',
+        text: 'Risk reassessment recommended',
+        link: '/dashboard/risk-assessment'
+      });
+    }
+  }
+
+  // Policy review approaching
+  const daysUntilReview = Math.ceil((nextReviewDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  if (daysUntilReview <= 30 && daysUntilReview > 0) {
+    actionCenterItems.push({
+      type: 'warning',
+      text: 'Policy review approaching',
+      link: '/dashboard/policies'
+    });
+  }
+
+  // Critical action items
+  if (criticalItems.length > 0) {
+    actionCenterItems.push({
+      type: 'warning',
+      text: `${criticalItems.length} critical action item${criticalItems.length > 1 ? 's' : ''} pending`,
+      link: '/dashboard/action-items'
+    });
+  }
+
+  // Last updated date
+  const lastUpdated = riskAssessment?.updated_at 
+    ? new Date(riskAssessment.updated_at)
+    : new Date();
 
   return (
-    <div className="flex flex-col gap-6 font-sans">
-
+    <div className="flex flex-col gap-6 font-sans max-w-[1600px] mx-auto">
       {/* ── Page Header ─────────────────────────────────────────────────── */}
       <div className="flex items-end justify-between border-b border-gray-200 pb-3">
         <div>
@@ -156,342 +287,234 @@ export default async function DashboardPage() {
             {organization.name} &nbsp;·&nbsp; {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </p>
         </div>
-        <span className={`text-xs font-light px-3 py-1 ${riskBg}`}>
-          {riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} Risk
-        </span>
       </div>
 
-      {/* ── Row 1: Score + 3 KPIs ───────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-
-        {/* Compliance Score */}
-        <Card className="border-0 shadow-sm bg-white rounded-none">
-          <CardContent className="p-6 flex flex-col items-center">
-            <p className="text-sm font-light text-[#565656] mb-3">Compliance Score</p>
-            <div className="relative w-[130px] h-[130px]">
+      {/* ── 1. COMPLIANCE SCORE (Card grande no topo) ───────────────────── */}
+      <Card className="border-0 shadow-sm bg-white rounded-none">
+        <CardContent className="p-8">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <h2 className="text-sm font-light text-[#565656] mb-4 uppercase tracking-wide">Overall Compliance Status</h2>
+              <div className="flex items-baseline gap-4 mb-4">
+                <span className="text-6xl font-thin text-[#0e274e]">{complianceScore}</span>
+                <span className="text-2xl font-thin text-gray-400">/ 100</span>
+              </div>
+              <div className="flex items-center gap-4 mb-6">
+                <span className={`text-sm font-light px-4 py-2 ${scoreColor === '#71bc48' ? 'bg-[#71bc48]/10 text-[#71bc48]' : scoreColor === '#fbab18' ? 'bg-[#fbab18]/10 text-[#fbab18]' : 'bg-[#e2231a]/10 text-[#e2231a]'}`}>
+                  {scoreLabel}
+                </span>
+                <span className="text-xs text-gray-400 font-light">
+                  Last Updated: {lastUpdated.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                </span>
+              </div>
+              <div className="flex items-center gap-6 text-xs text-gray-500 font-light">
+                <span>Next Review: {nextReviewDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              </div>
+            </div>
+            <div className="w-32 h-32 relative">
               <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r={radius} stroke="#f3f5f9" strokeWidth="8" fill="none" />
+                <circle cx="60" cy="60" r="52" stroke="#f3f5f9" strokeWidth="8" fill="none" />
                 <circle
-                  cx="60" cy="60" r={radius}
+                  cx="60" cy="60"
+                  r="52"
                   stroke={scoreColor}
                   strokeWidth="8"
                   fill="none"
-                  strokeDasharray={`${circumference}`}
-                  strokeDashoffset={scoreOffset}
-                  strokeLinecap="butt"
+                  strokeDasharray={`${2 * Math.PI * 52}`}
+                  strokeDashoffset={`${2 * Math.PI * 52 * (1 - complianceScore / 100)}`}
+                  strokeLinecap="round"
                 />
               </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-3xl font-light" style={{ color: scoreColor }}>{complianceScore}%</span>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl font-thin" style={{ color: scoreColor }}>{complianceScore}%</span>
               </div>
             </div>
-            <span className={`text-xs font-light px-3 py-1 mt-3 ${scoreBg}`}>{scoreLabel}</span>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Action Items */}
-        <Link href="/dashboard/action-items">
-          <Card className="border-0 shadow-sm bg-white rounded-none h-full hover:shadow-md transition-shadow cursor-pointer">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-sm font-light text-[#565656]">Action Items</p>
-                <ListChecks className="h-4 w-4 text-gray-300" />
-              </div>
-              <div className="flex items-end gap-2 mb-4">
-                <span className="text-4xl font-extralight" style={{ color: criticalItems.length > 0 ? '#e2231a' : '#71bc48' }}>{criticalItems.length}</span>
-                <span className="text-sm text-[#565656] font-light mb-1">critical</span>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs text-[#565656] font-light">
-                  <span>High priority</span>
-                  <span>{highItems.length}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-[#565656] font-light">
-                  <span>Completed</span>
-                  <span>{completedItems.length}/{actionItems.length}</span>
-                </div>
-              </div>
-              <div className="mt-4 h-[2px] bg-gray-100 w-full">
-                <div className="h-[2px] bg-[#00bceb]" style={{ width: `${actionItemsRate}%` }} />
-              </div>
-              <p className="text-[11px] text-gray-400 font-light mt-1">{actionItemsRate}% completed</p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        {/* Policies */}
-        <Link href="/dashboard/policies">
-          <Card className="border-0 shadow-sm bg-white rounded-none h-full hover:shadow-md transition-shadow cursor-pointer">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-sm font-light text-[#565656]">Policies</p>
-                <FileText className="h-4 w-4 text-gray-300" />
-              </div>
-              <div className="flex items-end gap-2 mb-4">
-                <span className="text-4xl font-extralight text-[#0e274e]">{policiesCompleted}</span>
-                <span className="text-sm text-[#565656] font-light mb-1">/ {policiesTotal} generated</span>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs text-[#565656] font-light">
-                  <span>Pending</span>
-                  <span>{policiesTotal - policiesCompleted}</span>
-                </div>
-              </div>
-              <div className="mt-4 h-[2px] bg-gray-100 w-full">
-                <div
-                  className="h-[2px] bg-[#00bceb]"
-                  style={{ width: `${Math.round((policiesCompleted / policiesTotal) * 100)}%` }}
-                />
-              </div>
-              <p className="text-[11px] text-gray-400 font-light mt-1">
-                {Math.round((policiesCompleted / policiesTotal) * 100)}% complete
-              </p>
-            </CardContent>
-          </Card>
-        </Link>
-
-        {/* Staff Training */}
-        <Link href="/dashboard/training">
-          <Card className="border-0 shadow-sm bg-white rounded-none h-full hover:shadow-md transition-shadow cursor-pointer">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-sm font-light text-[#565656]">Staff Training</p>
-                <Users className="h-4 w-4 text-gray-300" />
-              </div>
-              <div className="flex items-end gap-2 mb-4">
-                <span className="text-4xl font-extralight text-[#0e274e]">{trainingRate}%</span>
-                <span className="text-sm text-[#565656] font-light mb-1">certified</span>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-xs text-[#565656] font-light">
-                  <span>Trained</span>
-                  <span>{employeesTrained} of {employeesTotal}</span>
-                </div>
-                {expiredTrainings.length > 0 && (
-                  <div className="flex items-center justify-between text-xs text-[#565656] font-light">
-                    <span>Expired</span>
-                    <span className="text-[#e2231a]">{expiredTrainings.length}</span>
-                  </div>
-                )}
-              </div>
-              <div className="mt-4 h-[2px] bg-gray-100 w-full">
-                <div
-                  className="h-[2px] bg-[#00bceb]"
-                  style={{ width: `${trainingRate}%` }}
-                />
-              </div>
-              <p className="text-[11px] text-gray-400 font-light mt-1">{employeesTrained} of {employeesTotal} employees</p>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      {/* ── Row 2: Safeguards + Risk + Activity ─────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
-        {/* HIPAA Safeguards Progress */}
+      {/* ── 2. RISK STATUS (3 cards menores) ─────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <Card className="border-0 shadow-sm bg-white rounded-none">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-sm font-light text-[#0e274e]">HIPAA Safeguards</h3>
-              <Shield className="h-4 w-4 text-gray-300" />
-            </div>
-            <div className="space-y-5">
-              {[
-                { label: 'Administrative', score: adminScore, detail: `${policiesCompleted}/${policiesTotal} policies · ${trainingRate}% training` },
-                { label: 'Technical', score: techScore, detail: `${techEvidence} evidence items` },
-                { label: 'Physical', score: physScore, detail: `${physEvidence} evidence items` },
-              ].map(({ label, score, detail }) => (
-                <div key={label}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-light text-[#565656]">{label}</span>
-                    <span className="text-xs font-light text-[#565656]">{score}%</span>
-                  </div>
-                  <div className="h-[2px] bg-gray-100 w-full">
-                    <div className="h-[2px] bg-[#00bceb]" style={{ width: `${score}%` }} />
-                  </div>
-                  <p className="text-[11px] text-gray-400 font-light mt-1">{detail}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Evidence summary */}
-            <div className="mt-6 pt-5 border-t border-gray-100">
-              <p className="text-sm font-light text-[#0e274e] mb-3">Evidence Center</p>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="bg-[#f3f5f9] p-2.5">
-                  <div className="text-xl font-light text-[#0e274e]">{validEvidence}</div>
-                  <div className="text-[11px] text-gray-400 font-light mt-0.5">Valid</div>
-                </div>
-                <div className="bg-[#f3f5f9] p-2.5">
-                  <div className="text-xl font-light text-[#0e274e]">{expiredEvidence}</div>
-                  <div className="text-[11px] text-gray-400 font-light mt-0.5">Expired</div>
-                </div>
-                <div className="bg-[#f3f5f9] p-2.5">
-                  <div className="text-xl font-light text-[#0e274e]">{evidenceStats.expiring_soon}</div>
-                  <div className="text-[11px] text-gray-400 font-light mt-0.5">Expiring</div>
-                </div>
+            <h3 className="text-sm font-light text-[#0e274e] mb-4">Current Risk Level</h3>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: `${riskColor}20` }}>
+                <Shield className="h-6 w-6" style={{ color: riskColor }} />
               </div>
-              <Link href="/dashboard/evidence">
-                <Button variant="outline" className="w-full mt-3 border-gray-200 text-[#565656] hover:bg-gray-50 rounded-none font-light text-xs">
-                  View Evidence Center
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Compliance Status + Priority Action Items */}
-        <Card className="border-0 shadow-sm bg-white rounded-none">
-          <CardContent className="p-6">
-            {/* Risk Status */}
-            <div className="flex items-center gap-3 pb-4 border-b border-gray-100 mb-5">
-              <div className="relative shrink-0">
-                <div className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-100">
-                  <Shield className="h-5 w-5 text-[#565656]" />
-                </div>
-                <div
-                  className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center border-2 border-white"
-                  style={{ background: riskColor }}
-                />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-light text-[#0e274e]">
-                  {riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1)} Risk
-                </p>
-                <p className="text-[11px] text-gray-400 font-light">
-                  {new Date(riskAssessment?.updated_at || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              <div>
+                <p className="text-xl font-thin text-[#0e274e]">{riskLabel}</p>
+                <p className="text-xs text-gray-400 font-light">
+                  {riskAssessment ? 'Assessment completed' : 'No assessment yet'}
                 </p>
               </div>
-              <Link href="/dashboard/risk-assessment">
-                <Button className="bg-[#00bceb] hover:bg-[#00a0c9] text-white rounded-none font-light text-xs px-3 h-7">
-                  View
-                </Button>
-              </Link>
             </div>
-
-            {/* Priority Action Items */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-light text-[#0e274e]">Priority Items</p>
-                <Link href="/dashboard/action-items" className="text-xs text-[#00bceb] hover:underline font-light">
-                  View all
-                </Link>
-              </div>
-
-              {topActions.length === 0 ? (
-                <div className="py-6 text-center">
-                  <CheckCircle2 className="h-7 w-7 text-[#71bc48] mx-auto mb-2" />
-                  <p className="text-xs text-gray-400 font-light">No critical items pending</p>
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  {topActions.map((item: any, i: number) => (
-                    <Link key={i} href="/dashboard/action-items">
-                      <div className="flex items-start gap-2.5 px-2 py-2.5 hover:bg-[#f3f5f9] transition-colors group">
-                        <div
-                          className="mt-1.5 w-1.5 h-1.5 shrink-0 rounded-full"
-                          style={{ background: item.priority === 'critical' ? '#e2231a' : '#fbab18' }}
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-light text-[#565656] leading-snug line-clamp-2">
-                            {item.title}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[11px] text-gray-400 font-light capitalize">{item.priority}</span>
-                            {item.due_date && (
-                              <span className="text-[11px] text-gray-400 font-light flex items-center gap-1">
-                                <Clock className="h-2.5 w-2.5" />
-                                {new Date(item.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <ChevronRight className="h-3.5 w-3.5 text-gray-200 shrink-0 group-hover:text-[#00bceb] transition-colors mt-0.5" />
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Quick Actions */}
-            <div className="mt-4 pt-4 border-t border-gray-100 grid grid-cols-2 gap-2">
-              <Link href="/dashboard/policies">
-                <Button variant="outline" className="w-full border-gray-200 text-[#565656] hover:bg-gray-50 rounded-none font-light text-xs">
-                  Generate Policy
-                </Button>
-              </Link>
-              <Link href="/dashboard/training">
-                <Button variant="outline" className="w-full border-gray-200 text-[#565656] hover:bg-gray-50 rounded-none font-light text-xs">
-                  Add Training
-                </Button>
-              </Link>
-            </div>
+            <Link href="/dashboard/risk-assessment">
+              <Button variant="outline" className="w-full border-gray-200 text-[#565656] hover:bg-gray-50 rounded-none font-light text-xs mt-4">
+                View Assessment
+              </Button>
+            </Link>
           </CardContent>
         </Card>
 
-        {/* Activity Feed */}
         <Card className="border-0 shadow-sm bg-white rounded-none">
           <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-sm font-light text-[#0e274e]">Recent Activity</h3>
-              <TrendingUp className="h-4 w-4 text-gray-300" />
-            </div>
-
-            <div className="space-y-4">
-              {activityFeed.length > 0 ? (
-                activityFeed.map((item: any, i: number) => {
-                  const dotColor = activityIconColor[item.status] || '#9ca3af';
-                  return (
-                    <div key={i} className="flex gap-3 relative">
-                      {i !== activityFeed.length - 1 && (
-                        <div className="absolute left-[9px] top-5 bottom-[-16px] w-[1px] bg-gray-100" />
-                      )}
-                      <div className="mt-1 shrink-0 z-10 w-[18px] h-[18px] rounded-full flex items-center justify-center bg-gray-100">
-                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: dotColor }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-[#565656] font-light leading-snug">{item.title}</p>
-                        <p className="text-[11px] text-gray-400 font-light mt-0.5">{item.date}</p>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="py-8 text-center">
-                  <Info className="h-7 w-7 text-gray-200 mx-auto mb-2" />
-                  <p className="text-xs text-gray-400 font-light">No recent activity</p>
-                </div>
-              )}
-            </div>
-
-            {/* Audit Readiness */}
-            <div className="mt-6 pt-5 border-t border-gray-100">
-              <p className="text-sm font-light text-[#0e274e] mb-3">Audit Readiness</p>
-              <div className="space-y-2.5">
-                {[
-                  { label: 'Policy documents', done: policiesCompleted === policiesTotal, detail: `${policiesCompleted}/${policiesTotal}` },
-                  { label: 'Staff training', done: trainingRate === 100, detail: `${trainingRate}%` },
-                  { label: 'Evidence on file', done: validEvidence > 0, detail: `${validEvidence} valid` },
-                  { label: 'Risk assessment', done: !!riskAssessment, detail: riskAssessment ? 'Completed' : 'Pending' },
-                ].map((check, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {check.done
-                        ? <CheckCircle2 className="h-3.5 w-3.5 text-[#71bc48] shrink-0" />
-                        : <AlertTriangle className="h-3.5 w-3.5 text-gray-300 shrink-0" />
-                      }
-                      <span className="text-xs text-[#565656] font-light">{check.label}</span>
-                    </div>
-                    <span className="text-[11px] text-gray-400 font-light">{check.detail}</span>
+            <h3 className="text-sm font-light text-[#0e274e] mb-4">Top 3 Active Risks</h3>
+            {topRisks.length > 0 ? (
+              <div className="space-y-3">
+                {topRisks.map((risk, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <div className={`w-1.5 h-1.5 rounded-full mt-1.5 ${risk.priority === 'critical' ? 'bg-[#e2231a]' : 'bg-[#fbab18]'}`} />
+                    <p className="text-xs text-[#565656] font-light flex-1 leading-snug">{risk.title}</p>
                   </div>
                 ))}
               </div>
+            ) : (
+              <div className="py-4 text-center">
+                <CheckCircle2 className="h-6 w-6 text-[#71bc48] mx-auto mb-2" />
+                <p className="text-xs text-gray-400 font-light">No active risks</p>
+              </div>
+            )}
+            <Link href="/dashboard/action-items">
+              <Button variant="outline" className="w-full border-gray-200 text-[#565656] hover:bg-gray-50 rounded-none font-light text-xs mt-4">
+                View All Risks
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardContent className="p-6">
+            <h3 className="text-sm font-light text-[#0e274e] mb-4">Open Mitigation Items</h3>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-100">
+                <AlertTriangle className="h-6 w-6 text-[#565656]" />
+              </div>
+              <div>
+                <p className="text-2xl font-thin text-[#0e274e]">{openMitigations}</p>
+                <p className="text-xs text-gray-400 font-light">Items pending</p>
+              </div>
+            </div>
+            <Link href="/dashboard/action-items">
+              <Button variant="outline" className="w-full border-gray-200 text-[#565656] hover:bg-gray-50 rounded-none font-light text-xs mt-4">
+                View Action Items
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ── 3. DOCUMENTATION HEALTH ──────────────────────────────────────── */}
+      <Card className="border-0 shadow-sm bg-white rounded-none">
+        <CardHeader className="border-b border-gray-100 pb-4">
+          <CardTitle className="text-base font-light text-[#0e274e]">Documentation Health</CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div>
+              <p className="text-xs text-gray-400 font-light mb-1">Policies Up to Date</p>
+              <p className="text-2xl font-thin text-[#0e274e]">{policiesCompleted} / {policiesTotal}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 font-light mb-1">Staff Training Completed</p>
+              <p className="text-2xl font-thin text-[#0e274e]">{trainingRate}%</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 font-light mb-1">Risk Assessment Current</p>
+              <p className="text-2xl font-thin text-[#0e274e]">{riskAssessmentCurrent ? 'Yes' : 'No'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 font-light mb-1">BAAs Valid</p>
+              <p className="text-2xl font-thin text-[#0e274e]">{validBAAs} / {totalVendors || 0}</p>
+              {expiringBAAs > 0 && (
+                <p className="text-xs text-yellow-600 mt-1">{expiringBAAs} expiring soon</p>
+              )}
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 font-light mb-1">Next Policy Review Due</p>
+              <p className="text-sm font-thin text-[#0e274e]">{nextReviewDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 4. INCIDENT & VENDOR STATUS ──────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardHeader className="border-b border-gray-100 pb-4">
+            <CardTitle className="text-base font-light text-[#0e274e]">Incidents</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-gray-400 font-light mb-1">Open Incidents</p>
+                <p className="text-2xl font-thin text-[#0e274e]">{openIncidents}</p>
+              </div>
+              {lastIncident ? (
+                <div className="pt-4 border-t border-gray-100">
+                  <p className="text-xs text-gray-400 font-light mb-1">Last Incident</p>
+                  <p className="text-sm font-thin text-[#0e274e] mb-1">{new Date(lastIncident.date_discovered).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
+                  <p className="text-xs text-gray-500 font-light">Status: {lastIncident.status === 'open' ? 'Open' : lastIncident.status === 'under_review' ? 'Under Review' : 'Closed'}</p>
+                </div>
+              ) : (
+                <div className="pt-4 border-t border-gray-100">
+                  <p className="text-xs text-gray-400 font-light">No incidents reported</p>
+                </div>
+              )}
+              {highSeverityIncidents > 0 && (
+                <div className="pt-2">
+                  <p className="text-xs text-red-600 font-light">{highSeverityIncidents} high severity</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardHeader className="border-b border-gray-100 pb-4">
+            <CardTitle className="text-base font-light text-[#0e274e]">Vendors</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs text-gray-400 font-light mb-1">Total Vendors</p>
+                <p className="text-2xl font-thin text-[#0e274e]">{totalVendors}</p>
+              </div>
+              <div className="pt-4 border-t border-gray-100">
+                <p className="text-xs text-gray-400 font-light mb-1">BAAs Expiring in 30 days</p>
+                <p className={`text-2xl font-thin ${expiringBAAs > 0 ? 'text-[#fbab18]' : 'text-[#0e274e]'}`}>{expiringBAAs}</p>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* ── 5. ACTION CENTER (Lista vertical) ────────────────────────────── */}
+      <Card className="border-0 shadow-sm bg-white rounded-none">
+        <CardHeader className="border-b border-gray-100 pb-4">
+          <CardTitle className="text-base font-light text-[#0e274e]">Action Center</CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          {actionCenterItems.length > 0 ? (
+            <div className="space-y-3">
+              {actionCenterItems.map((item, i) => (
+                <Link key={i} href={item.link || '#'}>
+                  <div className="flex items-start gap-3 p-3 hover:bg-gray-50 transition-colors group">
+                    <AlertTriangle className={`h-4 w-4 mt-0.5 flex-shrink-0 ${item.type === 'warning' ? 'text-[#fbab18]' : 'text-[#00bceb]'}`} />
+                    <p className="text-sm text-[#565656] font-light flex-1">{item.text}</p>
+                    <span className="text-xs text-gray-400 group-hover:text-[#00bceb] transition-colors">View →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="py-8 text-center">
+              <CheckCircle2 className="h-10 w-10 text-[#71bc48] mx-auto mb-3" />
+              <p className="text-sm text-gray-500 font-light">All compliance items are up to date.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

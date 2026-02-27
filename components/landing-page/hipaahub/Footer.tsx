@@ -1,7 +1,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { Linkedin, Twitter, Globe, Mail, Phone, MapPin } from 'lucide-react';
+import { Linkedin, Instagram, Youtube, Mail, MapPin } from 'lucide-react';
 
 type LegalView = 'privacy-policy' | 'terms-of-service' | 'security' | 'hipaa-baa';
 
@@ -60,13 +60,10 @@ const Footer: React.FC<FooterProps> = ({ onNavigateLegal }) => {
             <h4 className="text-[11px] font-thin text-cisco-blue mb-6">Contact</h4>
             <ul className="space-y-4">
               <li className="flex items-center text-sm text-gray-600 font-thin">
-                <Mail size={14} className="mr-3 text-cisco-blue" /> support@hipaahub.com
+                <Mail size={14} className="mr-3 text-cisco-blue" /> contact@hipaahubhealth.com
               </li>
               <li className="flex items-center text-sm text-gray-600 font-thin">
-                <Phone size={14} className="mr-3 text-cisco-blue" /> +1-800-HIPAA-HUB
-              </li>
-              <li className="flex items-center text-sm text-gray-600 font-thin">
-                <MapPin size={14} className="mr-3 text-cisco-blue" /> San Jose, CA 95113
+                <MapPin size={14} className="mr-3 text-cisco-blue" /> Austin, Texas, United States
               </li>
             </ul>
           </div>
@@ -115,11 +112,11 @@ const Footer: React.FC<FooterProps> = ({ onNavigateLegal }) => {
         </div>
 
         <div className="pt-8 border-t border-gray-50 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs text-gray-400 font-thin">© 2026 HIPAA Hub Systems. All rights reserved.</p>
+          <p className="text-xs text-gray-400 font-thin">© 2026 HIPAA Hub LLC. All rights reserved.</p>
           <div className="flex items-center space-x-6">
-            <a href="#" className="text-xs text-gray-500 hover:text-cisco-navy transition-colors"><Linkedin size={16} /></a>
-            <a href="#" className="text-xs text-gray-500 hover:text-cisco-navy transition-colors"><Twitter size={16} /></a>
-            <a href="#" className="text-xs text-gray-500 hover:text-cisco-navy transition-colors"><Globe size={16} /></a>
+            <a href="https://www.linkedin.com/company/hipaahub/" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-cisco-navy transition-colors"><Linkedin size={16} /></a>
+            <a href="https://www.instagram.com/hipaahub/?hl=pt-br" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-cisco-navy transition-colors"><Instagram size={16} /></a>
+            <a href="https://www.youtube.com/@hipaahub-health" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-cisco-navy transition-colors"><Youtube size={16} /></a>
           </div>
         </div>
       </div>

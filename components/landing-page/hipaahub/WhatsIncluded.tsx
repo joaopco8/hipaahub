@@ -1,7 +1,8 @@
 import React from 'react';
+import Image from 'next/image';
 import { ChevronRight, CheckCircle2, Shield, Zap, FileText, Users, Search, Archive, Activity } from 'lucide-react';
 
-const WhatsIncluded: React.FC = () => {
+const WhatsIncluded: React.FC<{ onDemoClick?: () => void }> = ({ onDemoClick }) => {
   const policies = [
     "Privacy Policy", "Security Policy", "Breach Notification Policy",
     "Access Control Policy", "Audit & Accountability Policy", "Encryption Policy",
@@ -37,11 +38,16 @@ const WhatsIncluded: React.FC = () => {
         </div>
 
         {/* Large Platform Overview Photo */}
-        <div className="mb-20 bg-white/5 border border-white/10 aspect-[21/9] overflow-hidden rounded-none">
-          <img 
-            src="/Sem Título-1_upscayl_2x_ultramix-balanced-4x.png" 
-            alt="HIPAA Hub Platform Overview" 
-            className="w-full h-full object-cover"
+        <div className="mb-20 bg-white/5 border border-white/10 rounded-none relative overflow-hidden">
+          <Image 
+            src="/images/audit-readiness-dashboard.png" 
+            alt="HIPAA Hub Compliance Overview Dashboard - Audit Readiness" 
+            width={2400}
+            height={1350}
+            className="w-full h-auto"
+            quality={100}
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
           />
         </div>
 
@@ -78,7 +84,10 @@ const WhatsIncluded: React.FC = () => {
         </div>
 
         <div className="mt-20 pt-10 border-t border-white/10 flex flex-col md:flex-row items-center justify-center gap-10">
-           <button className="bg-cisco-blue text-white px-10 py-5 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all">
+           <button 
+             onClick={onDemoClick}
+             className="bg-cisco-blue text-white px-10 py-5 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all"
+           >
              Request Platform Demo
            </button>
            <div className="flex items-center gap-4 text-gray-400 text-xs font-thin">

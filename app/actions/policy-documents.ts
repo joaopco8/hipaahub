@@ -367,6 +367,102 @@ export async function deleteAdditionalDocument(documentId: string): Promise<void
   revalidatePath('/dashboard/policies');
 }
 
+// ─── Generated Policy Documents ───────────────────────────────────────────────
+
+export interface GeneratedPolicyStatus {
+  policy_id: number;
+  generated_at: string;
+  last_generated_at: string;
+  generation_count: number;
+}
+
+/**
+ * Mark a policy as generated (upsert — updates count on regeneration)
+ */
+export async function markPolicyAsGenerated(
+  policyNumericId: number,
+  policyName: string
+): Promise<void> {
+  const supabase = createClient();
+  const user = await getUser(supabase);
+
+  if (!user) throw new Error('Unauthorized');
+
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!organization) throw new Error('Organization not found');
+
+  // Check if already exists
+  const { data: existing } = await (supabase as any)
+    .from('generated_policy_documents')
+    .select('id, generation_count')
+    .eq('organization_id', organization.id)
+    .eq('policy_id', policyNumericId)
+    .maybeSingle();
+
+  if (existing) {
+    // Update: increment count + update timestamp
+    await (supabase as any)
+      .from('generated_policy_documents')
+      .update({
+        generation_count: existing.generation_count + 1,
+        last_generated_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', existing.id);
+  } else {
+    // Insert first time
+    await (supabase as any)
+      .from('generated_policy_documents')
+      .insert({
+        organization_id: organization.id,
+        policy_id: policyNumericId,
+        policy_name: policyName,
+        generated_by: user.id
+      });
+  }
+
+  revalidatePath('/dashboard/policies');
+}
+
+/**
+ * Get generation status for all policies of the current organization
+ */
+export async function getPolicyGenerationStatus(): Promise<Map<number, GeneratedPolicyStatus>> {
+  const supabase = createClient();
+  const user = await getUser(supabase);
+
+  if (!user) return new Map();
+
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!organization) return new Map();
+
+  const { data } = await (supabase as any)
+    .from('generated_policy_documents')
+    .select('policy_id, generated_at, last_generated_at, generation_count')
+    .eq('organization_id', organization.id);
+
+  const map = new Map<number, GeneratedPolicyStatus>();
+  if (data) {
+    for (const row of data) {
+      map.set(row.policy_id, row);
+    }
+  }
+
+  return map;
+}
+
+// ─── File Download ─────────────────────────────────────────────────────────────
+
 /**
  * Get signed URL for downloading a file
  */

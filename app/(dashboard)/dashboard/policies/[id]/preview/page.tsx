@@ -241,6 +241,7 @@ export default async function DocumentPreviewPage({
           documentContent={processedContent}
           organizationName={organization.name}
           policyId={document.policyId}
+          policyNumericId={Number(params.id)}
           />
         </div>
       </div>

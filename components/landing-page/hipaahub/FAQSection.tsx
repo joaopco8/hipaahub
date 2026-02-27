@@ -42,10 +42,6 @@ const FAQSection: React.FC = () => {
       answer: "Most organizations are audit-ready within 7-14 days. The timeline depends on your starting compliance posture and how quickly you implement recommendations. The Risk Assessment Engine prioritizes critical gaps first."
     },
     {
-      question: "Does HIPAA Hub integrate with my EHR?",
-      answer: "Yes. HIPAA Hub integrates with major EHR systems (Epic, Cerner, etc.) and other healthcare software. We also support integration with Google Drive, Dropbox, email, and other common tools."
-    },
-    {
       question: "What happens if we're audited?",
       answer: "HIPAA Hub provides one-click audit export. All required documentation is compiled, organized, and ready for OCR. We also provide audit support (included in Professional and Enterprise plans)."
     },
@@ -56,10 +52,6 @@ const FAQSection: React.FC = () => {
     {
       question: "Can I cancel anytime?",
       answer: "Yes. You can cancel your subscription anytime with no penalty. Your data remains accessible for 30 days after cancellation."
-    },
-    {
-      question: "Do you offer a free trial?",
-      answer: "Yes. All plans include a 14-day free trial with full access to all features. No credit card required."
     },
     {
       question: "What support do you offer?",

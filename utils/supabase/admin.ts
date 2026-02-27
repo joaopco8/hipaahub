@@ -621,12 +621,26 @@ const createOrRetrieveCustomer = async ({
   // Retrieve the Stripe customer ID using the Supabase customer ID, with email fallback
   let stripeCustomerId: string | undefined;
   if (existingSupabaseCustomer?.stripe_customer_id) {
-    const existingStripeCustomer = await stripe.customers.retrieve(
-      existingSupabaseCustomer.stripe_customer_id
-    );
-    stripeCustomerId = existingStripeCustomer.id;
-  } else {
-    // If Stripe ID is missing from Supabase, try to retrieve Stripe customer ID by email
+    try {
+      const existingStripeCustomer = await stripe.customers.retrieve(
+        existingSupabaseCustomer.stripe_customer_id
+      );
+      // Only use the customer ID if it's not deleted
+      if (!('deleted' in existingStripeCustomer) || !existingStripeCustomer.deleted) {
+        stripeCustomerId = existingStripeCustomer.id;
+      }
+    } catch (retrieveError: any) {
+      // Customer not found in current Stripe mode (e.g. live customer ID used in test mode)
+      // Fall through to look up by email or create a new customer
+      console.warn(
+        `Stripe customer ${existingSupabaseCustomer.stripe_customer_id} not found in current mode. Will create a new one. Error: ${retrieveError?.message}`
+      );
+      stripeCustomerId = undefined;
+    }
+  }
+
+  if (!stripeCustomerId) {
+    // If Stripe ID is missing or invalid, try to retrieve Stripe customer ID by email
     const stripeCustomers = await stripe.customers.list({ email: email });
     stripeCustomerId =
       stripeCustomers.data.length > 0 ? stripeCustomers.data[0].id : undefined;

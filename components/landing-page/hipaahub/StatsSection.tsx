@@ -27,9 +27,9 @@ const StatsSection: React.FC = () => {
           <div className="relative">
             <div className="bg-white p-2 shadow-2xl border border-gray-100 rounded-none overflow-hidden">
                <img 
-                 src="https://images.unsplash.com/photo-1551288049-bbbda546697a?auto=format&fit=crop&q=80&w=1200" 
-                 alt="Compliance Monitoring Interface" 
-                 className="w-full h-full object-cover grayscale brightness-95 hover:grayscale-0 transition-all duration-1000"
+                 src="/images/compliance-overview-dashboard.png" 
+                 alt="Compliance Overview Dashboard - HIPAA Hub Risk Assessment" 
+                 className="w-full h-auto object-contain"
                />
             </div>
             

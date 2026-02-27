@@ -1,78 +1,120 @@
 import React from 'react';
-import { UserPlus, ClipboardCheck, LayoutGrid, CheckCircle2, ArrowRight, Clock } from 'lucide-react';
+import { FileText, FolderOpen, GraduationCap, AlertTriangle, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
 
-const StepCard: React.FC<{ 
-  number: string;
-  title: string; 
-  duration: string;
-  list: string[];
+const FeatureCard: React.FC<{ 
+  title: string;
+  subtitle: string;
+  description: string;
+  items?: string[];
   icon: React.ReactNode;
-}> = ({ number, title, duration, list, icon }) => (
-  <div className="bg-white p-10 border border-gray-100 flex flex-col h-full hover:shadow-2xl transition-all duration-500 group">
-    <div className="flex items-center justify-between mb-8">
-      <div className="text-cisco-blue group-hover:scale-110 transition-transform">{icon}</div>
-      <div className="text-4xl font-thin text-gray-100 group-hover:text-cisco-blue/10 transition-colors">0{number}</div>
+}> = ({ title, subtitle, description, items, icon }) => (
+  <div className="bg-white/5 backdrop-blur-md border border-white/10 p-10 flex flex-col h-full hover:bg-white/10 transition-all duration-300 group">
+    <div className="mb-6">
+      <div className="text-cisco-blue mb-4 group-hover:scale-110 transition-transform inline-block">
+        {icon}
+      </div>
+      <h3 className="text-xl font-thin text-white mb-2">{title}</h3>
+      <p className="text-sm font-thin text-cisco-blue mb-4">{subtitle}</p>
     </div>
-    <div className="text-xs font-thin text-cisco-blue mb-2">Step {number}</div>
-    <h4 className="text-2xl font-thin mb-6 text-cisco-navy">{title}</h4>
-    <ul className="space-y-3 mb-8 flex-grow">
-      {list.map((item, i) => (
-        <li key={i} className="flex items-start text-base text-gray-600 font-thin">
-          <span className="w-1.5 h-1.5 bg-cisco-blue rounded-full mt-2.5 mr-3 flex-shrink-0 opacity-40"></span>
-          {item}
-        </li>
-      ))}
-    </ul>
-    <div className="pt-6 border-t border-gray-50 flex items-center justify-between">
-       <span className="text-xs font-thin text-gray-400">Phase timeline</span>
-       <span className="text-sm font-thin text-cisco-navy flex items-center gap-2"><Clock size={14} /> {duration}</span>
+    <p className="text-gray-300 text-[15px] font-thin leading-relaxed mb-6 flex-grow">
+      {description}
+    </p>
+    {items && items.length > 0 && (
+      <div className="pt-6 border-t border-white/10">
+        <p className="text-xs font-thin text-gray-400 mb-3">Policies:</p>
+        <div className="flex flex-wrap gap-2">
+          {items.map((item, i) => (
+            <span key={i} className="text-xs font-thin text-gray-300 bg-white/5 px-3 py-1.5 border border-white/10">
+              {item}
+            </span>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+const CTACard: React.FC<{ 
+  title: string;
+  description: string;
+  ctaText: string;
+  icon: React.ReactNode;
+}> = ({ title, description, ctaText, icon }) => (
+  <div className="bg-white/5 backdrop-blur-md border border-white/10 p-10 flex flex-col h-full hover:bg-white/10 transition-all duration-300 group">
+    <div className="mb-6">
+      <div className="text-cisco-green mb-4 group-hover:scale-110 transition-transform inline-block">
+        {icon}
+      </div>
+      <h3 className="text-xl font-thin text-white mb-4">{title}</h3>
     </div>
+    <p className="text-gray-300 text-[15px] font-thin leading-relaxed mb-8 flex-grow">
+      {description}
+    </p>
+    <button className="bg-cisco-green text-cisco-navy px-8 py-4 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all flex items-center justify-center gap-3 group-hover:shadow-lg shadow-cisco-green/20">
+      {ctaText}
+      <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+    </button>
   </div>
 );
 
 const HowItWorks: React.FC = () => {
   return (
-    <section id="how-it-works" className="py-24 bg-white border-t border-b border-gray-200 border-[0.5px]">
+    <section id="how-it-works" className="py-24 bg-cisco-navy border-t border-b border-white/5">
       <div className="max-w-7xl mx-auto px-4 md:px-12">
-        <div className="text-center mb-24">
-          <h2 className="text-4xl lg:text-[54px] font-thin text-cisco-navy leading-[1.2] mb-6">
-            Get Started <br /> in 3 Steps.
+        <div className="text-center mb-20">
+          <h2 className="text-4xl lg:text-[54px] font-thin text-white leading-[1.2] mb-6">
+            Complete Compliance Infrastructure
           </h2>
-          <p className="text-gray-500 text-lg md:text-xl font-thin max-w-3xl mx-auto">
-            From signup to audit-ready in days.
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gray-100 border border-gray-100 overflow-hidden">
-          <StepCard 
-            number="1"
-            icon={<UserPlus size={40} strokeWidth={1} />}
-            title="Sign Up"
-            duration="5 minutes"
-            list={["Create account", "Verify organization details", "Set up workspace", "Invite team members"]}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <FeatureCard 
+            icon={<FileText size={32} strokeWidth={1} />}
+            title="Policy Management"
+            subtitle="9 Customizable HIPAA Policies"
+            description="Pre-built templates aligned with OCR guidance. Customizable to your workflows. Version control included."
+            items={[
+              "Privacy",
+              "Security",
+              "Breach Notification",
+              "Access Control",
+              "Audit & Accountability",
+              "Encryption",
+              "Incident Response",
+              "Business Associate Agreement",
+              "Workforce Security"
+            ]}
           />
-          <StepCard 
-            number="2"
-            icon={<ClipboardCheck size={40} strokeWidth={1} />}
-            title="Assess"
-            duration="1-2 hours"
-            list={["Complete compliance questionnaire", "Risk Assessment Engine evaluation", "Receive risk score and report", "Review recommendations"]}
+          <FeatureCard 
+            icon={<FolderOpen size={32} strokeWidth={1} />}
+            title="Centralized Documentation"
+            subtitle="Secure Documentation Repository"
+            description="Upload and organize all compliance documentation. Full-text search. One-click evidence package export."
           />
-          <StepCard 
-            number="3"
-            icon={<LayoutGrid size={40} strokeWidth={1} />}
-            title="Implement"
-            duration="1-7 days"
-            list={["Customize policies", "Upload documentation", "Schedule staff training", "Organize evidence", "Verify audit readiness"]}
+          <FeatureCard 
+            icon={<GraduationCap size={32} strokeWidth={1} />}
+            title="Training Management"
+            subtitle="Workforce Training & Certification"
+            description="Pre-built modules. Track completion. Automated annual refresher reminders. Compliance reports."
           />
-        </div>
-        
-        <div className="mt-20 bg-cisco-navy p-12 text-center text-white flex flex-col items-center">
-           <CheckCircle2 size={48} className="text-cisco-green mb-8" />
-           <h3 className="text-3xl font-thin mb-10">Timeline: Audit-ready within 2 weeks.</h3>
-           <button className="bg-cisco-blue text-white px-12 py-5 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all flex items-center gap-3">
-             Start 14-day free trial <ArrowRight size={18} />
-           </button>
+          <FeatureCard 
+            icon={<AlertTriangle size={32} strokeWidth={1} />}
+            title="Breach Response"
+            subtitle="Incident Response & Breach Notification"
+            description="Breach response templates. 72-hour notification guidance. Incident documentation. Priority support."
+          />
+          <FeatureCard 
+            icon={<ShieldCheck size={32} strokeWidth={1} />}
+            title="Audit Readiness"
+            subtitle="One-Click Audit Evidence Export"
+            description="Compile all evidence into organized package. Export to PDF. Auditors receive comprehensive documentation within hours."
+          />
+          <CTACard 
+            icon={<CheckCircle2 size={32} strokeWidth={1} />}
+            title="Ready to Get Started?"
+            description="Join 500+ healthcare organizations that trust HIPAA Hub for continuous compliance. Transform your compliance posture today."
+            ctaText="Get Started"
+          />
         </div>
       </div>
     </section>

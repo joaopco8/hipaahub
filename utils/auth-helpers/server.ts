@@ -148,76 +148,28 @@ export async function signInWithPassword(formData: FormData) {
     );
   } else if (data.user) {
     cookieStore.set('preferredSignInView', 'password_signin', { path: '/' });
-    
-    // Check onboarding status FIRST (more important than redirect param or subscription)
+
     const { getOrganization, getComplianceCommitment, getSubscription } = await import('@/utils/supabase/queries');
     const [organization, commitment, subscription] = await Promise.all([
       getOrganization(supabase, data.user.id),
       getComplianceCommitment(supabase, data.user.id),
       getSubscription(supabase, data.user.id)
     ]);
-    
+
     if (process.env.NODE_ENV === 'development') {
-      console.log('signInWithPassword: Checking status for user:', data.user.id);
-      console.log('signInWithPassword: Has organization:', !!organization);
-      console.log('signInWithPassword: Has commitment:', !!commitment);
-      console.log('signInWithPassword: Has subscription:', !!subscription);
-      console.log('signInWithPassword: Redirect param:', redirectParam);
+      console.log('signInWithPassword: user:', data.user.id, '| org:', !!organization, '| commitment:', !!commitment, '| sub:', !!subscription, '| redirect:', redirectParam);
     }
-    
-    // If onboarding is complete, ALWAYS go to dashboard (never checkout, regardless of redirect param)
+
     if (organization && commitment) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('signInWithPassword: Onboarding complete, redirecting to dashboard (ignoring redirect param)');
-      }
+      // Onboarding complete → always send to dashboard
       redirectPath = getStatusRedirect('/dashboard', 'Success!', 'You are now signed in.');
     } else if (subscription) {
-      // User has subscription but onboarding incomplete → go to onboarding
-      if (process.env.NODE_ENV === 'development') {
-        console.log('signInWithPassword: Has subscription but onboarding incomplete, redirecting to onboarding');
-      }
+      // Has subscription but onboarding incomplete → resume onboarding
       redirectPath = getStatusRedirect('/onboarding/expectation', 'Success!', 'You are now signed in.');
-    } else if (redirectParam === 'checkout') {
-      // No subscription, onboarding incomplete, and came from checkout flow → go to checkout
-      if (process.env.NODE_ENV === 'development') {
-        console.log('signInWithPassword: No subscription, onboarding incomplete, redirecting to checkout');
-      }
-      redirectPath = '/checkout';
     } else {
-      // Check onboarding status FIRST (more important than subscription)
-      const { getOrganization, getComplianceCommitment, getSubscription } = await import('@/utils/supabase/queries');
-      const [organization, commitment, subscription] = await Promise.all([
-        getOrganization(supabase, data.user.id),
-        getComplianceCommitment(supabase, data.user.id),
-        getSubscription(supabase, data.user.id)
-      ]);
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('signInWithPassword: Checking status for user:', data.user.id);
-        console.log('signInWithPassword: Has organization:', !!organization);
-        console.log('signInWithPassword: Has commitment:', !!commitment);
-        console.log('signInWithPassword: Has subscription:', !!subscription);
-      }
-      
-      // If onboarding is complete, ALWAYS go to dashboard (never checkout)
-      if (organization && commitment) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('signInWithPassword: Onboarding complete, redirecting to dashboard');
-        }
-        redirectPath = getStatusRedirect('/dashboard', 'Success!', 'You are now signed in.');
-      } else if (subscription) {
-        // User has subscription but onboarding incomplete → go to onboarding
-        if (process.env.NODE_ENV === 'development') {
-          console.log('signInWithPassword: Has subscription but onboarding incomplete, redirecting to onboarding');
-        }
-        redirectPath = getStatusRedirect('/onboarding/expectation', 'Success!', 'You are now signed in.');
-      } else {
-        // No subscription and onboarding incomplete → go to checkout
-        if (process.env.NODE_ENV === 'development') {
-          console.log('signInWithPassword: No subscription and onboarding incomplete, redirecting to checkout');
-        }
-        redirectPath = '/checkout';
-      }
+      // No subscription yet → go to checkout so the user can pick a plan.
+      // The checkout page will recover the plan from localStorage (set by PricingSection before redirect).
+      redirectPath = '/checkout';
     }
   } else {
     redirectPath = getErrorRedirect(
@@ -272,57 +224,29 @@ export async function signUp(formData: FormData) {
     );
   } else if (data.session) {
     // User is immediately signed in (email confirmation disabled)
-    // Update user phone number in users table
-    if (phoneNumber && data.user) {
+    // Update user profile metadata in users table
+    if (data.user && (phoneNumber || fullName)) {
       await supabase
         .from('users')
         .update({ phone_number: phoneNumber, full_name: fullName })
         .eq('id', data.user.id);
     }
-    // Check if redirect is checkout
-    if (redirectParam === 'checkout') {
-      // Verify subscription status BEFORE redirecting to checkout
-      const { getSubscription } = await import('@/utils/supabase/queries');
-      const subscription = data.user ? await getSubscription(supabase, data.user.id) : null;
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('signUp: Checking subscription for user:', data.user?.id);
-        console.log('signUp: Subscription found:', subscription ? 'YES' : 'NO');
-      }
-      
-      if (subscription) {
-        // User has active subscription, redirect to dashboard
-        if (process.env.NODE_ENV === 'development') {
-          console.log('signUp: User has subscription, redirecting to dashboard');
-        }
-        redirectPath = '/dashboard';
-      } else {
-        // User doesn't have subscription, proceed to checkout
-        if (process.env.NODE_ENV === 'development') {
-          console.log('signUp: User does NOT have subscription, redirecting to checkout');
-        }
-        redirectPath = '/checkout';
-      }
+
+    // Check subscription status before deciding where to send the user
+    const { getSubscription } = await import('@/utils/supabase/queries');
+    const subscription = data.user ? await getSubscription(supabase, data.user.id) : null;
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('signUp: user:', data.user?.id, '| subscription:', subscription ? 'YES' : 'NO');
+    }
+
+    if (subscription) {
+      // User already has an active subscription → go to onboarding (or dashboard if complete)
+      redirectPath = '/onboarding/expectation';
     } else {
-      // ALWAYS verify subscription status FIRST before allowing any access
-      const { getSubscription } = await import('@/utils/supabase/queries');
-      const subscription = data.user ? await getSubscription(supabase, data.user.id) : null;
-      
-      if (process.env.NODE_ENV === 'development') {
-        console.log('signUp: Checking subscription for user:', data.user?.id);
-        console.log('signUp: Subscription found:', subscription ? 'YES' : 'NO');
-      }
-      
-      if (!subscription) {
-        // User doesn't have subscription, redirect to checkout
-        if (process.env.NODE_ENV === 'development') {
-          console.log('signUp: User does NOT have subscription, redirecting to checkout');
-        }
-        redirectPath = '/checkout';
-      } else {
-        // User has subscription, redirect to onboarding
-        redirectPath = '/onboarding/expectation';
-      }
+      // No subscription yet → go to checkout.
+      // The checkout page will recover the plan from localStorage (set by PricingSection).
+      redirectPath = '/checkout';
     }
   } else if (
     data.user &&

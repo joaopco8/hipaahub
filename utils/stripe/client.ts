@@ -2,20 +2,15 @@ import { loadStripe, Stripe } from '@stripe/stripe-js';
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
-// Hardcoded production key as fallback (from STRIPE_PRODUCTION_KEYS.md)
-const FALLBACK_PUBLISHABLE_KEY = 'pk_live_51Qig6XFjJxHsNvNGwtnek4yywzuF4ehhCxzSF2q5h215M4g3l9GQpCxJr6mygdWj8JRLkv5jnmxCID74MzoLqUn000oEIt6yDJ';
-
 export const getStripe = async (): Promise<Stripe | null> => {
-  // Get the publishable key with fallback
-  let publishableKey = 
+  // Prefer live key if set, otherwise fall back to (test) key
+  const publishableKey =
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY_LIVE ??
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ??
     '';
 
-  // If no key found, use fallback (production key)
   if (!publishableKey || publishableKey.trim() === '') {
-    console.warn('⚠️ Stripe publishable key not found in env vars, using fallback production key');
-    publishableKey = FALLBACK_PUBLISHABLE_KEY;
+    throw new Error('Stripe publishable key is not configured. Set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in your environment variables.');
   }
 
   // Validate key format (should start with pk_)

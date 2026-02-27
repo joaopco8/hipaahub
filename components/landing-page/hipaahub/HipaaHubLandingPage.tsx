@@ -7,7 +7,7 @@ import Hero from './Hero';
 import SolutionSection from './SolutionSection';
 import StatsSection from './StatsSection';
 import HowItWorks from './HowItWorks';
-import VideoTutorial from './VideoTutorial';
+import HowItWorksSteps from './HowItWorksSteps';
 import WhatsIncluded from './WhatsIncluded';
 import SocialProof from './SocialProof';
 import BlogSection from './BlogSection';
@@ -21,28 +21,18 @@ import PrivacyPolicyPage from './PrivacyPolicyPage';
 import TermsOfServicePage from './TermsOfServicePage';
 import SecurityPage from './SecurityPage';
 import HipaaBAAPage from './HipaaBAAPage';
+import DemoRequestModal from './DemoRequestModal';
+import CompanyPage from './CompanyPage';
+import BlogPage from './BlogPage';
+import ResearchPage from './ResearchPage';
+import PlatformPage from './PlatformPage';
 
 type AppView =
   | 'home'
   | 'blog'
-  | 'solutions'
   | 'platform'
   | 'research'
-  | 'intelligence-reports'
-  | 'regulatory-analysis'
-  | 'methodology'
-  | 'industries'
   | 'company'
-  | 'assessment'
-  | 'risk-assessment'
-  | 'policy-generator'
-  | 'gap-analysis'
-  | 'breach-builder'
-  | 'roadmap'
-  | 'reporting'
-  | 'independent-practices'
-  | 'implementation-services'
-  | 'compliance-assessment'
   | 'privacy-policy'
   | 'terms-of-service'
   | 'security'
@@ -52,6 +42,7 @@ const HipaaHubLandingPage: React.FC = () => {
   const router = useRouter();
   const [view, setView] = useState<AppView>('home');
   const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
   const navigateTo = (newView: AppView, post?: any) => {
     if (post) setSelectedPost(post);
@@ -64,11 +55,12 @@ const HipaaHubLandingPage: React.FC = () => {
   };
 
   const isLegalView = ['privacy-policy', 'terms-of-service', 'security', 'hipaa-baa'].includes(view);
+  const isContentView = ['blog', 'company', 'research', 'platform'].includes(view);
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
-      {!isLegalView && (
-        <Navbar onNavigate={(v) => navigateTo(v as AppView)} />
+      {(!isLegalView) && (
+        <Navbar onNavigate={(v) => navigateTo(v as AppView)} onDemoClick={() => setIsDemoModalOpen(true)} />
       )}
 
       <main className="flex-grow">
@@ -84,19 +76,38 @@ const HipaaHubLandingPage: React.FC = () => {
               </div>
             </div>
 
-            <Hero onAssessmentClick={handleAssessmentClick} />
+            <Hero onAssessmentClick={handleAssessmentClick} onDemoClick={() => setIsDemoModalOpen(true)} />
             <SolutionSection />
             <StatsSection />
             <HowItWorks />
-            <VideoTutorial />
-            <WhatsIncluded />
+            <HowItWorksSteps />
+            <WhatsIncluded onDemoClick={() => setIsDemoModalOpen(true)} />
             <SocialProof />
             <BlogSection onReadMore={(post) => navigateTo('blog', post)} />
             <AuditGuarantee />
-            <PricingSection />
+            <PricingSection onDemoClick={() => setIsDemoModalOpen(true)} />
             <FAQSection />
-            <BottomCTA onAssessmentClick={handleAssessmentClick} />
+            <BottomCTA onAssessmentClick={handleAssessmentClick} onDemoClick={() => setIsDemoModalOpen(true)} />
           </>
+        )}
+
+        {view === 'blog' && (
+          <BlogPage
+            onBack={() => navigateTo('home')}
+            onReadMore={(post) => navigateTo('blog', post)}
+          />
+        )}
+
+        {view === 'company' && (
+          <CompanyPage onBack={() => navigateTo('home')} />
+        )}
+
+        {view === 'research' && (
+          <ResearchPage onBack={() => navigateTo('home')} />
+        )}
+
+        {view === 'platform' && (
+          <PlatformPage onBack={() => navigateTo('home')} />
         )}
 
         {view === 'privacy-policy' && (
@@ -114,25 +125,33 @@ const HipaaHubLandingPage: React.FC = () => {
         {view === 'hipaa-baa' && (
           <HipaaBAAPage onBack={() => navigateTo('home')} />
         )}
-
-        {/* Other views coming soon */}
-        {view !== 'home' && !isLegalView && (
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold mb-4">Page Coming Soon</h1>
-              <button
-                onClick={() => setView('home')}
-                className="text-cisco-blue hover:underline"
-              >
-                Return to Home
-              </button>
-            </div>
-          </div>
-        )}
       </main>
 
-      {!isLegalView && (
+      {!isLegalView && !isContentView && (
         <Footer onNavigateLegal={(v) => navigateTo(v)} />
+      )}
+      {isContentView && (
+        <footer className="bg-[#0e274e] py-8 px-4">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-gray-400 font-thin">© 2026 HIPAA Hub Health, Inc. All rights reserved.</p>
+            <div className="flex flex-wrap gap-6">
+              {[
+                { label: 'Privacy Policy', view: 'privacy-policy' as AppView },
+                { label: 'Terms of Service', view: 'terms-of-service' as AppView },
+                { label: 'Security', view: 'security' as AppView },
+                { label: 'HIPAA BAA', view: 'hipaa-baa' as AppView },
+              ].map(({ label, view: v }) => (
+                <button
+                  key={v}
+                  onClick={() => navigateTo(v)}
+                  className="text-xs font-thin text-gray-400 hover:text-white transition-colors"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </footer>
       )}
 
       {isLegalView && (
@@ -160,6 +179,10 @@ const HipaaHubLandingPage: React.FC = () => {
       )}
 
       <CookieConsent />
+      <DemoRequestModal 
+        isOpen={isDemoModalOpen} 
+        onClose={() => setIsDemoModalOpen(false)} 
+      />
     </div>
   );
 };

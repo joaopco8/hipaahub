@@ -56,7 +56,7 @@ export type CheckoutResult =
  * 2. If user has active subscription → return redirect to dashboard
  * 3. If user has no subscription → create Stripe checkout and return sessionId
  */
-export async function initiateCheckout(): Promise<CheckoutResult> {
+export async function initiateCheckout(priceId?: string): Promise<CheckoutResult> {
   const supabase = createClient();
   
   // Wait a moment for OAuth session to be fully established
@@ -215,51 +215,56 @@ export async function initiateCheckout(): Promise<CheckoutResult> {
   }
 
   // Find the best available price
-  // Priority: 1) Annual price ($500/year = 50000 cents), 2) Any annual price, 3) Any active price
   let selectedPrice = null;
   
   try {
-    // Priority 1: Look for exact annual price ($500/year = 50000 cents)
-    for (const product of products || []) {
-      if (product?.prices && Array.isArray(product.prices)) {
-        selectedPrice = product.prices.find(
-          (price: any) => price?.active === true && 
-                         price?.interval === 'year' && 
-                         price?.unit_amount === 50000
-        );
-        if (selectedPrice) break;
-      }
-    }
-
-    // Priority 2: If not found, try to find any annual price
-    if (!selectedPrice) {
+    // Priority 1: If a specific priceId was provided, use it directly
+    if (priceId) {
       for (const product of products || []) {
         if (product?.prices && Array.isArray(product.prices)) {
           selectedPrice = product.prices.find(
-            (price: any) => price?.active === true && price?.interval === 'year'
+            (price: any) => price?.id === priceId && price?.active === true
           );
           if (selectedPrice) break;
         }
       }
     }
 
-    // Priority 3: If still not found, use the first active price from "HIPAA Hub" product
+    // Priority 2: Look for Essential plan price by ID from env
+    if (!selectedPrice) {
+      const essentialPriceId = process.env.NEXT_PUBLIC_STRIPE_ESSENTIAL_PRICE_ID;
+      if (essentialPriceId) {
+        for (const product of products || []) {
+          if (product?.prices && Array.isArray(product.prices)) {
+            selectedPrice = product.prices.find(
+              (price: any) => price?.id === essentialPriceId && price?.active === true
+            );
+            if (selectedPrice) break;
+          }
+        }
+      }
+    }
+
+    // Priority 3: Any active monthly USD price from HIPAA Hub product
     if (!selectedPrice) {
       const hipaaHubProduct = products?.find(
         (product: any) => product?.name?.toLowerCase().includes('hipaa') || 
                          product?.name?.toLowerCase().includes('hub')
       );
-      
       if (hipaaHubProduct?.prices && Array.isArray(hipaaHubProduct.prices)) {
-        selectedPrice = hipaaHubProduct.prices.find((price: any) => price?.active === true);
+        selectedPrice = hipaaHubProduct.prices.find(
+          (price: any) => price?.active === true && price?.currency === 'usd' && price?.interval === 'month'
+        );
       }
     }
 
-    // Priority 4: Last resort - use the first active price from any product
+    // Priority 4: Last resort - first active USD price from any product
     if (!selectedPrice) {
       for (const product of products || []) {
         if (product?.prices && Array.isArray(product.prices)) {
-          selectedPrice = product.prices.find((price: any) => price?.active === true);
+          selectedPrice = product.prices.find(
+            (price: any) => price?.active === true && price?.currency === 'usd'
+          );
           if (selectedPrice) break;
         }
       }
