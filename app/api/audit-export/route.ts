@@ -9,15 +9,6 @@ import { createClient } from '@/utils/supabase/server';
 import { getUser } from '@/utils/supabase/queries';
 import { getAuditExportData, type AuditExportData } from '@/app/actions/audit-export';
 import { processDocumentTemplate } from '@/lib/document-generator';
-import { HIPAA_SECURITY_PRIVACY_MASTER_POLICY_TEMPLATE } from '@/lib/document-templates/hipaa-security-privacy-master-policy';
-import { SECURITY_RISK_ANALYSIS_POLICY_TEMPLATE } from '@/lib/document-templates/security-risk-analysis-policy';
-import { RISK_MANAGEMENT_PLAN_POLICY_TEMPLATE } from '@/lib/document-templates/risk-management-plan-policy';
-import { ACCESS_CONTROL_POLICY_TEMPLATE } from '@/lib/document-templates/access-control-policy';
-import { WORKFORCE_TRAINING_POLICY_TEMPLATE } from '@/lib/document-templates/workforce-training-policy';
-import { SANCTION_POLICY_TEMPLATE } from '@/lib/document-templates/sanction-policy';
-import { INCIDENT_RESPONSE_BREACH_NOTIFICATION_POLICY_TEMPLATE } from '@/lib/document-templates/incident-response-breach-notification-policy';
-import { BUSINESS_ASSOCIATE_MANAGEMENT_POLICY_TEMPLATE } from '@/lib/document-templates/business-associate-management-policy';
-import { AUDIT_LOGS_DOCUMENTATION_RETENTION_POLICY_TEMPLATE } from '@/lib/document-templates/audit-logs-documentation-retention-policy';
 import fs from 'fs';
 import path from 'path';
 
@@ -100,7 +91,7 @@ export async function POST(req: NextRequest) {
       // Full individual policy documents — one PDF per generated policy
       const fullPolFolder = polFolder.folder('Full_Policy_Documents')!;
       for (const policy of policiesWithDocs) {
-        const policyPDF = buildSinglePolicyPDF(policy.id, data, jsPDF, logoData);
+        const policyPDF = await buildSinglePolicyPDF(policy.id, data, jsPDF, logoData);
         if (policyPDF) {
           const safeName = policy.name.replace(/[^a-zA-Z0-9\s&]/g, '').trim().replace(/\s+/g, '_');
           fullPolFolder.file(`${safeName}.pdf`, policyPDF);
@@ -1696,17 +1687,35 @@ function trunc(str: string | undefined | null, maxLen: number): string {
 
 // ─── POLICY TEMPLATES MAP ─────────────────────────────────────────────────────
 
-const POLICY_TEMPLATES_MAP: Record<number, { template: string; policyId: string; name: string }> = {
-  1: { template: HIPAA_SECURITY_PRIVACY_MASTER_POLICY_TEMPLATE, policyId: 'MST-001', name: 'HIPAA Security and Privacy Master Policy' },
-  2: { template: SECURITY_RISK_ANALYSIS_POLICY_TEMPLATE,         policyId: 'SRA-001', name: 'Security Risk Analysis Policy' },
-  3: { template: RISK_MANAGEMENT_PLAN_POLICY_TEMPLATE,           policyId: 'RMP-001', name: 'Risk Management Plan' },
-  4: { template: ACCESS_CONTROL_POLICY_TEMPLATE,                 policyId: 'ACP-001', name: 'Access Control Policy' },
-  5: { template: WORKFORCE_TRAINING_POLICY_TEMPLATE,             policyId: 'WTP-001', name: 'Workforce Training Policy' },
-  6: { template: SANCTION_POLICY_TEMPLATE,                       policyId: 'SAN-001', name: 'Sanction Policy' },
-  7: { template: INCIDENT_RESPONSE_BREACH_NOTIFICATION_POLICY_TEMPLATE, policyId: 'IRP-001', name: 'Incident Response and Breach Notification Policy' },
-  8: { template: BUSINESS_ASSOCIATE_MANAGEMENT_POLICY_TEMPLATE, policyId: 'BAM-001', name: 'Business Associate Management Policy' },
-  9: { template: AUDIT_LOGS_DOCUMENTATION_RETENTION_POLICY_TEMPLATE,   policyId: 'ALR-001', name: 'Audit Logs and Documentation Retention Policy' },
-};
+async function getPolicyTemplate(policyNumId: number): Promise<{ template: string; policyId: string; name: string } | null> {
+  const templateMap: Record<number, { module: () => Promise<any>; exportName: string; policyId: string; name: string }> = {
+    1: { module: () => import('@/lib/document-templates/hipaa-security-privacy-master-policy'), exportName: 'HIPAA_SECURITY_PRIVACY_MASTER_POLICY_TEMPLATE', policyId: 'MST-001', name: 'HIPAA Security and Privacy Master Policy' },
+    2: { module: () => import('@/lib/document-templates/security-risk-analysis-policy'), exportName: 'SECURITY_RISK_ANALYSIS_POLICY_TEMPLATE', policyId: 'SRA-001', name: 'Security Risk Analysis Policy' },
+    3: { module: () => import('@/lib/document-templates/risk-management-plan-policy'), exportName: 'RISK_MANAGEMENT_PLAN_POLICY_TEMPLATE', policyId: 'RMP-001', name: 'Risk Management Plan' },
+    4: { module: () => import('@/lib/document-templates/access-control-policy'), exportName: 'ACCESS_CONTROL_POLICY_TEMPLATE', policyId: 'ACP-001', name: 'Access Control Policy' },
+    5: { module: () => import('@/lib/document-templates/workforce-training-policy'), exportName: 'WORKFORCE_TRAINING_POLICY_TEMPLATE', policyId: 'WTP-001', name: 'Workforce Training Policy' },
+    6: { module: () => import('@/lib/document-templates/sanction-policy'), exportName: 'SANCTION_POLICY_TEMPLATE', policyId: 'SAN-001', name: 'Sanction Policy' },
+    7: { module: () => import('@/lib/document-templates/incident-response-breach-notification-policy'), exportName: 'INCIDENT_RESPONSE_BREACH_NOTIFICATION_POLICY_TEMPLATE', policyId: 'IRP-001', name: 'Incident Response and Breach Notification Policy' },
+    8: { module: () => import('@/lib/document-templates/business-associate-management-policy'), exportName: 'BUSINESS_ASSOCIATE_MANAGEMENT_POLICY_TEMPLATE', policyId: 'BAM-001', name: 'Business Associate Management Policy' },
+    9: { module: () => import('@/lib/document-templates/audit-logs-documentation-retention-policy'), exportName: 'AUDIT_LOGS_DOCUMENTATION_RETENTION_POLICY_TEMPLATE', policyId: 'ALR-001', name: 'Audit Logs and Documentation Retention Policy' },
+  };
+
+  const config = templateMap[policyNumId];
+  if (!config) return null;
+
+  try {
+    const module = await config.module();
+    const template = module[config.exportName] || '';
+    if (!template) {
+      console.error(`Template ${config.exportName} not found in module`);
+      return null;
+    }
+    return { template, policyId: config.policyId, name: config.name };
+  } catch (error) {
+    console.error(`Failed to load policy template ${policyNumId}:`, error);
+    return null;
+  }
+}
 
 // ─── TEXT FLOW RENDERER ───────────────────────────────────────────────────────
 // Renders long text (from templates / letter content) through multi-page jsPDF docs
@@ -1884,13 +1893,13 @@ function flowContentToPDF(
 
 // ─── BUILDER: Single Full Policy PDF ─────────────────────────────────────────
 
-function buildSinglePolicyPDF(
+async function buildSinglePolicyPDF(
   policyNumId: number,
   data: AuditExportData,
   jsPDF: any,
   logoData: Buffer | null
-): Uint8Array | null {
-  const config = POLICY_TEMPLATES_MAP[policyNumId];
+): Promise<Uint8Array | null> {
+  const config = await getPolicyTemplate(policyNumId);
   if (!config) return null;
 
   const org = data.organization;
