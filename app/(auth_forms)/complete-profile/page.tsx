@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -96,12 +96,12 @@ function CompleteProfilePageContent() {
   return (
     <div className="flex min-h-[100dvh] bg-[#f3f5f9]">
       {/* Left Side - Form */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 sm:px-8 lg:px-12 xl:px-16 bg-[#0d1122]">
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 sm:px-8 lg:px-12 xl:px-16 bg-white">
         <div className="w-full max-w-md mx-auto space-y-8">
           {/* Back Button */}
           <Link
             href="/signin"
-            className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors text-sm font-geologica font-light mb-4"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-cisco-navy transition-colors text-sm font-thin mb-4"
             prefetch={false}
           >
             <ArrowLeft className="w-4 h-4" />
@@ -109,22 +109,23 @@ function CompleteProfilePageContent() {
           </Link>
 
           {/* Logo */}
-          <div className="flex items-center justify-center mb-8">
+          <div className="flex items-center justify-start mb-8">
             <Image
-              src="/images/logohipa.png"
+              src="/logoescura.png"
               alt="HIPAA Hub"
-              width={120}
-              height={120}
+              width={140}
+              height={40}
               className="object-contain"
+              priority
             />
           </div>
 
           {/* Form Title */}
-          <div className="space-y-2">
-            <h2 className="text-3xl font-geologica font-light text-white">
+          <div className="space-y-3">
+            <h2 className="text-3xl md:text-4xl font-thin text-cisco-navy leading-tight">
               Complete your profile
             </h2>
-            <p className="text-zinc-400 font-geologica font-light text-base">
+            <p className="text-gray-600 font-thin text-base leading-relaxed">
               We need your phone number to complete your account setup
             </p>
           </div>
@@ -132,10 +133,10 @@ function CompleteProfilePageContent() {
           {/* Form */}
           <form
             onSubmit={handleSubmit}
-            className="space-y-5"
+            className="space-y-6 mt-8"
           >
             <div className="space-y-2">
-              <Label htmlFor="phone_number" className="text-zinc-300 font-geologica font-light text-sm">
+              <Label htmlFor="phone_number" className="text-gray-700 font-thin text-sm">
                 Phone Number <span className="text-red-500">*</span>
               </Label>
               <Input
@@ -147,33 +148,49 @@ function CompleteProfilePageContent() {
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 autoComplete="tel"
                 required
-                className="h-12 bg-white/10 border-zinc-600 text-white placeholder:text-zinc-500 rounded-lg font-geologica font-light focus:border-[#1ad07a] focus:ring-[#1ad07a] focus:bg-white/15"
+                className="h-12 bg-white border-gray-300 text-cisco-navy placeholder:text-gray-400 rounded-none font-thin focus:border-cisco-blue focus:ring-cisco-blue focus:ring-1"
               />
-              <p className="text-xs text-zinc-400 font-geologica font-light">
+              <p className="text-xs text-gray-500 font-thin mt-2">
                 This will be used for account verification and important communications
               </p>
             </div>
 
             <Button 
               type="submit" 
-              className="w-full h-12 bg-[#1ad07a] text-[#0d1122] font-geologica font-medium hover:bg-[#1ad07a]/90 rounded-lg text-base"
+              className="w-full h-12 bg-cisco-blue text-white font-thin hover:bg-cisco-navy transition-all rounded-none text-sm shadow-md shadow-cisco-blue/10"
               disabled={isSubmitting || !phoneNumber.trim()}
             >
-              {isSubmitting ? 'Saving...' : 'Continue →'}
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Saving...
+                </span>
+              ) : (
+                <>
+                  Continue <ArrowRight className="w-4 h-4 ml-2 inline" />
+                </>
+              )}
             </Button>
           </form>
         </div>
       </div>
 
-      {/* Right Side - Image */}
-      <div className="relative hidden md:block w-1/2">
-        <img
-          src="/seguro-rcp-enfermeiro-1920x0-c-default_upscayl_4x_ultramix-balanced-4x.png"
-          alt="Healthcare professional using a laptop"
-          className="absolute inset-0 h-full w-full object-cover"
-          loading="eager"
-        />
-        <div className="absolute inset-0 bg-black/10" />
+      {/* Right Side - Clean Background */}
+      <div className="relative hidden lg:block w-1/2 bg-cisco-navy">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-10%] right-[-10%] w-[60%] h-[60%] bg-cisco-blue/10 blur-[120px] rounded-full"></div>
+          <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-purple-900/10 blur-[100px] rounded-full"></div>
+        </div>
+        <div className="relative z-10 h-full flex items-center justify-center p-12">
+          <div className="max-w-md text-white">
+            <h3 className="text-2xl md:text-3xl font-thin mb-4 leading-tight">
+              Secure. Compliant. Ready.
+            </h3>
+            <p className="text-gray-300 font-thin text-base leading-relaxed">
+              Complete your profile to access HIPAA compliance tools and start your journey to continuous compliance.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
