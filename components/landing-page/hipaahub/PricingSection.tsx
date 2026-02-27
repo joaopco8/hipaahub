@@ -31,8 +31,9 @@ const PricingCard: React.FC<{
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleCheckout = async () => {
+    // If no Stripe price ID configured, redirect to signup page
     if (!priceId) {
-      onDemoClick?.();
+      window.location.href = '/signup';
       return;
     }
 
@@ -44,9 +45,7 @@ const PricingCard: React.FC<{
 
       if (result.type === 'redirect') {
         // Persist the selected priceId so the checkout page can recover it after auth
-        if (priceId) {
-          localStorage.setItem('hipaa_pending_price_id', priceId);
-        }
+        localStorage.setItem('hipaa_pending_price_id', priceId);
         window.location.href = result.path;
       } else if (result.type === 'checkout') {
         try {
@@ -71,9 +70,10 @@ const PricingCard: React.FC<{
     }
   };
 
-  const isCtaCheckout = !!priceId;
-  const isCtaDemo = cta === 'Contact Sales';
+  // Always treat "Get Started" as a checkout action (falls back to /signup if no priceId)
+  const isCtaCheckout = cta === 'Get Started';
   const isCtaSales = cta === 'Contact Sales';
+  const isCtaDemo = false;
 
   return (
     <div className={`p-10 flex flex-col h-full border ${isFeatured ? 'border-gray-300 shadow-2xl relative z-10 lg:scale-105 bg-white' : 'border-gray-100 bg-white/50 shadow-sm'} transition-all duration-500 hover:-translate-y-2 group`}>
