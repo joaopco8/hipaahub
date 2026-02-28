@@ -240,16 +240,18 @@ export async function initiateCheckout(priceId?: string): Promise<CheckoutResult
 
     // Priority 2: Look for Essential plan price by ID from env (only when no priceId was provided)
     if (!selectedPrice) {
-      const essentialPriceId = process.env.NEXT_PUBLIC_STRIPE_ESSENTIAL_PRICE_ID;
-      if (essentialPriceId) {
-        for (const product of products || []) {
-          if (product?.prices && Array.isArray(product.prices)) {
-            selectedPrice = product.prices.find(
-              (price: any) => price?.id === essentialPriceId && price?.active === true
-            );
-            if (selectedPrice) break;
-          }
+      const essentialPriceId = process.env.NEXT_PUBLIC_STRIPE_ESSENTIAL_PRICE_ID || 'price_1T4lRNFjJxHsNvNGBzEXKgYv';
+      for (const product of products || []) {
+        if (product?.prices && Array.isArray(product.prices)) {
+          selectedPrice = product.prices.find(
+            (price: any) => price?.id === essentialPriceId && price?.active === true
+          );
+          if (selectedPrice) break;
         }
+      }
+      // If still not found in DB, use it directly from Stripe
+      if (!selectedPrice) {
+        selectedPrice = { id: essentialPriceId, currency: 'usd', active: true } as any;
       }
     }
 

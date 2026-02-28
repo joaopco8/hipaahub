@@ -11,8 +11,10 @@ interface FeatureGroup {
   items: string[];
 }
 
-const ESSENTIAL_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_ESSENTIAL_PRICE_ID || '';
-const GROWTH_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_GROWTH_PRICE_ID || '';
+// Fallback to hardcoded IDs so the correct price is always used in production
+// even if the Vercel env vars are not configured.
+const ESSENTIAL_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_ESSENTIAL_PRICE_ID || 'price_1T4lRNFjJxHsNvNGBzEXKgYv';
+const GROWTH_PRICE_ID    = process.env.NEXT_PUBLIC_STRIPE_GROWTH_PRICE_ID    || 'price_1T4lRNFjJxHsNvNGCH2pkACR';
 
 const PricingCard: React.FC<{ 
   title: string; 
