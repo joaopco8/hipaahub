@@ -16,7 +16,6 @@ const Navbar: React.FC<{
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [hasSubscription, setHasSubscription] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -50,8 +49,6 @@ const Navbar: React.FC<{
         console.error('Error checking auth:', error);
         setIsAuthenticated(false);
         setHasSubscription(false);
-      } finally {
-        setIsCheckingAuth(false);
       }
     };
 
@@ -142,34 +139,30 @@ const Navbar: React.FC<{
         </div>
 
         <div className="flex items-center space-x-4 md:space-x-6 shrink-0">
-          {!isCheckingAuth && (
+          {isAuthenticated && hasSubscription ? (
+            <Link 
+              href="/dashboard"
+              className="bg-cisco-green text-white px-4 md:px-6 py-3 text-xs md:text-sm font-thin hover:bg-[#17b86a] transition-all shadow-md shadow-cisco-green/10 flex items-center space-x-2"
+            >
+              <LayoutDashboard size={16} />
+              <span>Go to Dashboard</span>
+            </Link>
+          ) : (
             <>
-              {isAuthenticated && hasSubscription ? (
-                <Link 
-                  href="/dashboard"
-                  className="bg-cisco-green text-white px-4 md:px-6 py-3 text-xs md:text-sm font-thin hover:bg-[#17b86a] transition-all shadow-md shadow-cisco-green/10 flex items-center space-x-2"
-                >
-                  <LayoutDashboard size={16} />
-                  <span>Go to Dashboard</span>
-                </Link>
-              ) : (
-                <>
-                  <Link 
-                    href="/signin"
-                    className="hidden sm:flex items-center space-x-2 text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin"
-                  >
-                    <User size={16} />
-                    <span>Login</span>
-                  </Link>
+              <Link 
+                href="/signin"
+                className="hidden sm:flex items-center space-x-2 text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin"
+              >
+                <User size={16} />
+                <span>Login</span>
+              </Link>
 
-                  <button 
-                    onClick={onDemoClick}
-                    className="bg-cisco-blue text-white px-4 md:px-6 py-3 text-xs md:text-sm font-thin hover:bg-cisco-navy transition-all shadow-md shadow-cisco-blue/10"
-                  >
-                    Request Demo
-                  </button>
-                </>
-              )}
+              <button 
+                onClick={onDemoClick}
+                className="bg-cisco-blue text-white px-4 md:px-6 py-3 text-xs md:text-sm font-thin hover:bg-cisco-navy transition-all shadow-md shadow-cisco-blue/10"
+              >
+                Request Demo
+              </button>
             </>
           )}
           
@@ -187,27 +180,25 @@ const Navbar: React.FC<{
         ${isMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'}
       `}>
         <div className="h-full overflow-y-auto p-8 space-y-10">
-          {!isCheckingAuth && (
-            <div className="sm:hidden border-b border-gray-100 pb-6">
-              {isAuthenticated && hasSubscription ? (
-                <Link 
-                  href="/dashboard"
-                  className="flex items-center space-x-2 text-cisco-green hover:text-[#17b86a] transition-colors text-lg font-thin"
-                >
-                  <LayoutDashboard size={20} />
-                  <span>Go to Dashboard</span>
-                </Link>
-              ) : (
-                <Link 
-                  href="/signin"
-                  className="flex items-center space-x-2 text-cisco-navy hover:text-cisco-blue transition-colors text-lg font-thin"
-                >
-                  <User size={20} />
-                  <span>Account Login</span>
-                </Link>
-              )}
-            </div>
-          )}
+          <div className="sm:hidden border-b border-gray-100 pb-6">
+            {isAuthenticated && hasSubscription ? (
+              <Link 
+                href="/dashboard"
+                className="flex items-center space-x-2 text-cisco-green hover:text-[#17b86a] transition-colors text-lg font-thin"
+              >
+                <LayoutDashboard size={20} />
+                <span>Go to Dashboard</span>
+              </Link>
+            ) : (
+              <Link 
+                href="/signin"
+                className="flex items-center space-x-2 text-cisco-navy hover:text-cisco-blue transition-colors text-lg font-thin"
+              >
+                <User size={20} />
+                <span>Account Login</span>
+              </Link>
+            )}
+          </div>
 
           {navLinks.map((link) => (
             <button
@@ -226,7 +217,7 @@ const Navbar: React.FC<{
             >
               Pricing
             </button>
-            {!isCheckingAuth && !(isAuthenticated && hasSubscription) && (
+            {!(isAuthenticated && hasSubscription) && (
               <button 
                 onClick={onDemoClick}
                 className="w-full bg-cisco-blue text-white px-6 py-4 text-sm font-thin hover:bg-cisco-navy transition-all mt-6"
@@ -234,7 +225,7 @@ const Navbar: React.FC<{
                 Request Demo
               </button>
             )}
-            {!isCheckingAuth && isAuthenticated && hasSubscription && (
+            {isAuthenticated && hasSubscription && (
               <Link 
                 href="/dashboard"
                 className="w-full bg-cisco-green text-white px-6 py-4 text-sm font-thin hover:bg-[#17b86a] transition-all mt-6 flex items-center justify-center space-x-2"
