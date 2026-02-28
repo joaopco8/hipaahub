@@ -15,6 +15,7 @@ const Navbar: React.FC<{
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [hasSubscription, setHasSubscription] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
@@ -25,16 +26,30 @@ const Navbar: React.FC<{
     }
   }, [isMenuOpen]);
 
-  // Check authentication status
+  // Check authentication AND subscription status
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
-        setIsAuthenticated(!!user);
+        const authenticated = !!user;
+        setIsAuthenticated(authenticated);
+
+        if (authenticated && user) {
+          const { data: subs } = await supabase
+            .from('subscriptions')
+            .select('id, status')
+            .eq('user_id', user.id)
+            .in('status', ['active', 'trialing'])
+            .limit(1);
+          setHasSubscription(!!subs && subs.length > 0);
+        } else {
+          setHasSubscription(false);
+        }
       } catch (error) {
         console.error('Error checking auth:', error);
         setIsAuthenticated(false);
+        setHasSubscription(false);
       } finally {
         setIsCheckingAuth(false);
       }
@@ -44,8 +59,20 @@ const Navbar: React.FC<{
 
     // Listen for auth state changes
     const supabase = createClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session?.user);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const authenticated = !!session?.user;
+      setIsAuthenticated(authenticated);
+      if (authenticated && session?.user) {
+        const { data: subs } = await supabase
+          .from('subscriptions')
+          .select('id, status')
+          .eq('user_id', session.user.id)
+          .in('status', ['active', 'trialing'])
+          .limit(1);
+        setHasSubscription(!!subs && subs.length > 0);
+      } else {
+        setHasSubscription(false);
+      }
     });
 
     return () => {
@@ -117,7 +144,7 @@ const Navbar: React.FC<{
         <div className="flex items-center space-x-4 md:space-x-6 shrink-0">
           {!isCheckingAuth && (
             <>
-              {isAuthenticated ? (
+              {isAuthenticated && hasSubscription ? (
                 <Link 
                   href="/dashboard"
                   className="bg-cisco-green text-white px-4 md:px-6 py-3 text-xs md:text-sm font-thin hover:bg-[#17b86a] transition-all shadow-md shadow-cisco-green/10 flex items-center space-x-2"
@@ -162,7 +189,7 @@ const Navbar: React.FC<{
         <div className="h-full overflow-y-auto p-8 space-y-10">
           {!isCheckingAuth && (
             <div className="sm:hidden border-b border-gray-100 pb-6">
-              {isAuthenticated ? (
+              {isAuthenticated && hasSubscription ? (
                 <Link 
                   href="/dashboard"
                   className="flex items-center space-x-2 text-cisco-green hover:text-[#17b86a] transition-colors text-lg font-thin"
@@ -199,7 +226,7 @@ const Navbar: React.FC<{
             >
               Pricing
             </button>
-            {!isCheckingAuth && !isAuthenticated && (
+            {!isCheckingAuth && !(isAuthenticated && hasSubscription) && (
               <button 
                 onClick={onDemoClick}
                 className="w-full bg-cisco-blue text-white px-6 py-4 text-sm font-thin hover:bg-cisco-navy transition-all mt-6"
@@ -207,7 +234,7 @@ const Navbar: React.FC<{
                 Request Demo
               </button>
             )}
-            {!isCheckingAuth && isAuthenticated && (
+            {!isCheckingAuth && isAuthenticated && hasSubscription && (
               <Link 
                 href="/dashboard"
                 className="w-full bg-cisco-green text-white px-6 py-4 text-sm font-thin hover:bg-[#17b86a] transition-all mt-6 flex items-center justify-center space-x-2"

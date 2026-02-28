@@ -12,6 +12,7 @@ import Image from 'next/image';
 export default function LandingHeader() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [hasSubscription, setHasSubscription] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const supabase = createClient();
@@ -27,10 +28,23 @@ export default function LandingHeader() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        setUser(currentUser);
+
+        if (currentUser) {
+          const { data: subs } = await supabase
+            .from('subscriptions')
+            .select('id, status')
+            .eq('user_id', currentUser.id)
+            .in('status', ['active', 'trialing'])
+            .limit(1);
+          setHasSubscription(!!subs && subs.length > 0);
+        } else {
+          setHasSubscription(false);
+        }
       } catch (error) {
         setUser(null);
+        setHasSubscription(false);
       }
     };
     checkAuth();
@@ -81,7 +95,7 @@ export default function LandingHeader() {
 
             {/* Desktop CTA Buttons */}
             <div className="hidden md:flex items-center gap-4">
-              {user ? (
+              {user && hasSubscription ? (
                 <Link href="/dashboard">
                   <Button
                     className="bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90 rounded-lg px-6 font-medium"
@@ -170,7 +184,7 @@ export default function LandingHeader() {
               
               {/* CTA Buttons - Pushed up with margin-top auto */}
               <div className="flex flex-col gap-3 mt-auto pt-8 pb-8">
-                {user ? (
+                {user && hasSubscription ? (
                   <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full bg-[#1ad07a] text-[#0c0b1d] h-14 rounded-lg text-base font-medium shadow-lg hover:bg-[#1ad07a]/90">
                       Go to Dashboard
