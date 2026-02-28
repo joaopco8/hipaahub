@@ -20,6 +20,7 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const priceId = searchParams.get('priceId');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
@@ -62,6 +63,7 @@ function SignInContent() {
           {searchParams.get('redirect') === 'checkout' && (
             <input type="hidden" name="redirect" value="checkout" />
           )}
+          {priceId && <input type="hidden" name="priceId" value={priceId} />}
           
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-thin text-gray-700">
@@ -170,6 +172,7 @@ function SignInContent() {
             {searchParams.get('redirect') === 'checkout' && (
               <input type="hidden" name="redirect" value="checkout" />
             )}
+            {priceId && <input type="hidden" name="priceId" value={priceId} />}
             <input type="hidden" name="provider" value="google" />
             <button
               type="submit"
@@ -213,7 +216,7 @@ function SignInContent() {
           <div className="text-center text-sm text-gray-600 font-thin">
             Don't have an account?{' '}
             <Link
-              href={searchParams.get('redirect') ? `/signup?redirect=${searchParams.get('redirect')}` : '/signup'}
+              href={priceId ? `/signup?priceId=${priceId}` : searchParams.get('redirect') ? `/signup?redirect=${searchParams.get('redirect')}` : '/signup'}
               className="font-thin hover:opacity-80"
               style={{ color: '#0175a2' }}
               prefetch={false}

@@ -72,7 +72,16 @@ export default function CheckoutPage() {
 
         // Recover the plan the user selected before they were sent to auth
         const pendingPriceId = getStoredPriceId();
-        console.log('CheckoutPage: Pending price ID:', pendingPriceId ?? '(none – will use default)');
+
+        // If no plan is stored, send the user to the plan selection screen
+        if (!pendingPriceId) {
+          console.log('CheckoutPage: No priceId found – redirecting to /select-plan');
+          setHasRedirected(true);
+          window.location.href = '/select-plan';
+          return;
+        }
+
+        console.log('CheckoutPage: Pending price ID:', pendingPriceId);
         
         // Add a small delay to ensure auth state is ready after OAuth redirect
         await new Promise(resolve => setTimeout(resolve, 800));

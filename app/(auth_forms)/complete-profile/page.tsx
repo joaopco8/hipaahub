@@ -20,6 +20,7 @@ function CompleteProfilePageContent() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const redirectParam = searchParams.get('redirect') || '';
+  const priceId = searchParams.get('priceId') || '';
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,8 +61,11 @@ function CompleteProfilePageContent() {
 
       toast.success('Phone number saved successfully');
 
-      // Redirect based on redirect parameter or default flow
-      if (redirectParam === 'checkout') {
+      // Redirect based on priceId / redirect parameter or default flow
+      if (priceId) {
+        // User already selected a plan before signing in → go straight to checkout
+        router.push(`/checkout?priceId=${priceId}`);
+      } else if (redirectParam === 'checkout') {
         router.push('/checkout');
       } else {
         // Check subscription status and redirect accordingly
@@ -82,7 +86,8 @@ function CompleteProfilePageContent() {
             router.push('/onboarding/expectation');
           }
         } else {
-          router.push('/checkout');
+          // No plan selected → show plan selection screen
+          router.push('/select-plan');
         }
       }
     } catch (error) {

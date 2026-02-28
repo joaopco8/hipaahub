@@ -70,16 +70,16 @@ export async function initiateCheckout(priceId?: string): Promise<CheckoutResult
     if (process.env.NODE_ENV === 'development') {
       console.error('initiateCheckout: Auth error:', authError);
     }
-    // If there's an auth error, redirect to signup
-    return { type: 'redirect', path: '/signup?redirect=checkout' };
+    const priceParam = priceId ? `&priceId=${priceId}` : '';
+    return { type: 'redirect', path: `/signup?redirect=checkout${priceParam}` };
   }
   
   if (!user) {
-    // Return redirect instruction (client will handle it)
     if (process.env.NODE_ENV === 'development') {
       console.log('initiateCheckout: User not authenticated, redirecting to signup');
     }
-    return { type: 'redirect', path: '/signup?redirect=checkout' };
+    const priceParam = priceId ? `&priceId=${priceId}` : '';
+    return { type: 'redirect', path: `/signup?redirect=checkout${priceParam}` };
   }
 
   if (process.env.NODE_ENV === 'development') {

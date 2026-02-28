@@ -20,6 +20,9 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get('code');
   const errorParam = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
+  // Plan selected before auth — must survive the whole OAuth / email-confirm round-trip
+  const priceId = requestUrl.searchParams.get('priceId');
+  const redirectParam = requestUrl.searchParams.get('redirect');
   
   // Check if OAuth provider returned an error
   if (errorParam) {
@@ -78,15 +81,17 @@ export async function GET(request: NextRequest) {
 
       if (!userData?.phone_number) {
         // User doesn't have phone number, redirect to complete profile
-        const redirectParam = requestUrl.searchParams.get('redirect');
-        const redirectUrl = redirectParam 
-          ? `${requestUrl.origin}/complete-profile?redirect=${redirectParam}`
-          : `${requestUrl.origin}/complete-profile`;
-        
+        // Carry the priceId so the plan is not lost after profile completion
+        let completeProfileUrl = `${requestUrl.origin}/complete-profile`;
+        const params: string[] = [];
+        if (priceId) params.push(`priceId=${priceId}`);
+        else if (redirectParam) params.push(`redirect=${redirectParam}`);
+        if (params.length) completeProfileUrl += `?${params.join('&')}`;
+
         if (process.env.NODE_ENV === 'development') {
-          console.log('Auth callback: User does not have phone number, redirecting to complete profile');
+          console.log('Auth callback: User does not have phone number, redirecting to complete profile:', completeProfileUrl);
         }
-        return NextResponse.redirect(redirectUrl);
+        return NextResponse.redirect(completeProfileUrl);
       }
 
       // Check subscription and onboarding status
@@ -102,7 +107,7 @@ export async function GET(request: NextRequest) {
       }
 
       if (organization && commitment) {
-        // Onboarding fully complete → dashboard (regardless of subscription state — webhook may still be in-flight)
+        // Onboarding fully complete → dashboard
         return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
       }
 
@@ -111,9 +116,13 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${requestUrl.origin}/onboarding/expectation`);
       }
 
-      // No subscription yet → send to checkout.
-      // The checkout page recovers the selected plan from localStorage (set by PricingSection before redirect to auth).
-      return NextResponse.redirect(`${requestUrl.origin}/checkout`);
+      // No subscription yet
+      if (priceId) {
+        // User had already selected a plan → go straight to checkout
+        return NextResponse.redirect(`${requestUrl.origin}/checkout?priceId=${priceId}`);
+      }
+      // No plan selected → show plan selection screen
+      return NextResponse.redirect(`${requestUrl.origin}/select-plan`);
     }
   }
 

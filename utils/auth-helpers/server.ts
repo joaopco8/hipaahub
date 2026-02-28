@@ -132,6 +132,7 @@ export async function signInWithPassword(formData: FormData) {
   const email = String(formData.get('email')).trim();
   const password = String(formData.get('password')).trim();
   const redirectParam = formData.get('redirect') as string | null;
+  const priceId = formData.get('priceId') as string | null;
   let redirectPath: string;
 
   const supabase = createClient();
@@ -157,7 +158,7 @@ export async function signInWithPassword(formData: FormData) {
     ]);
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('signInWithPassword: user:', data.user.id, '| org:', !!organization, '| commitment:', !!commitment, '| sub:', !!subscription, '| redirect:', redirectParam);
+      console.log('signInWithPassword: user:', data.user.id, '| org:', !!organization, '| commitment:', !!commitment, '| sub:', !!subscription, '| redirect:', redirectParam, '| priceId:', priceId);
     }
 
     if (organization && commitment) {
@@ -166,10 +167,12 @@ export async function signInWithPassword(formData: FormData) {
     } else if (subscription) {
       // Has subscription but onboarding incomplete → resume onboarding
       redirectPath = getStatusRedirect('/onboarding/expectation', 'Success!', 'You are now signed in.');
+    } else if (priceId) {
+      // No subscription, but user already selected a plan → go straight to checkout
+      redirectPath = `/checkout?priceId=${priceId}`;
     } else {
-      // No subscription yet → go to checkout so the user can pick a plan.
-      // The checkout page will recover the plan from localStorage (set by PricingSection before redirect).
-      redirectPath = '/checkout';
+      // No subscription, no plan selected → show plan selection screen
+      redirectPath = '/select-plan';
     }
   } else {
     redirectPath = getErrorRedirect(
@@ -185,9 +188,13 @@ export async function signInWithPassword(formData: FormData) {
 export async function signUp(formData: FormData) {
   // Check if redirect parameter is present (for checkout flow)
   const redirectParam = formData.get('redirect') as string | null;
-  const callbackURL = redirectParam === 'checkout' 
-    ? getURL('/auth/callback?redirect=checkout')
-    : getURL('/auth/callback');
+  const priceId = formData.get('priceId') as string | null;
+  // Build callback URL — include priceId so the plan survives email-confirmation round-trip
+  const callbackURL = priceId
+    ? getURL(`/auth/callback?priceId=${priceId}`)
+    : redirectParam === 'checkout'
+      ? getURL('/auth/callback?redirect=checkout')
+      : getURL('/auth/callback');
 
   const email = String(formData.get('email')).trim();
   const password = String(formData.get('password')).trim();
@@ -243,10 +250,12 @@ export async function signUp(formData: FormData) {
     if (subscription) {
       // User already has an active subscription → go to onboarding (or dashboard if complete)
       redirectPath = '/onboarding/expectation';
+    } else if (priceId) {
+      // No subscription, but user already selected a plan → go straight to checkout
+      redirectPath = `/checkout?priceId=${priceId}`;
     } else {
-      // No subscription yet → go to checkout.
-      // The checkout page will recover the plan from localStorage (set by PricingSection).
-      redirectPath = '/checkout';
+      // No subscription, no plan selected → show plan selection screen
+      redirectPath = '/select-plan';
     }
   } else if (
     data.user &&

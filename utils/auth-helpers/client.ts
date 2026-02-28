@@ -61,6 +61,7 @@ export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
   const formData = new FormData(form);
   const provider = String(formData.get('provider')).trim() as Provider;
   const redirectParam = formData.get('redirect') as string | null;
+  const priceId = formData.get('priceId') as string | null;
 
   const currentPath = window.location.pathname;
   
@@ -68,9 +69,8 @@ export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
   if (!provider) {
     console.error('Provider is missing or empty');
     const errorMessage = 'Provider is required. Please try again.';
-    const errorUrl = redirectParam === 'checkout'
-      ? `${currentPath}?error=${encodeURIComponent('Sign in failed')}&error_description=${encodeURIComponent(errorMessage)}&redirect=checkout`
-      : `${currentPath}?error=${encodeURIComponent('Sign in failed')}&error_description=${encodeURIComponent(errorMessage)}`;
+    const extra = priceId ? `&priceId=${priceId}` : redirectParam === 'checkout' ? '&redirect=checkout' : '';
+    const errorUrl = `${currentPath}?error=${encodeURIComponent('Sign in failed')}&error_description=${encodeURIComponent(errorMessage)}${extra}`;
     window.location.href = errorUrl;
     return;
   }
@@ -83,9 +83,11 @@ export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
   
   // Create client-side supabase client and call signInWithOAuth
   const supabase = createClient();
-  const redirectURL = redirectParam === 'checkout'
-    ? getURL('/auth/callback?redirect=checkout')
-    : getURL('/auth/callback');
+  const redirectURL = priceId
+    ? getURL(`/auth/callback?priceId=${priceId}`)
+    : redirectParam === 'checkout'
+      ? getURL('/auth/callback?redirect=checkout')
+      : getURL('/auth/callback');
   
   // Debug logging
   console.log('OAuth sign-in attempt:', {

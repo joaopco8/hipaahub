@@ -21,13 +21,18 @@ function SignUpContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const priceId = searchParams.get('priceId');
 
   useEffect(() => {
     const redirect = searchParams.get('redirect');
     if (redirect === 'checkout') {
       localStorage.setItem('signup_redirect', 'checkout');
     }
-  }, [searchParams]);
+    // Always persist the selected plan so the checkout page can recover it
+    if (priceId) {
+      localStorage.setItem('hipaa_pending_price_id', priceId);
+    }
+  }, [searchParams, priceId]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
@@ -58,9 +63,10 @@ function SignUpContent() {
           className="space-y-5"
           onSubmit={(e) => handleSubmit(e)}
         >
-          {searchParams.get('redirect') === 'checkout' && (
+          {(searchParams.get('redirect') === 'checkout' || priceId) && (
             <input type="hidden" name="redirect" value="checkout" />
           )}
+          {priceId && <input type="hidden" name="priceId" value={priceId} />}
           
           {/* Hidden fields for backend compatibility */}
           <input type="hidden" name="phone_number" value="" />
@@ -227,7 +233,7 @@ function SignUpContent() {
         {/* Sign In Link */}
         <div className="mt-8 text-center text-sm">
           <Link
-            href={searchParams.get('redirect') ? `/signin?redirect=${searchParams.get('redirect')}` : '/signin'}
+            href={priceId ? `/signin?priceId=${priceId}` : searchParams.get('redirect') ? `/signin?redirect=${searchParams.get('redirect')}` : '/signin'}
             className="font-thin hover:opacity-80"
             style={{ color: '#0175a2' }}
             prefetch={false}
