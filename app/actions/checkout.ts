@@ -218,7 +218,7 @@ export async function initiateCheckout(priceId?: string): Promise<CheckoutResult
   let selectedPrice = null;
   
   try {
-    // Priority 1: If a specific priceId was provided, use it directly
+    // Priority 1: If a specific priceId was provided, search for it in DB products
     if (priceId) {
       for (const product of products || []) {
         if (product?.prices && Array.isArray(product.prices)) {
@@ -228,9 +228,17 @@ export async function initiateCheckout(priceId?: string): Promise<CheckoutResult
           if (selectedPrice) break;
         }
       }
+
+      // If priceId was explicitly provided but not found in DB, use it directly.
+      // checkoutWithStripe fetches the price from Stripe API using the ID anyway,
+      // so this is safe — Stripe will validate and reject invalid IDs.
+      if (!selectedPrice) {
+        console.warn(`Price ${priceId} not found in DB products, using it directly from Stripe.`);
+        selectedPrice = { id: priceId, currency: 'usd', active: true } as any;
+      }
     }
 
-    // Priority 2: Look for Essential plan price by ID from env
+    // Priority 2: Look for Essential plan price by ID from env (only when no priceId was provided)
     if (!selectedPrice) {
       const essentialPriceId = process.env.NEXT_PUBLIC_STRIPE_ESSENTIAL_PRICE_ID;
       if (essentialPriceId) {
