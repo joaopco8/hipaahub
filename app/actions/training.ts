@@ -171,6 +171,60 @@ export async function createTrainingRecord(data: {
   }
 }
 
+export interface EmployeeInvite {
+  id: string;
+  name: string;
+  email: string;
+  role_title: string;
+  status: 'invited' | 'completed' | 'expired';
+  invited_at: string;
+  completed_at: string | null;
+  quiz_score: number | null;
+  certificate_id: string | null;
+  token_expires_at: string;
+}
+
+export async function getEmployeeInvites(): Promise<EmployeeInvite[]> {
+  const supabase = createClient();
+  const user = await getUser(supabase);
+
+  if (!user) {
+    throw new Error('Unauthorized');
+  }
+
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  if (!org) return [];
+
+  const { data, error } = await supabase
+    .from('employee_invites' as any)
+    .select('id, name, email, role_title, status, invited_at, completed_at, quiz_score, certificate_id, token_expires_at')
+    .eq('organization_id', org.id)
+    .order('invited_at', { ascending: false });
+
+  if (error) {
+    console.error('Failed to fetch employee invites:', error.message);
+    return [];
+  }
+
+  return (data || []) as EmployeeInvite[];
+}
+
+export async function getEmployeeInviteStats() {
+  const invites = await getEmployeeInvites();
+  const total = invites.length;
+  const completed = invites.filter((i) => i.status === 'completed').length;
+  const pending = invites.filter((i) => i.status === 'invited').length;
+  const expired = invites.filter((i) => i.status === 'expired').length;
+  const compliancePercent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  return { total, completed, pending, expired, compliancePercent };
+}
+
 export async function exportTrainingReport() {
   const supabase = createClient();
   const user = await getUser(supabase);
