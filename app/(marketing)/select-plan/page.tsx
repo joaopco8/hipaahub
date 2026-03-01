@@ -97,28 +97,28 @@ function PlanCard({ plan }: { plan: Plan }) {
     <div
       className={`relative flex flex-col bg-white border ${
         plan.featured
-          ? 'border-[#0c0b1d] shadow-2xl lg:scale-105 z-10'
+          ? 'border-[#0e274e] shadow-2xl lg:scale-105 z-10'
           : 'border-gray-200 shadow-sm'
       } rounded-none p-10 transition-all duration-300 hover:-translate-y-1`}
     >
       {plan.featured && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#1ad07a] text-[#0c0b1d] text-[11px] font-thin px-5 py-1.5 whitespace-nowrap">
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#00bceb] text-[#0e274e] text-[11px] font-thin px-5 py-1.5 whitespace-nowrap">
           Most popular
         </div>
       )}
 
-      <h3 className="text-xl font-thin text-[#0c0b1d] mb-1 tracking-wide">{plan.name}</h3>
+      <h3 className="text-xl font-thin text-[#0e274e] mb-1 tracking-wide">{plan.name}</h3>
       <p className="text-gray-400 text-xs font-thin mb-6 leading-relaxed">{plan.description}</p>
 
       <div className="flex items-baseline mb-8">
-        <span className="text-5xl font-thin text-[#0c0b1d]">{plan.price}</span>
+        <span className="text-5xl font-thin text-[#0e274e]">{plan.price}</span>
         <span className="text-gray-400 text-sm ml-2 font-thin">/ month</span>
       </div>
 
       <ul className="space-y-3 flex-grow mb-8">
         {plan.features.map((feature, idx) => (
           <li key={idx} className="flex items-start gap-3 text-sm text-gray-600 font-thin">
-            <Check size={14} className="text-[#1ad07a] mt-0.5 flex-shrink-0" />
+            <Check size={14} className="text-[#00bceb] mt-0.5 flex-shrink-0" />
             <span>{feature}</span>
           </li>
         ))}
@@ -133,8 +133,8 @@ function PlanCard({ plan }: { plan: Plan }) {
         disabled={isLoading}
         className={`w-full py-4 text-sm font-thin flex items-center justify-center gap-3 transition-colors disabled:opacity-70 disabled:cursor-not-allowed ${
           plan.featured
-            ? 'bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#17b86a]'
-            : 'bg-[#0c0b1d] text-white hover:bg-[#0c0b1d]/80'
+            ? 'bg-[#00bceb] text-[#0e274e] hover:bg-[#00a8d4]'
+            : 'bg-[#0e274e] text-white hover:bg-[#0e274e]/80'
         }`}
       >
         {isLoading ? (
@@ -171,11 +171,11 @@ export default function SelectPlanPage() {
 
       {/* Header */}
       <div className="text-center mb-12 max-w-xl">
-        <div className="inline-flex items-center gap-2 text-[#1ad07a] mb-4">
+        <div className="inline-flex items-center gap-2 text-[#00bceb] mb-4">
           <Shield size={18} />
           <span className="text-sm font-thin tracking-wide uppercase">Account Created</span>
         </div>
-        <h1 className="text-3xl md:text-4xl font-thin text-[#0c0b1d] leading-tight mb-3">
+        <h1 className="text-3xl md:text-4xl font-thin text-[#0e274e] leading-tight mb-3">
           Choose your plan
         </h1>
         <p className="text-gray-500 font-thin text-base leading-relaxed">
