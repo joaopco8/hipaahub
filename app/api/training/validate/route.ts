@@ -2,6 +2,8 @@
 // Public endpoint — validates an employee invite token
 // No authentication required (employee has no account)
 
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 

@@ -2,6 +2,8 @@
 // Public endpoint — completes training for an invited employee (no account required)
 // Validates the token, creates a training_record, and updates the invite status
 
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js';
 

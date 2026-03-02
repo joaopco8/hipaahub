@@ -2,6 +2,8 @@
 // Returns all employee invites + stats for the authenticated user's organization.
 // Used by the client-side EmployeeInvitesSection for live refresh.
 
+export const dynamic = 'force-dynamic';
+
 import { createClient } from '@/utils/supabase/server';
 import { getUser } from '@/utils/supabase/queries';
 import { NextResponse } from 'next/server';

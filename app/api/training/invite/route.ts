@@ -1,6 +1,8 @@
 // POST /api/training/invite
 // Creates an employee invite record and sends training invitation email via Resend
 
+export const dynamic = 'force-dynamic';
+
 import { createClient } from '@/utils/supabase/server';
 import { getUser } from '@/utils/supabase/queries';
 import { NextResponse } from 'next/server';
