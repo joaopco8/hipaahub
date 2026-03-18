@@ -99,8 +99,8 @@ const SolutionSection: React.FC = () => {
             label="average fine per violation" 
           />
           <SolidCircleStat 
-            value="4-8w" 
-            label="OCR gives you 10 days to respond. Most solo practices need 4-8 weeks to find their documentation."
+            value="10 days"
+            label="OCR gives you 10 days to respond to an audit request. Most solo practices need 4-8 weeks to find their files."
           />
         </div>
       </div>

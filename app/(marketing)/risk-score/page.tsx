@@ -2,6 +2,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 
 type RiskLevel = "low" | "moderate" | "high";
 
@@ -344,6 +347,7 @@ function getRiskTier(pct: number): RiskLevel {
 }
 
 export default function RiskScorePage() {
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<Array<number | undefined>>(
     () => new Array(QUESTIONS.length)
@@ -413,6 +417,13 @@ export default function RiskScorePage() {
       next[currentQ] = idx;
       return next;
     });
+
+    // Auto-advance as soon as an option is selected.
+    if (currentQ < QUESTIONS.length - 1) {
+      setCurrentQ((q) => q + 1);
+      return;
+    }
+    setStage("email");
   }
 
   function handleNext() {
@@ -441,9 +452,93 @@ export default function RiskScorePage() {
   const breakdownEntries = Object.entries(categoryScores);
 
   return (
-    <div className="min-h-screen bg-cisco-navy text-white flex flex-col">
+    <div className="min-h-screen bg-[#f3f5f9] text-cisco-navy flex flex-col">
+      {/* Landing-style navbar (always visible) */}
+      <nav className="sticky top-0 z-[120] w-full bg-white text-cisco-navy border-b border-gray-100">
+        <div className="mx-auto max-w-7xl px-4 md:px-12 h-[72px] flex items-center justify-between">
+          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <Image
+              src="/logoescura.png"
+              alt="HIPAA Hub"
+              width={120}
+              height={32}
+              className="object-contain"
+              priority
+            />
+          </Link>
+
+          <div className="hidden xl:flex items-center gap-8 h-full">
+            <Link href="/" className="text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin py-4 h-full flex items-center">
+              Platform
+            </Link>
+            <Link href="/" className="text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin py-4 h-full flex items-center">
+              Blog
+            </Link>
+            <Link href="/" className="text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin py-4 h-full flex items-center">
+              Pricing
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Link
+              href="/risk-score"
+              className="hidden sm:inline-flex items-center gap-1.5 border border-cisco-blue/30 bg-cisco-blue/5 text-cisco-navy px-3 py-1.5 text-xs font-thin hover:bg-cisco-blue/10 hover:border-cisco-blue/40 transition-colors"
+            >
+              Free Risk Score <ArrowUpRight size={14} />
+            </Link>
+            <Link
+              href="/signin"
+              className="hidden sm:inline-flex items-center border border-cisco-navy/30 bg-transparent text-cisco-navy px-3 py-1.5 text-xs font-thin hover:bg-gray-50 transition-colors"
+            >
+              Login
+            </Link>
+
+            <button
+              type="button"
+              className="xl:hidden text-gray-600 p-2"
+              onClick={() => setIsNavOpen((v) => !v)}
+              aria-label="Toggle navigation"
+            >
+              {isNavOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+        </div>
+
+        <div
+          className={[
+            "xl:hidden border-t border-gray-100 bg-white",
+            isNavOpen ? "block" : "hidden",
+          ].join(" ")}
+        >
+          <div className="px-4 py-6 space-y-4">
+            <Link href="/" className="block text-base font-thin text-cisco-navy hover:text-cisco-blue transition-colors">
+              Platform
+            </Link>
+            <Link href="/" className="block text-base font-thin text-cisco-navy hover:text-cisco-blue transition-colors">
+              Blog
+            </Link>
+            <Link href="/" className="block text-base font-thin text-cisco-navy hover:text-cisco-blue transition-colors">
+              Pricing
+            </Link>
+            <Link
+              href="/risk-score"
+              className="inline-flex items-center justify-between gap-4 w-full border border-cisco-blue/30 bg-cisco-blue/5 text-cisco-navy px-4 py-3 text-base font-thin hover:bg-cisco-blue/10 hover:border-cisco-blue/40 transition-colors"
+            >
+              <span>Free Risk Score</span>
+              <ArrowUpRight size={18} />
+            </Link>
+            <Link
+              href="/signin"
+              className="inline-flex items-center justify-center w-full border border-cisco-navy/30 bg-transparent text-cisco-navy px-4 py-3 text-base font-thin hover:bg-gray-50 transition-colors"
+            >
+              Login
+            </Link>
+          </div>
+        </div>
+      </nav>
+
       {/* Top ticker */}
-      <div className="bg-red-900 px-4 py-2 text-[11px] text-red-100">
+      <div className="bg-[#0c0b1d] px-4 py-2 text-[11px] text-white/80 border-b border-black/10">
         <div className="mx-auto max-w-5xl text-center tracking-[0.03em]">
           Federal regulators opened hundreds of HIPAA investigations in 2024, small
           practices are a primary target segment.
@@ -451,47 +546,47 @@ export default function RiskScorePage() {
       </div>
 
       {/* Hero aligned with landing */}
-      <header className="relative w-full overflow-hidden bg-cisco-navy px-4 pb-10 pt-10 md:pb-16 md:pt-16">
+      <header className="relative w-full overflow-hidden bg-white px-4 pb-10 pt-10 md:pb-14 md:pt-14 border-b border-gray-200">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-32 -right-24 h-72 w-72 rounded-full bg-cisco-blue/10 blur-[110px]" />
-          <div className="absolute -bottom-40 -left-28 h-72 w-72 rounded-full bg-purple-900/20 blur-[110px]" />
+          <div className="absolute -top-32 -right-24 h-72 w-72 bg-cisco-blue/10 blur-[110px]" />
+          <div className="absolute -bottom-40 -left-28 h-72 w-72 bg-[#0c0b1d]/10 blur-[110px]" />
         </div>
         <div className="relative mx-auto flex max-w-7xl flex-col gap-8 md:flex-row md:items-center md:px-8">
           <div className="relative flex-1">
             <div className="mb-4">
-              <span className="inline-flex items-center rounded-none border border-cisco-blue px-3 py-1 text-[11px] font-thin uppercase tracking-[0.18em] text-cisco-blue">
+              <span className="inline-flex items-center border border-cisco-blue/30 bg-cisco-blue/5 px-3 py-1 text-[11px] font-thin uppercase tracking-[0.18em] text-cisco-navy">
                 Free assessment · three minutes · instant results
               </span>
             </div>
-            <h1 className="mb-4 text-3xl font-thin leading-tight text-white md:text-4xl lg:text-5xl">
+            <h1 className="mb-4 text-3xl font-thin leading-tight text-cisco-navy md:text-4xl lg:text-5xl">
               What is your practice&apos;s real HIPAA risk?
             </h1>
-            <p className="mb-5 max-w-xl text-sm font-thin text-gray-300 md:text-base">
+            <p className="mb-5 max-w-xl text-sm font-thin text-gray-600 md:text-base">
               Ten focused questions. Instant score. See exactly where you are exposed,
               before auditors and insurers do.
             </p>
-            <div className="flex flex-wrap gap-2 text-[11px] font-thin text-gray-100">
-              <span className="rounded-none border border-white/20 bg-white/5 px-3 py-1">
+            <div className="flex flex-wrap gap-2 text-[11px] font-thin text-gray-700">
+              <span className="border border-gray-200 bg-white px-3 py-1">
                 $50,000 average fine per violation
               </span>
-              <span className="rounded-none border border-white/20 bg-white/5 px-3 py-1">
+              <span className="border border-gray-200 bg-white px-3 py-1">
                 40% increase in audits in 2024
               </span>
-              <span className="rounded-none border border-white/20 bg-white/5 px-3 py-1">
+              <span className="border border-gray-200 bg-white px-3 py-1">
                 Three minutes to get your score
               </span>
             </div>
           </div>
 
-          <aside className="relative flex-1 rounded-2xl border border-white/10 bg-slate-950/80 px-5 py-5 shadow-2xl shadow-black/50 backdrop-blur">
+          <aside className="relative flex-1 border border-gray-200 bg-white px-5 py-5 shadow-sm">
             <div className="mb-3 text-[11px] font-thin uppercase tracking-[0.16em] text-cisco-blue">
               HIPAA Hub · Risk Score Tool
             </div>
-            <p className="mb-3 text-[13px] font-thin text-gray-100">
+            <p className="mb-3 text-[13px] font-thin text-cisco-navy">
               Built specifically for private practices, therapists, dentists, and
               independent clinics that cannot afford a full‑time compliance officer.
             </p>
-            <p className="text-[12px] font-thin text-gray-300">
+            <p className="text-[12px] font-thin text-gray-600">
               No patient information is collected. Your answers remain in this browser
               session only; you can optionally receive a score summary by email.
             </p>
@@ -500,58 +595,58 @@ export default function RiskScorePage() {
       </header>
 
       {/* Trust bar */}
-      <section className="border-y border-slate-800 bg-cisco-navy px-4 py-2.5 text-[11px] text-slate-100">
+      <section className="border-b border-gray-200 bg-white px-4 py-3 text-[11px] text-gray-700">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-3">
           <div className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-cisco-blue" />
+            <span className="h-1.5 w-1.5 bg-cisco-blue" />
             <span>No patient health information stored</span>
           </div>
           <div className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-cisco-blue" />
+            <span className="h-1.5 w-1.5 bg-cisco-blue" />
             <span>Designed by HIPAA compliance specialists</span>
           </div>
           <div className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-cisco-blue" />
+            <span className="h-1.5 w-1.5 bg-cisco-blue" />
             <span>Instant score and structured breakdown</span>
           </div>
           <div className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-cisco-blue" />
+            <span className="h-1.5 w-1.5 bg-cisco-blue" />
             <span>Optimized for independent and small practices</span>
           </div>
         </div>
       </section>
 
       {/* Main content */}
-      <main className="flex-1 bg-cisco-navy px-4 py-6 pb-8 text-white md:py-8">
+      <main className="flex-1 bg-[#f3f5f9] px-4 py-8 pb-10 md:py-10">
         <div className="mx-auto max-w-[700px] space-y-5">
           {/* QUIZ */}
           {stage === "quiz" && (
-            <section id="quiz-section" className="rounded-2xl border border-slate-700/80 bg-slate-950/80 px-4 py-5 shadow-2xl shadow-black/40 backdrop-blur md:px-6 md:py-6">
-              <div className="mb-3">
-                <div className="mb-1 flex items-baseline justify-between text-[11px] text-slate-300">
+            <section id="quiz-section" className="border border-gray-200 bg-white px-4 py-6 shadow-sm md:px-6 md:py-7">
+              <div className="mb-5">
+                <div className="mb-2 flex flex-wrap items-end justify-between gap-3">
                   <span>
                     Question{" "}
-                    <span className="font-semibold text-slate-50">
+                    <span className="font-semibold text-cisco-navy">
                       {currentQ + 1}
                     </span>{" "}
                     of {QUESTIONS.length}
                   </span>
-                  <span>{progressPct}% complete</span>
+                  <span className="text-cisco-navy font-semibold">{progressPct}% complete</span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full border border-slate-800 bg-slate-950">
+                <div className="h-2.5 w-full overflow-hidden border border-gray-200 bg-white">
                   <div
-                    className="h-full rounded-full bg-cisco-blue transition-[width] duration-500"
+                    className="h-full bg-cisco-blue transition-[width] duration-500"
                     style={{ width: `${progressPct}%` }}
                   />
                 </div>
               </div>
 
-              <div className="mt-2 mb-4 flex items-center gap-1.5">
+              <div className="mt-2 mb-5 flex items-center gap-2">
                 {QUESTIONS.map((_, idx) => (
                   <span
                     key={idx}
                     className={[
-                      "h-2.5 w-2.5 rounded-full border border-slate-600",
+                      "h-3 w-3 border border-gray-300",
                       idx < currentQ && typeof answers[idx] === "number"
                         ? "bg-cisco-blue border-cisco-blue"
                         : "",
@@ -563,27 +658,27 @@ export default function RiskScorePage() {
                 ))}
               </div>
 
-              <div className="rounded-2xl border border-slate-700/80 bg-slate-950 px-4 py-4 shadow-xl shadow-black/50 md:px-5 md:py-5">
-                <div className="mb-2 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.16em] text-slate-300">
-                  <span className="rounded-full border border-cisco-blue/80 bg-cisco-blue/10 px-2 py-0.5 text-[10px] text-cisco-blue">
+              <div className="border border-gray-200 bg-white px-4 py-5 md:px-5 md:py-6">
+                <div className="mb-3 flex flex-wrap items-center gap-3 text-[12px] uppercase tracking-[0.18em] text-gray-500">
+                  <span className="border border-cisco-blue/30 bg-cisco-blue/5 px-2 py-0.5 text-[11px] text-cisco-navy">
                     {currentQuestion.category}
                   </span>
-                  <span className="text-slate-400">
+                  <span className="text-gray-500">
                     Question {currentQ + 1} of {QUESTIONS.length}
                   </span>
                 </div>
-                <h2 className="mb-3 text-[19px] leading-snug text-slate-50 md:text-[21px] font-thin">
+                <h2 className="mb-4 text-[22px] leading-snug text-cisco-navy md:text-[24px] font-thin">
                   {currentQuestion.text}
                 </h2>
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-3">
                   {currentQuestion.options.map((opt, idx) => {
                     const isSelected = selectedIdx === idx;
                     const riskClass =
                       opt.risk === "high"
-                        ? "bg-red-100 text-red-700"
+                        ? "bg-red-50 text-red-700 border-red-200"
                         : opt.risk === "med"
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-emerald-100 text-emerald-700";
+                        ? "bg-amber-50 text-amber-700 border-amber-200"
+                        : "bg-emerald-50 text-emerald-700 border-emerald-200";
                     const riskText =
                       opt.risk === "high"
                         ? "High risk"
@@ -596,10 +691,10 @@ export default function RiskScorePage() {
                         type="button"
                         onClick={() => handleSelect(idx)}
                         className={[
-                          "grid w-full grid-cols-[auto,minmax(0,1fr),auto] items-center gap-2 rounded-xl border px-3.5 py-2.5 text-left text-sm transition-all",
-                          "bg-slate-950/80 border-slate-700 hover:border-slate-500 hover:bg-slate-900/80",
+                          "grid w-full grid-cols-[auto,minmax(0,1fr),auto] items-center gap-3 border px-4 py-3 text-left text-sm transition-all",
+                          "bg-white border-gray-200 hover:border-gray-300 hover:bg-gray-50",
                           isSelected
-                            ? "border-cisco-blue bg-slate-950 shadow-[0_0_0_1px_rgba(0,188,235,0.6)]"
+                            ? "border-cisco-blue bg-white shadow-[0_0_0_1px_rgba(0,188,235,0.35)]"
                             : "",
                         ]
                           .filter(Boolean)
@@ -607,27 +702,27 @@ export default function RiskScorePage() {
                       >
                         <span
                           className={[
-                            "mr-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-slate-500",
-                            isSelected ? "border-cisco-blue bg-cisco-blue" : "",
+                            "mr-1 flex h-4 w-4 items-center justify-center border-2 border-gray-400",
+                            isSelected ? "border-cisco-blue bg-cisco-blue" : "bg-white",
                           ]
                             .filter(Boolean)
                             .join(" ")}
                         >
-                          <span className="h-1.5 w-1.5 rounded-full bg-slate-950" />
+                          <span className={["h-1.5 w-1.5", isSelected ? "bg-white" : "bg-transparent"].join(" ")} />
                         </span>
                         <span className="flex flex-col gap-0.5 pr-1">
-                          <span className="text-[13px] text-slate-50">
+                          <span className="text-[14px] text-cisco-navy">
                             {opt.text}
                           </span>
                           {opt.sub && (
-                            <span className="text-[11px] text-slate-400">
+                            <span className="text-[12px] text-gray-600">
                               {opt.sub}
                             </span>
                           )}
                         </span>
                         <span
                           className={[
-                            "ml-1 rounded-full px-2 py-0.5 text-[10px] font-medium",
+                            "ml-1 border px-2 py-0.5 text-[11px] font-medium",
                             riskClass,
                           ]
                             .filter(Boolean)
@@ -646,7 +741,7 @@ export default function RiskScorePage() {
                   type="button"
                   onClick={handleBack}
                   disabled={currentQ === 0}
-                  className="inline-flex items-center justify-center rounded-none border border-slate-600 bg-slate-950 px-4 py-2 text-xs font-light text-slate-200 shadow-sm shadow-black/30 transition hover:bg-slate-900 disabled:opacity-40"
+                  className="inline-flex items-center justify-center border border-gray-300 bg-white px-4 py-2.5 text-xs font-light text-cisco-navy shadow-sm transition hover:bg-gray-50 disabled:opacity-40"
                 >
                   ← Back
                 </button>
@@ -654,7 +749,7 @@ export default function RiskScorePage() {
                   type="button"
                   onClick={handleNext}
                   disabled={typeof selectedIdx !== "number"}
-                  className="inline-flex items-center justify-center rounded-none bg-cisco-blue px-5 py-2.5 text-xs font-medium text-white shadow-lg shadow-cisco-blue/30 transition hover:bg-white hover:text-cisco-navy disabled:cursor-default disabled:opacity-40"
+                  className="inline-flex items-center justify-center bg-cisco-blue px-5 py-2.5 text-xs font-medium text-white shadow-lg shadow-cisco-blue/20 transition hover:bg-[#0c0b1d] disabled:cursor-default disabled:opacity-40"
                 >
                   Continue →
                 </button>
@@ -666,24 +761,24 @@ export default function RiskScorePage() {
           {stage === "email" && (
             <section
               id="email-section"
-              className="mx-auto max-w-md rounded-2xl border border-slate-700/80 bg-slate-950/80 px-5 py-6 shadow-2xl shadow-black/50 backdrop-blur"
+              className="mx-auto max-w-md border border-gray-200 bg-white px-5 py-6 shadow-sm"
             >
-              <h2 className="mb-1 text-[22px] font-thin text-slate-50">
+              <h2 className="mb-1 text-[22px] font-thin text-cisco-navy">
                 Your score is ready
               </h2>
-              <p className="mb-4 text-[13px] text-slate-200">
+              <p className="mb-4 text-[13px] text-gray-700">
                 We&apos;ve calculated your HIPAA risk score and identified your top
                 vulnerabilities. Enter your details to see your results and receive your
                 free PDF-ready report.
               </p>
-              <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-dashed border-slate-600 bg-slate-950 px-3.5 py-2.5">
+              <div className="mb-4 flex items-center justify-between gap-3 border border-dashed border-gray-300 bg-white px-3.5 py-2.5">
                 <div>
-                  <div className="text-xs text-slate-400">Your Risk Score</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-gray-600">Your Risk Score</div>
+                  <div className="text-xs text-gray-500">
                     Enter your email to reveal the full assessment
                   </div>
                 </div>
-                <div className="select-none text-2xl font-semibold text-slate-100 blur-sm">
+                <div className="select-none text-2xl font-semibold text-cisco-navy blur-sm">
                   {riskPct}%
                 </div>
               </div>
@@ -695,27 +790,27 @@ export default function RiskScorePage() {
               >
                 <div className="space-y-2">
                   <div>
-                    <label className="mb-1 block text-xs text-slate-200">
+                    <label className="mb-1 block text-xs text-gray-700">
                       First name
                     </label>
                     <input
                       id="user-name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="h-9 w-full rounded-none border border-slate-600 bg-slate-950 px-2.5 text-xs text-slate-100 outline-none ring-0 transition focus:border-cisco-blue focus:ring-1 focus:ring-cisco-blue"
+                      className="h-9 w-full rounded-none border border-gray-300 bg-white px-2.5 text-xs text-cisco-navy outline-none ring-0 transition focus:border-cisco-blue focus:ring-1 focus:ring-cisco-blue"
                       placeholder="Your first name"
                       required
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-200">
+                    <label className="mb-1 block text-xs text-gray-700">
                       Work email
                     </label>
                     <input
                       id="user-email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="h-9 w-full rounded-none border border-slate-600 bg-slate-950 px-2.5 text-xs text-slate-100 outline-none ring-0 transition focus:border-cisco-blue focus:ring-1 focus:ring-cisco-blue"
+                      className="h-9 w-full rounded-none border border-gray-300 bg-white px-2.5 text-xs text-cisco-navy outline-none ring-0 transition focus:border-cisco-blue focus:ring-1 focus:ring-cisco-blue"
                       placeholder="your.name@yourpractice.com"
                       required
                     />
@@ -726,12 +821,12 @@ export default function RiskScorePage() {
                 )}
                 <button
                   type="submit"
-                  className="inline-flex w-full items-center justify-center rounded-none bg-cisco-blue px-4 py-2.5 text-xs font-medium text-white shadow-lg shadow-cisco-blue/25 transition hover:bg-white hover:text-cisco-navy"
+                  className="inline-flex w-full items-center justify-center rounded-none bg-cisco-blue px-4 py-2.5 text-xs font-medium text-white shadow-lg shadow-cisco-blue/20 transition hover:bg-[#0c0b1d]"
                 >
                   Reveal my HIPAA Risk Score →
                 </button>
               </form>
-              <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+              <p className="mt-3 text-[11px] leading-relaxed text-gray-500">
                 No spam. We&apos;ll send your PDF report and occasional HIPAA compliance
                 tips. Unsubscribe anytime.
               </p>
@@ -742,14 +837,14 @@ export default function RiskScorePage() {
           {stage === "results" && (
             <section
               id="result-section"
-              className="overflow-hidden rounded-2xl border border-slate-700/80 bg-slate-950 shadow-2xl shadow-black/50"
+              className="overflow-hidden border border-gray-200 bg-white shadow-sm"
             >
               <div
                 id="result-header"
                 data-tier={riskTier}
-                className="border-b border-slate-800 bg-gradient-to-br from-slate-950 via-slate-950 to-cisco-blue/10 px-5 py-5 md:px-6 md:py-6"
+                className="border-b border-gray-200 bg-white px-5 py-5 md:px-6 md:py-6"
               >
-                <p className="mb-3 text-[11px] text-slate-300">
+                <p className="mb-3 text-[11px] text-gray-500">
                   HIPAA Hub · Risk Assessment ·{" "}
                   {new Date().toLocaleDateString(undefined, {
                     year: "numeric",
@@ -762,31 +857,31 @@ export default function RiskScorePage() {
                     <div
                       id="result-score-circle"
                       data-tier={riskTier}
-                      className="flex h-[110px] w-[110px] items-center justify-center rounded-full border-[3px] border-cisco-blue"
+                      className="flex h-[110px] w-[110px] items-center justify-center border-[3px] border-cisco-blue"
                     >
-                      <div className="flex h-[84px] w-[84px] items-center justify-center rounded-full bg-slate-950 text-[26px] font-semibold text-cisco-blue">
+                      <div className="flex h-[84px] w-[84px] items-center justify-center bg-white text-[26px] font-semibold text-cisco-blue border border-gray-200">
                         {riskPct}%
                       </div>
                     </div>
-                    <div className="text-[9px] uppercase tracking-[0.18em] text-slate-400">
+                    <div className="text-[9px] uppercase tracking-[0.18em] text-gray-500">
                       Risk Score
                     </div>
                   </div>
                   <div>
-                    <h2 className="mb-1 text-[21px] font-thin text-slate-50">
+                    <h2 className="mb-1 text-[21px] font-thin text-cisco-navy">
                       {tierCopy.title}
                     </h2>
-                    <p className="text-[13px] text-slate-200">
+                    <p className="text-[13px] text-gray-700">
                       {tierCopy.subtitle}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4 bg-slate-950 px-5 py-5 md:px-6 md:py-6">
+              <div className="space-y-4 bg-white px-5 py-5 md:px-6 md:py-6">
                 {/* breakdown */}
                 <section className="space-y-2">
-                  <h3 className="text-sm font-semibold text-slate-100">
+                  <h3 className="text-sm font-semibold text-cisco-navy">
                     Score breakdown by category
                   </h3>
                   <div className="space-y-2">
@@ -799,20 +894,20 @@ export default function RiskScorePage() {
                       return (
                         <div
                           key={cat}
-                          className="flex flex-col gap-1 text-[12px] text-slate-200 md:flex-row md:items-center md:gap-3"
+                          className="flex flex-col gap-1 text-[12px] text-gray-700 md:flex-row md:items-center md:gap-3"
                         >
-                          <span className="w-40 flex-none text-slate-100">
+                          <span className="w-40 flex-none text-cisco-navy">
                             {cat}
                           </span>
                           <div className="flex-1">
-                            <div className="h-1.5 w-full overflow-hidden rounded-full border border-slate-800 bg-slate-950">
+                            <div className="h-2 w-full overflow-hidden border border-gray-200 bg-white">
                               <div
-                                className={`${barColor} h-full rounded-full transition-[width] duration-300`}
+                                className={`${barColor} h-full transition-[width] duration-300`}
                                 style={{ width: `${pctCat}%` }}
                               />
                             </div>
                           </div>
-                          <span className="w-20 flex-none text-right text-[11px] text-slate-400">
+                          <span className="w-20 flex-none text-right text-[11px] text-gray-500">
                             {score.total} / {score.max} pts
                           </span>
                         </div>
@@ -823,12 +918,12 @@ export default function RiskScorePage() {
 
                 {/* findings */}
                 <section className="space-y-2">
-                  <h3 className="text-sm font-semibold text-slate-100">
+                  <h3 className="text-sm font-semibold text-cisco-navy">
                     Your key findings
                   </h3>
-                  <div className="divide-y divide-slate-800 rounded-xl border border-slate-800 bg-slate-950">
+                  <div className="divide-y divide-gray-200 border border-gray-200 bg-white">
                     {breakdownEntries.filter(([, s]) => s.total > 8).length === 0 ? (
-                      <p className="px-4 py-3 text-[12px] text-slate-300">
+                      <p className="px-4 py-3 text-[12px] text-gray-700">
                         No high-priority findings were identified based on your responses.
                         Maintaining documentation and monitoring remains essential.
                       </p>
@@ -838,16 +933,16 @@ export default function RiskScorePage() {
                         .map(([cat, score]) => (
                           <div
                             key={cat}
-                            className="grid grid-cols-[auto,minmax(0,1fr)] gap-3 px-4 py-3 text-[13px] text-slate-100"
+                            className="grid grid-cols-[auto,minmax(0,1fr)] gap-3 px-4 py-3 text-[13px] text-cisco-navy"
                           >
-                            <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-[10px] text-slate-950">
+                            <div className="mt-0.5 flex h-6 w-6 items-center justify-center bg-amber-400 text-[10px] text-[#0c0b1d]">
                               !
                             </div>
                             <div>
                               <p className="text-[13px] font-semibold">
                                 {cat}: risk identified
                               </p>
-                              <p className="text-[12px] text-slate-300">
+                              <p className="text-[12px] text-gray-600">
                                 {/* Simplified copy – full legal copy can be added here */}
                                 This category shows elevated risk based on your responses.
                               </p>
@@ -860,10 +955,10 @@ export default function RiskScorePage() {
 
                 {/* CTA */}
                 <section className="space-y-2">
-                  <h3 className="text-[17px] font-thin text-slate-50">
+                  <h3 className="text-[17px] font-thin text-cisco-navy">
                     Protect your practice starting today
                   </h3>
-                  <p className="text-[13px] text-slate-200">
+                  <p className="text-[13px] text-gray-700">
                     HIPAA Hub can move you from your current score to an audit-ready posture
                     in roughly a week. You receive all nine HIPAA policies, automated risk
                     tracking, breach notification workflows, and one-click audit export
@@ -874,19 +969,19 @@ export default function RiskScorePage() {
                       href="https://hipaahubhealth.com/signup"
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex w-full items-center justify-center rounded-none bg-cisco-blue px-4 py-2.5 text-xs font-medium text-white shadow-lg shadow-cisco-blue/25 transition hover:bg-white hover:text-cisco-navy"
+                      className="inline-flex w-full items-center justify-center rounded-none bg-cisco-blue px-4 py-2.5 text-xs font-medium text-white shadow-lg shadow-cisco-blue/20 transition hover:bg-[#0c0b1d]"
                     >
                       Start my free 14-day trial, no credit card →
                     </a>
                     <button
                       type="button"
                       onClick={() => window.print()}
-                      className="inline-flex w-full items-center justify-center rounded-none border border-slate-600 bg-slate-950 px-4 py-2.5 text-xs font-light text-slate-200 shadow-sm shadow-black/30 transition hover:bg-slate-900"
+                      className="inline-flex w-full items-center justify-center rounded-none border border-gray-300 bg-white px-4 py-2.5 text-xs font-light text-cisco-navy shadow-sm transition hover:bg-gray-50"
                     >
                       Download my PDF report
                     </button>
                   </div>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-gray-500">
                     Free trial includes all 9 HIPAA policies, risk assessment, breach
                     notification tools, and audit export.
                   </p>

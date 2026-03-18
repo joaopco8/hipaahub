@@ -72,7 +72,7 @@ const HowItWorks: React.FC = () => {
             icon={<FileText size={32} strokeWidth={1} />}
             title="Policy Management"
             subtitle="9 Customizable HIPAA Policies"
-            description="Pre-built templates aligned with OCR guidance. Customizable to your workflows. Version control included."
+            description="Missing policies are the first thing OCR looks for, and the easiest fine to avoid. 9 ready-to-activate templates, version-controlled forever."
             items={[
               "Privacy",
               "Security",
@@ -89,7 +89,7 @@ const HowItWorks: React.FC = () => {
             icon={<FolderOpen size={32} strokeWidth={1} />}
             title="Centralized Documentation"
             subtitle="Secure Documentation Repository"
-            description="Upload and organize all compliance documentation. Full-text search. One-click evidence package export."
+            description="When OCR requests your files, you have 10 days. Everything organized, searchable, and exportable in one click, not scattered across Google Drive."
           />
           <FeatureCard 
             icon={<GraduationCap size={32} strokeWidth={1} />}
