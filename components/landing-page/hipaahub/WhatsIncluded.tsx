@@ -18,12 +18,9 @@ const WhatsIncluded: React.FC<{ onDemoClick?: () => void }> = ({ onDemoClick }) 
   return (
     <section id="features" className="relative bg-cisco-navy py-20 md:py-32 overflow-hidden border-t border-white/5">
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=2000" 
-          alt="Healthcare background" 
-          className="w-full h-full object-cover opacity-[0.05] mix-blend-overlay"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-cisco-navy via-transparent to-cisco-navy"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-cisco-navy via-[#0c0b1d]/60 to-cisco-navy"></div>
+        <div className="absolute -top-20 -right-20 h-[520px] w-[520px] rounded-full bg-cisco-blue/10 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-[560px] w-[560px] rounded-full bg-cisco-green/10 blur-3xl" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-12">
@@ -84,7 +81,7 @@ const WhatsIncluded: React.FC<{ onDemoClick?: () => void }> = ({ onDemoClick }) 
              onClick={onDemoClick}
              className="bg-cisco-blue text-white px-10 py-5 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all"
            >
-             Request Platform Demo
+             Watch 3 min demo
            </button>
            <div className="flex items-center gap-4 text-gray-400 text-xs font-thin">
              <Activity className="text-cisco-blue" size={20} /> Continuous Compliance Monitoring Included

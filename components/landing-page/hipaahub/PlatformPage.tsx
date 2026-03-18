@@ -195,7 +195,7 @@ const PlatformPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 </div>
              </div>
              <button className="bg-cisco-navy text-white px-10 py-4 text-xs font-bold hover:bg-cisco-blue transition-all">
-                Request Platform Demo
+                Watch 3 min demo
              </button>
           </div>
         </div>
@@ -207,9 +207,11 @@ const PlatformPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <div className="inline-flex items-center justify-center p-4 bg-white/10 rounded-full mb-8">
             <Cpu size={32} className="text-cisco-blue" />
           </div>
-          <h2 className="text-4xl md:text-6xl font-thin mb-10 leading-[1.2]">Transform Your <br /> Compliance Posture.</h2>
+          <h2 className="text-4xl md:text-6xl font-thin mb-10 leading-[1.2]">
+            The OCR does not warn you before an audit.
+          </h2>
           <p className="text-gray-400 text-lg md:text-xl font-thin mb-12 leading-relaxed max-w-2xl mx-auto">
-            HIPAA Hub transforms compliance from reactive crisis management into continuous operational infrastructure.
+            Most therapists spend years hoping they are compliant. HIPAA Hub shows you exactly where you stand, and closes every gap before it becomes a fine.
           </p>
           <button 
             onClick={handleGetStarted}
@@ -217,6 +219,9 @@ const PlatformPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           >
             Get Started <ArrowRight size={18} className="ml-3 group-hover:translate-x-1 transition-transform" />
           </button>
+          <p className="text-gray-400 text-sm md:text-base font-thin mt-6">
+            Your practice can be audit-ready in 7 days. Start free today, no credit card.
+          </p>
         </div>
       </section>
     </div>

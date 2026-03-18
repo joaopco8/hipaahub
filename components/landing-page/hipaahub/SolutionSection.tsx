@@ -10,7 +10,7 @@ const CircularProgress: React.FC<{ percentage: number; label: string; valueDispl
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-[156px] h-[156px] flex items-center justify-center mb-8">
+      <div className="relative w-[250px] h-[250px] flex items-center justify-center mb-10">
         <svg className="w-full h-full -rotate-90 block" viewBox="0 0 128 128">
           <circle
             cx="64"
@@ -33,10 +33,10 @@ const CircularProgress: React.FC<{ percentage: number; label: string; valueDispl
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-4xl font-thin text-slate-800">{valueDisplay || `${percentage}%`}</span>
+          <span className="text-6xl font-thin text-slate-800">{valueDisplay || `${percentage}%`}</span>
         </div>
       </div>
-      <p className="text-center text-[13px] text-gray-500 max-w-[180px] leading-relaxed font-thin">{label}</p>
+      <p className="text-center text-base text-gray-500 max-w-[320px] leading-relaxed font-thin">{label}</p>
     </div>
   );
 };
@@ -44,12 +44,12 @@ const CircularProgress: React.FC<{ percentage: number; label: string; valueDispl
 const SolidCircleStat: React.FC<{ value: string; label: string }> = ({ value, label }) => {
   return (
     <div className="flex flex-col items-center">
-      <div className="w-[156px] h-[156px] flex items-center justify-center mb-8">
-        <div className="w-[146px] h-[146px] rounded-full bg-cisco-green flex items-center justify-center text-white shadow-sm overflow-hidden group">
-          <span className="text-4xl font-thin">{value}</span>
+      <div className="w-[250px] h-[250px] flex items-center justify-center mb-10">
+        <div className="w-[234px] h-[234px] rounded-full bg-cisco-green flex items-center justify-center text-white shadow-sm overflow-hidden group">
+          <span className="text-6xl font-thin">{value}</span>
         </div>
       </div>
-      <p className="text-center text-[13px] text-gray-500 max-w-[180px] leading-relaxed font-thin">{label}</p>
+      <p className="text-center text-base text-gray-500 max-w-[320px] leading-relaxed font-thin">{label}</p>
     </div>
   );
 };
@@ -64,7 +64,7 @@ const SolutionSection: React.FC = () => {
           {/* Left: Main Heading */}
           <div className="lg:col-span-4">
             <h2 className="text-[42px] font-thin text-cisco-navy leading-[1.1]">
-              The Healthcare Compliance Challenge
+              The Private Practice Compliance Challenge
             </h2>
           </div>
 
@@ -76,17 +76,18 @@ const SolutionSection: React.FC = () => {
                 <FileText className="text-gray-400" size={18} strokeWidth={1.5} />
               </div>
               <p className="text-gray-500 text-[15px] font-thin leading-relaxed max-w-2xl">
-                Most healthcare organizations store compliance documentation across Google Drive, email, and paper files. When regulators request documentation, retrieval takes weeks. Gaps emerge. Violations accumulate.
+                Most private practices store compliance documentation across Google Drive, email, and paper files. When regulators request documentation, retrieval takes weeks. Gaps emerge. Violations accumulate.
               </p>
             </div>
           </div>
         </div>
 
         {/* Stats Grid - All circles now standardized to the same visual scale */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 lg:gap-4 border-t border-gray-50 pt-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-16 xl:gap-10 border-t border-gray-50 pt-20">
           <CircularProgress 
-            percentage={72} 
-            label="of healthcare organizations have documentation gaps" 
+            percentage={33}
+            valueDisplay="1 in 3"
+            label="solo practices audited by OCR had no documented policies on file"
           />
           <CircularProgress 
             percentage={40} 
@@ -99,7 +100,7 @@ const SolutionSection: React.FC = () => {
           />
           <SolidCircleStat 
             value="4-8w" 
-            label="to retrieve documentation across multiple systems" 
+            label="OCR gives you 10 days to respond. Most solo practices need 4-8 weeks to find their documentation."
           />
         </div>
       </div>

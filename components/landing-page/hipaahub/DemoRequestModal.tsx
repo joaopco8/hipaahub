@@ -92,7 +92,7 @@ const DemoRequestModal: React.FC<DemoRequestModalProps> = ({ isOpen, onClose }) 
           <>
             {/* Header */}
             <div className="bg-cisco-navy p-8 text-white">
-              <h2 className="text-3xl font-thin mb-2">Request Platform Demo</h2>
+              <h2 className="text-3xl font-thin mb-2">Watch 3 min demo</h2>
               <p className="text-gray-300 text-sm font-thin">
                 Schedule a personalized demo of HIPAA Hub's compliance infrastructure.
               </p>

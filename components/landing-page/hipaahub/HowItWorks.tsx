@@ -93,15 +93,15 @@ const HowItWorks: React.FC = () => {
           />
           <FeatureCard 
             icon={<GraduationCap size={32} strokeWidth={1} />}
-            title="Training Management"
-            subtitle="Workforce Training & Certification"
-            description="Pre-built modules. Track completion. Automated annual refresher reminders. Compliance reports."
+            title="Staff Training"
+            subtitle="Workforce violations cause 28% of all HIPAA fines"
+            description="Track every employee, every year, automatically. Pre-built modules, completion logs, and audit-ready certificates with annual refreshers."
           />
           <FeatureCard 
             icon={<AlertTriangle size={32} strokeWidth={1} />}
             title="Breach Response"
-            subtitle="Incident Response & Breach Notification"
-            description="Breach response templates. 72-hour notification guidance. Incident documentation. Priority support."
+            subtitle="OCR requires notification within 72 hours"
+            description="When it happens, you will have the letter ready in minutes. Use structured templates, incident logging, and a response timeline built for audits."
           />
           <FeatureCard 
             icon={<ShieldCheck size={32} strokeWidth={1} />}

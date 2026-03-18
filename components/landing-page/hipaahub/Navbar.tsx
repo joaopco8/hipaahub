@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, User, LayoutDashboard } from 'lucide-react';
+import { Menu, X, User, LayoutDashboard, ArrowUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -130,12 +130,6 @@ const Navbar: React.FC<{
               {link.label}
             </button>
           ))}
-          <Link
-            href="/risk-score"
-            className="text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin py-4 h-full flex items-center"
-          >
-            Free Risk Score
-          </Link>
           <button 
             onClick={() => handleNavigation('pricing-section')}
             className="text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin py-4 h-full flex items-center"
@@ -155,6 +149,12 @@ const Navbar: React.FC<{
             </Link>
           ) : (
             <>
+              <Link
+                href="/risk-score"
+                className="hidden xl:inline-flex items-center gap-1.5 border border-cisco-blue/30 bg-cisco-blue/5 text-cisco-navy px-3 py-1.5 text-xs font-thin hover:bg-cisco-blue/10 hover:border-cisco-blue/40 transition-colors"
+              >
+                Free Risk Score <ArrowUpRight size={14} />
+              </Link>
               <Link 
                 href="/signin"
                 className="hidden sm:flex items-center space-x-2 text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin"
@@ -167,7 +167,7 @@ const Navbar: React.FC<{
                 onClick={onDemoClick}
                 className="bg-cisco-blue text-white px-4 md:px-6 py-3 text-xs md:text-sm font-thin hover:bg-cisco-navy transition-all shadow-md shadow-cisco-blue/10"
               >
-                Request Demo
+                Watch 3 min demo
               </button>
             </>
           )}
@@ -219,9 +219,10 @@ const Navbar: React.FC<{
           <div className="space-y-4">
             <Link 
               href="/risk-score"
-              className="text-xl font-thin text-cisco-navy border-b border-gray-50 pb-2 w-full text-left hover:text-cisco-blue transition-colors"
+              className="inline-flex items-center justify-between gap-4 w-full border border-cisco-blue/30 bg-cisco-blue/5 text-cisco-navy px-4 py-3 text-base font-thin hover:bg-cisco-blue/10 hover:border-cisco-blue/40 transition-colors"
             >
-              Free Risk Score
+              <span>Free Risk Score</span>
+              <ArrowUpRight size={18} />
             </Link>
             <button 
               onClick={() => handleNavigation('pricing-section')}
@@ -234,7 +235,7 @@ const Navbar: React.FC<{
                 onClick={onDemoClick}
                 className="w-full bg-cisco-blue text-white px-6 py-4 text-sm font-thin hover:bg-cisco-navy transition-all mt-6"
               >
-                Request Demo
+                Watch 3 min demo
               </button>
             )}
             {isAuthenticated && hasSubscription && (

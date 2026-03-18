@@ -26,13 +26,13 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => 
         <div className="grid lg:grid-cols-2 gap-20 items-center">
           <div className="max-w-3xl">
             <h2 className="text-4xl lg:text-[60px] font-thin leading-[1.2] mb-8 text-white">
-              Transform Your <br /> Compliance Posture.
+              The OCR does not warn you before an audit.
             </h2>
             <h3 className="text-xl md:text-2xl font-thin text-cisco-blue mb-10">
-              Get started today. Transform your compliance infrastructure.
+              Your practice can be audit-ready in 7 days. Start free today, no credit card.
             </h3>
             <p className="text-gray-400 text-lg font-thin leading-relaxed mb-12">
-              HIPAA Hub transforms compliance from reactive crisis management into continuous operational infrastructure. Centralized documentation. Automated risk assessment. Continuous audit readiness.
+              Most therapists spend years hoping they are compliant. HIPAA Hub shows you exactly where you stand, and closes every gap before it becomes a fine.
             </p>
             
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-6">
@@ -46,7 +46,7 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => 
                 onClick={onDemoClick}
                 className="text-white flex items-center justify-center text-sm font-thin hover:text-cisco-blue transition-colors group"
               >
-                Request Platform Demo <ArrowRight size={18} className="ml-3 transition-transform group-hover:translate-x-1" />
+                Watch 3 min demo <ArrowRight size={18} className="ml-3 transition-transform group-hover:translate-x-1" />
               </button>
             </div>
           </div>
