@@ -175,7 +175,7 @@ function TermsOfServicePage({ onBack }: Props) {
 
         <Section title="14. Contact">
           <div className="bg-[#f3f5f9] p-6 mt-4 space-y-2">
-            <p><strong className="text-[#0e274e] font-normal">HIPAA Hub Health, Inc. — Legal Department</strong></p>
+            <p><strong className="text-[#0e274e] font-normal">HIPAA Hub Health, Inc., Legal Department</strong></p>
             <p>150 North First Street, Suite 300</p>
             <p>San Jose, CA 95113</p>
             <p>Email: <span className="text-[#0175a2]">legal@hipaahubhealth.com</span></p>

@@ -181,7 +181,7 @@ const ResearchReportsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         reverse
         title="HIPAA Audit Preparedness Whitepaper"
         subtitle="Structured framework for preparing healthcare organizations for regulatory audit."
-        body="Audit preparation requires specific documentation, organization, and evidence. This whitepaper provides a structured framework for audit preparation—what OCR expects, how to organize documentation, and how to respond to audit requests."
+        body="Audit preparation requires specific documentation, organization, and evidence. This whitepaper provides a structured framework for audit preparation: what OCR expects, how to organize documentation, and how to respond to audit requests."
         listLabel="Topics covered:"
         listItems={[
           "OCR audit process and timeline",

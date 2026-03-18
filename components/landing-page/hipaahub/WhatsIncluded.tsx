@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import { ChevronRight, CheckCircle2, Shield, Zap, FileText, Users, Search, Archive, Activity } from 'lucide-react';
 
 const WhatsIncluded: React.FC<{ onDemoClick?: () => void }> = ({ onDemoClick }) => {
@@ -33,21 +32,18 @@ const WhatsIncluded: React.FC<{ onDemoClick?: () => void }> = ({ onDemoClick }) 
             Everything You Need for <br /> Audit Readiness.
           </h2>
           <p className="text-gray-300 text-lg md:text-xl font-thin leading-relaxed">
-            Complete compliance infrastructure in one platform.
+            See how it works in action.
           </p>
         </div>
 
-        {/* Large Platform Overview Photo */}
-        <div className="mb-20 bg-white/5 border border-white/10 rounded-none relative overflow-hidden">
-          <Image 
-            src="/images/audit-readiness-dashboard.png" 
-            alt="HIPAA Hub Compliance Overview Dashboard - Audit Readiness" 
-            width={2400}
-            height={1350}
-            className="w-full h-auto"
-            quality={100}
-            priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px"
+        {/* YouTube Video Embed */}
+        <div className="mb-20 bg-white/5 border border-white/10 rounded-none relative overflow-hidden aspect-video">
+          <iframe
+            className="w-full h-full"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_HERE"
+            title="HIPAA Hub Platform Demo"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
           />
         </div>
 

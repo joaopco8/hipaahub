@@ -63,7 +63,7 @@ function HipaaBAAPage({ onBack }: Props) {
           <p>NOW, THEREFORE, in consideration of the mutual promises and covenants contained herein, and for other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:</p>
         </Section>
 
-        <Section title="Article I — Definitions">
+        <Section title="Article I: Definitions">
           <p><strong className="text-[#0e274e] font-normal">1.1 "Business Associate"</strong> means HIPAA Hub Health, Inc., which performs functions or activities, or provides services, on behalf of a Covered Entity that involve the use or disclosure of PHI.</p>
           <p><strong className="text-[#0e274e] font-normal">1.2 "Covered Entity"</strong> means the organization subscribing to the HIPAA Hub platform, which is a covered entity as defined under 45 CFR § 160.103.</p>
           <p><strong className="text-[#0e274e] font-normal">1.3 "Protected Health Information" or "PHI"</strong> has the meaning set forth in 45 CFR § 160.103, and is limited to PHI received from, or created, maintained, or transmitted on behalf of, the Covered Entity.</p>
@@ -74,7 +74,7 @@ function HipaaBAAPage({ onBack }: Props) {
           <p><strong className="text-[#0e274e] font-normal">Note on PHI:</strong> HIPAA Hub's platform is architected to operate without storing PHI. This BAA covers any incidental or inadvertent access to PHI that may occur in the course of providing compliance support services. Covered Entities must not submit PHI to the platform except as necessary and minimally as required for generating compliant policy documentation.</p>
         </Section>
 
-        <Section title="Article II — Obligations and Activities of Business Associate">
+        <Section title="Article II: Obligations and Activities of Business Associate">
           <p><strong className="text-[#0e274e] font-normal">2.1 Use and Disclosure Limitations.</strong> Business Associate agrees to not use or disclose PHI other than as permitted or required by this BAA, the Agreement, or as required by applicable law. Business Associate shall use and disclose PHI only: (a) as necessary to perform the Services; (b) as required by applicable law; or (c) as otherwise permitted under this BAA.</p>
           <p><strong className="text-[#0e274e] font-normal">2.2 Safeguards.</strong> Business Associate agrees to implement and maintain appropriate administrative, technical, and physical safeguards to prevent use or disclosure of PHI other than as provided in this BAA, in accordance with 45 CFR Part 164 Subpart C. These safeguards include, but are not limited to:</p>
           <ul className="list-none space-y-3">
@@ -101,28 +101,28 @@ function HipaaBAAPage({ onBack }: Props) {
           <p><strong className="text-[#0e274e] font-normal">2.9 Governmental Access.</strong> Business Associate agrees to make internal practices, books, and records relating to the use and disclosure of PHI received from, or created or received by, Business Associate on behalf of the Covered Entity, available to the Secretary of HHS for purposes of determining the Covered Entity's or Business Associate's compliance with the HIPAA Rules.</p>
         </Section>
 
-        <Section title="Article III — Permitted Uses and Disclosures">
+        <Section title="Article III: Permitted Uses and Disclosures">
           <p><strong className="text-[#0e274e] font-normal">3.1 Permitted Uses.</strong> Except as otherwise limited in this BAA, Business Associate is permitted to use PHI for the proper management and administration of the Services, provided that: (a) such uses are necessary; and (b) Business Associate obtains reasonable assurances from the person to whom PHI is disclosed that the PHI will be held confidentially and used or further disclosed only as required by law or for the purposes for which it was disclosed to the person.</p>
           <p><strong className="text-[#0e274e] font-normal">3.2 Permitted Disclosures.</strong> Business Associate is permitted to disclose PHI for the following purposes: (a) as necessary to provide the Services to Covered Entity; (b) for Business Associate's proper management and administration; (c) to carry out its legal responsibilities; and (d) as required by law.</p>
           <p><strong className="text-[#0e274e] font-normal">3.3 Minimum Necessary.</strong> Business Associate agrees to use, disclose, or request only the minimum necessary PHI to accomplish the intended purpose, in accordance with 45 CFR § 164.502(b) and § 164.514(d).</p>
           <p><strong className="text-[#0e274e] font-normal">3.4 De-Identification.</strong> Business Associate may de-identify PHI in accordance with 45 CFR § 164.514 and use such de-identified data for service improvement and analytics purposes. De-identified data is not considered PHI under the HIPAA Rules.</p>
         </Section>
 
-        <Section title="Article IV — Obligations of Covered Entity">
+        <Section title="Article IV: Obligations of Covered Entity">
           <p><strong className="text-[#0e274e] font-normal">4.1 Notifications.</strong> Covered Entity shall notify Business Associate of any restriction on the use or disclosure of PHI agreed to by the Covered Entity, to the extent that such restriction may affect Business Associate's use or disclosure of PHI.</p>
           <p><strong className="text-[#0e274e] font-normal">4.2 Permissible Requests.</strong> Covered Entity shall not request Business Associate to use or disclose PHI in any manner that would not be permissible under the HIPAA Rules if done by the Covered Entity.</p>
           <p><strong className="text-[#0e274e] font-normal">4.3 PHI Submission.</strong> Covered Entity acknowledges that HIPAA Hub's platform is not designed or intended as a repository for PHI. Covered Entity shall minimize the inclusion of PHI in platform inputs and agrees to use de-identified information wherever possible. Covered Entity is solely responsible for any PHI submitted to the platform.</p>
           <p><strong className="text-[#0e274e] font-normal">4.4 Authorization.</strong> Covered Entity represents and warrants that it has obtained all required authorizations, consents, and approvals necessary to share any PHI with Business Associate under this BAA.</p>
         </Section>
 
-        <Section title="Article V — Term and Termination">
+        <Section title="Article V: Term and Termination">
           <p><strong className="text-[#0e274e] font-normal">5.1 Term.</strong> This BAA shall become effective on the date the Covered Entity activates a HIPAA Hub account and shall remain in effect until the termination of the Agreement, unless earlier terminated in accordance with this Article.</p>
           <p><strong className="text-[#0e274e] font-normal">5.2 Termination for Cause.</strong> Either party may terminate this BAA and the underlying Agreement upon thirty (30) days written notice if the other party materially breaches a provision of this BAA and does not cure the breach within the notice period. A material breach of this BAA shall be deemed a material breach of the Agreement.</p>
           <p><strong className="text-[#0e274e] font-normal">5.3 Effect of Termination.</strong> Upon termination of this BAA for any reason, Business Associate shall return or destroy all PHI received from, or created or received on behalf of, the Covered Entity that Business Associate still maintains in any form. If return or destruction of PHI is not feasible, protections shall be extended to such PHI, and uses and disclosures shall be limited to those purposes that make the return or destruction of the PHI infeasible.</p>
           <p><strong className="text-[#0e274e] font-normal">5.4 Survival.</strong> The provisions of this BAA shall survive the termination of the Agreement to the extent necessary to ensure compliance with applicable law, including the HIPAA Rules.</p>
         </Section>
 
-        <Section title="Article VI — General Provisions">
+        <Section title="Article VI: General Provisions">
           <p><strong className="text-[#0e274e] font-normal">6.1 Amendment.</strong> This BAA may be modified by HIPAA Hub to ensure compliance with applicable law, including changes to the HIPAA Rules. HIPAA Hub will provide thirty (30) days written notice of material amendments. Continued use of the Services after the effective date of the amendment constitutes acceptance.</p>
           <p><strong className="text-[#0e274e] font-normal">6.2 Interpretation.</strong> Any ambiguity in this BAA shall be resolved to permit the parties to comply with the HIPAA Rules. The parties agree to take such action as is necessary to implement the standards and requirements of the HIPAA Rules.</p>
           <p><strong className="text-[#0e274e] font-normal">6.3 No Third-Party Beneficiaries.</strong> Nothing in this BAA shall confer any rights or remedies upon any person other than the parties hereto and their respective successors and permitted assigns.</p>
@@ -131,7 +131,7 @@ function HipaaBAAPage({ onBack }: Props) {
           <p><strong className="text-[#0e274e] font-normal">6.6 Entire Agreement.</strong> This BAA, together with the Agreement and all exhibits and addenda thereto, constitutes the entire agreement between the parties with respect to the subject matter hereof, and supersedes all prior and contemporaneous agreements and understandings, whether written or oral.</p>
         </Section>
 
-        <Section title="Article VII — Liability and Indemnification">
+        <Section title="Article VII: Liability and Indemnification">
           <p><strong className="text-[#0e274e] font-normal">7.1 HIPAA Hub Indemnification.</strong> Business Associate shall indemnify, defend, and hold harmless Covered Entity and its officers, directors, employees, and agents from and against any claims, damages, penalties, fines, or expenses (including reasonable attorneys' fees) arising from Business Associate's material breach of this BAA or its failure to comply with applicable HIPAA Rules, except to the extent caused by Covered Entity's acts or omissions.</p>
           <p><strong className="text-[#0e274e] font-normal">7.2 Covered Entity Indemnification.</strong> Covered Entity shall indemnify, defend, and hold harmless Business Associate and its officers, directors, employees, and agents from and against any claims, damages, penalties, fines, or expenses (including reasonable attorneys' fees) arising from Covered Entity's material breach of this BAA, Covered Entity's violation of applicable HIPAA Rules, or Covered Entity's submission of PHI to the platform in a manner contrary to the terms of this BAA.</p>
           <p><strong className="text-[#0e274e] font-normal">7.3 Limitation of Liability.</strong> The limitation of liability provisions in the Agreement shall apply to this BAA, except to the extent prohibited by applicable law.</p>
@@ -139,7 +139,7 @@ function HipaaBAAPage({ onBack }: Props) {
 
         <Section title="Contact for BAA Inquiries">
           <div className="bg-[#f3f5f9] p-6 mt-4 space-y-2">
-            <p><strong className="text-[#0e274e] font-normal">HIPAA Hub Health, Inc. — Compliance Officer</strong></p>
+            <p><strong className="text-[#0e274e] font-normal">HIPAA Hub Health, Inc., Compliance Officer</strong></p>
             <p>150 North First Street, Suite 300</p>
             <p>San Jose, CA 95113</p>
             <p>Email: <span className="text-[#0175a2]">compliance@hipaahubhealth.com</span></p>

@@ -776,9 +776,7 @@ export default function HeroSketchy() {
 
                 {/* Trust Text */}
                 <p className="text-[10px] sm:text-xs md:text-sm text-zinc-600 font-light text-center">
-                  Trusted by{' '}
-                  <span className="font-semibold text-[#0c0b1d]">1,000+ clinics</span>
-                  {' '}across the United States
+                  Trusted by independent practices across the United States
                 </p>
               </motion.div>
             </motion.div>

@@ -130,6 +130,12 @@ const Navbar: React.FC<{
               {link.label}
             </button>
           ))}
+          <Link
+            href="/risk-score"
+            className="text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin py-4 h-full flex items-center"
+          >
+            Free Risk Score
+          </Link>
           <button 
             onClick={() => handleNavigation('pricing-section')}
             className="text-gray-600 hover:text-cisco-blue transition-colors text-sm font-thin py-4 h-full flex items-center"
@@ -211,6 +217,12 @@ const Navbar: React.FC<{
           ))}
           
           <div className="space-y-4">
+            <Link 
+              href="/risk-score"
+              className="text-xl font-thin text-cisco-navy border-b border-gray-50 pb-2 w-full text-left hover:text-cisco-blue transition-colors"
+            >
+              Free Risk Score
+            </Link>
             <button 
               onClick={() => handleNavigation('pricing-section')}
               className="text-xl font-thin text-cisco-navy border-b border-gray-50 pb-2 w-full text-left"

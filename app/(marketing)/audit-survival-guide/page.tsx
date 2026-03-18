@@ -71,11 +71,7 @@ export default function AuditSurvivalGuidePage() {
                       <TextHighlight variant="bold" color="green">
                         30 days
                       </TextHighlight>
-                      . Used by{' '}
-                      <TextHighlight variant="bold" color="default">
-                        500+ clinics
-                      </TextHighlight>
-                      {' '}to pass audits without fines.
+                      . Built for independent practices to pass audits without fines.
                     </p>
                   </motion.div>
                 </motion.div>

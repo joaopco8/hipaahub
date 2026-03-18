@@ -20,17 +20,21 @@ const Hero: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void 
       <div className="relative z-20 max-w-7xl mx-auto w-full px-4 md:pl-0 md:pr-12">
         <div className="text-white max-w-5xl">
           <div className="animate-reveal [animation-delay:200ms] opacity-0">
-            <p className="text-sm md:text-lg font-thin mb-4 md:mb-6 text-cisco-blue">Proprietary Compliance SaaS</p>
+            <p className="text-sm md:text-lg font-thin mb-4 md:mb-6 text-cisco-blue">
+              For private practice therapists &amp; mental health clinics
+            </p>
           </div>
           <div className="animate-reveal [animation-delay:400ms] opacity-0">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-thin mb-6 md:mb-8 leading-[1.1]">
-              Complete HIPAA Compliance.<br className="hidden md:block" /> Structured. Automated. Audit Ready.
+              HIPAA compliant in 7 days.{" "}
+              <br className="hidden md:block" />
+              Without the $10,000 consultant.
             </h1>
           </div>
           <div className="animate-reveal [animation-delay:600ms] opacity-0">
             <div className="max-w-2xl text-base md:text-lg text-gray-300 font-thin leading-relaxed mb-10 md:mb-12 space-y-6">
               <p className="text-white font-thin opacity-90">
-                Centralize policies, automate risk assessments, track vendors and incidents, and maintain continuous audit readiness in one secure platform.
+                HIPAA Hub gives solo therapists and small clinics ready-made policies, automated risk assessments, and one-click audit exports, so you stay protected without the paperwork.
               </p>
             </div>
           </div>
@@ -40,16 +44,18 @@ const Hero: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void 
                 onClick={onAssessmentClick}
                 className="w-full sm:w-auto bg-cisco-blue text-white px-8 md:px-12 py-4 md:py-6 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all border-none rounded-none shadow-2xl shadow-cisco-blue/20"
               >
-                Get Started
+                Start free, no credit card
               </button>
               <button 
                 onClick={onDemoClick}
                 className="w-full sm:w-auto border border-white/20 text-white px-8 md:px-12 py-4 md:py-6 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all rounded-none"
               >
-                Request Platform Demo
+                Watch 3-min demo
               </button>
             </div>
-            <p className="mt-6 text-[10px] text-gray-500 font-thin">Cancel anytime.</p>
+            <p className="mt-6 text-xs md:text-sm text-gray-500 font-thin">
+              Cancel anytime · 14-day free trial · HIPAA BAA included
+            </p>
           </div>
         </div>
       </div>

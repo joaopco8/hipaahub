@@ -19,7 +19,7 @@ const problems = [
   },
   {
     icon: FileQuestion,
-    text: 'Evidence exists — but no one knows where'
+    text: 'Evidence exists, but no one knows where'
   },
   {
     icon: AlertTriangle,

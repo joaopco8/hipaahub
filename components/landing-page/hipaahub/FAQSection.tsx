@@ -26,32 +26,32 @@ const FAQItem: React.FC<{ question: string; answer: string }> = ({ question, ans
 const FAQSection: React.FC = () => {
   const faqs = [
     {
-      question: "How does the Risk Assessment Engine work?",
-      answer: "The Risk Assessment Engine evaluates your organization against HIPAA regulatory requirements. It identifies gaps, quantifies compliance risk, and produces a risk score (0-100). The assessment takes 1-2 hours and provides a prioritized remediation roadmap."
+      question: "Do I really need this if it's just me and one assistant?",
+      answer: "Yes. OCR audits sole proprietors and small practices at the same rate as large clinics. In fact, small practices are audited more frequently because they're less likely to have documentation ready. HIPAA Hub was built specifically for practices with 1–5 staff."
     },
     {
-      question: "Can I customize the 9 policies to my organization?",
-      answer: "Yes. All 9 policies are fully customizable to your organization's specific workflows, staff structure, and operational requirements. You can edit policies directly in the platform."
+      question: "What happens if I get audited while using HIPAA Hub?",
+      answer: "You'll have everything the OCR needs in one place. Our one-click Audit Export compiles your policies, risk assessments, training records, and incident logs into a structured evidence package, the exact format auditors expect. Most of our clients receive audit requests and respond within 24 hours."
     },
     {
-      question: "What if I already have HIPAA policies?",
-      answer: "You can upload your existing policies into HIPAA Hub. The platform will compare them against regulatory requirements and identify gaps. You can then customize or replace policies as needed."
+      question: "Does this replace a HIPAA consultant?",
+      answer: "For most small practices, yes. HIPAA Hub gives you the same policies, assessments, and documentation a consultant would produce, at a fraction of the cost. If you face an active OCR investigation, we recommend pairing our platform with legal counsel."
     },
     {
-      question: "How long does it take to get audit-ready?",
-      answer: "Most organizations are audit-ready within 7-14 days. The timeline depends on your starting compliance posture and how quickly you implement recommendations. The Risk Assessment Engine prioritizes critical gaps first."
+      question: "How long does setup actually take?",
+      answer: "Most practices are fully configured in 1–3 hours. You create your account, complete the risk assessment questionnaire (about 45 minutes), customize your 9 policy templates, and add your team. Your compliance score updates in real time as you complete each step."
     },
     {
-      question: "What happens if we're audited?",
-      answer: "HIPAA Hub provides one-click audit export. All required documentation is compiled, organized, and ready for OCR. We also provide audit support (included in Professional and Enterprise plans)."
+      question: "What if I already have HIPAA policies from somewhere else?",
+      answer: "Upload them to your Evidence Center and we'll keep them versioned and audit-ready. Many clients start with existing policies and use HIPAA Hub to fill the gaps the Risk Assessment identifies."
     },
     {
-      question: "Is my data secure?",
-      answer: "Yes. HIPAA Hub uses AES-256 encryption, role-based access controls, multi-factor authentication, and SOC 2 Type II compliance. We maintain a HIPAA Business Associate Agreement with all customers."
+      question: "Is my patient data stored in HIPAA Hub?",
+      answer: "No. HIPAA Hub stores your compliance documentation: policies, training records, risk assessments, incident logs. No PHI (patient health information) is ever stored on our platform. We sign a Business Associate Agreement with every customer."
     },
     {
       question: "Can I cancel anytime?",
-      answer: "Yes. You can cancel your subscription anytime with no penalty. Your data remains accessible for 30 days after cancellation."
+      answer: "Yes. No contracts, no cancellation fees. If you cancel, you can export all your documentation before your account closes."
     },
     {
       question: "What support do you offer?",

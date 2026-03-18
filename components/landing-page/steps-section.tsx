@@ -66,7 +66,7 @@ const steps = [
     title: "Review Your Compliance Score & Risk Analysis",
     subtitle: "Real-time vulnerability dashboard",
     description: "See your compliance status at a glance. Our engine calculates your legal exposure score, highlights critical gaps, and provides a prioritized remediation roadmap with step-by-step guidance.",
-    example: "Example: \"82% Compliant — 3 Critical Issues Detected\" with actionable fix recommendations",
+    example: "Example: \"82% Compliant, 3 Critical Issues Detected\" with actionable fix recommendations",
     icon: Search,
     features: [
       "Visual compliance dashboard",
@@ -195,7 +195,7 @@ export default function StepsSection() {
                   You&apos;re 100% audit-ready and legally defensible
                 </h3>
                 <p className="text-xl text-white/70 font-light leading-relaxed">
-                  Your entire compliance infrastructure — documented, evidenced, and ready for regulatory inspection.
+                  Your entire compliance infrastructure: documented, evidenced, and ready for regulatory inspection.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 pt-4">
                   <Link href="/signup">

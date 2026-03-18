@@ -48,24 +48,24 @@ const BlogSection: React.FC<{ onReadMore: (post: Post) => void }> = ({ onReadMor
       id: '1',
       category: "Regulatory",
       title: "OCR Audit Trends: What small clinics need to know for 2024",
-      date: "May 15, 2024",
-      author: "Dr. Sarah Mitchell",
+      date: "February 18, 2026",
+      author: "Dr. Marcus Chen",
       image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800"
     },
     {
       id: '2',
       category: "Cybersecurity",
       title: "The rising threat of ransomware in private medical practices",
-      date: "May 10, 2024",
-      author: "David Chen",
+      date: "February 10, 2026",
+      author: "Jordan Vasquez",
       image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
     },
     {
       id: '3',
       category: "Best Practices",
       title: "5 common documentation mistakes that lead to HIPAA fines",
-      date: "May 03, 2024",
-      author: "James Wilson",
+      date: "February 3, 2026",
+      author: "Priya Nair",
       image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800"
     }
   ];

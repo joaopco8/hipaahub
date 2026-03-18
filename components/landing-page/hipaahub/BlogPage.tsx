@@ -20,7 +20,7 @@ const ALL_POSTS: Post[] = [
     category: 'Regulatory',
     title: 'OCR Audit Trends: What small clinics need to know for 2026',
     date: 'February 18, 2026',
-    author: 'Dr. Sarah Mitchell',
+    author: 'Dr. Marcus Chen',
     excerpt: 'The Office for Civil Rights has significantly expanded its audit program scope. Independent practices and solo practitioners are now among the primary targets. Here is what the data says and what you need to prepare.',
     readTime: '7 min read',
     image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800'
@@ -30,7 +30,7 @@ const ALL_POSTS: Post[] = [
     category: 'Cybersecurity',
     title: 'The rising threat of ransomware in private medical practices',
     date: 'February 10, 2026',
-    author: 'David Chen',
+    author: 'Jordan Vasquez',
     excerpt: 'Ransomware incidents against healthcare organizations increased 43% year over year. Unlike hospital networks, private practices often lack the security infrastructure to detect, contain, and recover from these events.',
     readTime: '9 min read',
     image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800'
@@ -40,7 +40,7 @@ const ALL_POSTS: Post[] = [
     category: 'Best Practices',
     title: '5 common documentation mistakes that lead to HIPAA fines',
     date: 'February 3, 2026',
-    author: 'James Wilson',
+    author: 'Priya Nair',
     excerpt: 'OCR enforcement data consistently identifies the same five documentation failures across investigated organizations. Understanding these patterns is the fastest way to close your compliance gaps.',
     readTime: '6 min read',
     image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800'
@@ -50,7 +50,7 @@ const ALL_POSTS: Post[] = [
     category: 'Risk Management',
     title: 'Security Risk Analysis: The single most important HIPAA document',
     date: 'January 27, 2026',
-    author: 'Dr. Sarah Mitchell',
+    author: 'Dr. Marcus Chen',
     excerpt: 'OCR has made clear: a current, documented Security Risk Analysis is the foundation of HIPAA compliance. Organizations without one face the highest exposure in any investigation. This is how to conduct one correctly.',
     readTime: '11 min read',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800'
@@ -70,7 +70,7 @@ const ALL_POSTS: Post[] = [
     category: 'Breach Response',
     title: 'The 72-hour breach notification requirement: A practical guide',
     date: 'January 13, 2026',
-    author: 'Marcus Chen',
+    author: 'Dr. Marcus Chen',
     excerpt: 'When a breach is confirmed, the clock starts immediately. The 72-hour window for notifying HHS of breaches affecting 500 or more individuals is one of the most commonly violated HIPAA provisions.',
     readTime: '10 min read',
     image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=800'
@@ -90,7 +90,7 @@ const ALL_POSTS: Post[] = [
     category: 'Regulatory',
     title: 'HIPAA enforcement in 2025: The 10 largest settlements and what they signal',
     date: 'December 30, 2025',
-    author: 'Dr. Sarah Mitchell',
+    author: 'Alexandra Reed',
     excerpt: 'OCR resolved a record number of enforcement actions in 2025. An analysis of the ten largest settlements reveals consistent patterns: inadequate risk analysis, missing BAAs, and insufficient access controls.',
     readTime: '12 min read',
     image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800'

@@ -258,7 +258,7 @@ const MethodologyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         number="07"
         title="Ongoing Oversight"
         subtitle="Continuous monitoring & maintenance."
-        body="Methodology concludes with the transition to continuous oversight—quarterly reviews and annual reassessments to maintain absolute audit readiness as regulations evolve."
+        body="Methodology concludes with the transition to continuous oversight: quarterly reviews and annual reassessments to maintain absolute audit readiness as regulations evolve."
         deliverables={[
           "Quarterly compliance review schedule",
           "Annual reassessment protocol",

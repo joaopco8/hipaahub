@@ -84,7 +84,7 @@ function SecurityPage({ onBack }: Props) {
 
         <div className="bg-[#f3f5f9] border-l-4 border-[#0175a2] p-6 mb-12">
           <p className="text-[#0e274e] text-sm font-thin leading-relaxed">
-            At HIPAA Hub, security is foundational — not a feature. As a compliance platform serving the healthcare sector,
+            At HIPAA Hub, security is foundational, not a feature. As a compliance platform serving the healthcare sector,
             we hold ourselves to the same stringent security standards we help our customers achieve. This document describes
             our technical, administrative, and physical security controls, frameworks, and practices as of the last updated date above.
           </p>
@@ -118,7 +118,7 @@ function SecurityPage({ onBack }: Props) {
             icon={<Server size={16} className="text-white" />}
             title="Infrastructure"
             items={[
-              'Hosted on Amazon Web Services (AWS) — us-east-1 and us-west-2',
+              'Hosted on Amazon Web Services (AWS): us-east-1 and us-west-2',
               'SOC 2 Type II audited cloud infrastructure',
               'Network segmentation with VPC isolation',
               'Web Application Firewall (WAF) on all public endpoints',
@@ -148,7 +148,7 @@ function SecurityPage({ onBack }: Props) {
         <Section title="2. Application Security">
           <p><strong className="text-[#0e274e] font-normal">2.1 Secure Development Lifecycle (SDLC).</strong> All code undergoes peer review before merging into production. We follow OWASP Top 10 guidelines and conduct threat modeling for significant new features. Automated static analysis (SAST) and dependency vulnerability scanning run on every code commit.</p>
           <p><strong className="text-[#0e274e] font-normal">2.2 Penetration Testing.</strong> We conduct annual third-party penetration tests covering our web application, API layer, and network infrastructure. Critical and high-severity findings are remediated within 30 and 60 days, respectively. Summaries of penetration test results are available to Enterprise customers under NDA.</p>
-          <p><strong className="text-[#0e274e] font-normal">2.3 Vulnerability Management.</strong> Continuous automated scanning identifies vulnerabilities in our infrastructure and application dependencies. We subscribe to security advisories for all major software components and apply security patches within the following SLAs: Critical — 24 hours, High — 7 days, Medium — 30 days.</p>
+          <p><strong className="text-[#0e274e] font-normal">2.3 Vulnerability Management.</strong> Continuous automated scanning identifies vulnerabilities in our infrastructure and application dependencies. We subscribe to security advisories for all major software components and apply security patches within the following SLAs: Critical: 24 hours, High: 7 days, Medium: 30 days.</p>
           <p><strong className="text-[#0e274e] font-normal">2.4 API Security.</strong> All API endpoints require authenticated sessions with short-lived JWT tokens. Rate limiting is enforced on all endpoints. Input validation and output encoding are applied to prevent injection attacks. All API activity is logged with correlation IDs.</p>
         </Section>
 
@@ -179,7 +179,7 @@ function SecurityPage({ onBack }: Props) {
 
         <Section title="7. Vendor and Third-Party Security">
           <p><strong className="text-[#0e274e] font-normal">7.1 Vendor Assessment.</strong> All third-party vendors with access to customer data or our production environment undergo a security review prior to engagement. Reviews include examination of SOC 2 reports, security policies, and data processing agreements.</p>
-          <p><strong className="text-[#0e274e] font-normal">7.2 Data Processing Agreements.</strong> We execute Data Processing Agreements (DPAs) with all sub-processors handling customer data. Our current sub-processors include: Amazon Web Services (infrastructure), Supabase (database), Stripe (payments), and OpenAI (AI document generation — processed without customer PII).</p>
+          <p><strong className="text-[#0e274e] font-normal">7.2 Data Processing Agreements.</strong> We execute Data Processing Agreements (DPAs) with all sub-processors handling customer data. Our current sub-processors include: Amazon Web Services (infrastructure), Supabase (database), Stripe (payments), and OpenAI (AI document generation, processed without customer PII).</p>
           <p><strong className="text-[#0e274e] font-normal">7.3 Annual Review.</strong> Third-party vendor relationships are reviewed annually, including reassessment of their security posture and compliance status.</p>
         </Section>
 
@@ -220,7 +220,7 @@ function SecurityPage({ onBack }: Props) {
 
         <Section title="10. Contact and Security Reporting">
           <div className="bg-[#f3f5f9] p-6 mt-4 space-y-2">
-            <p><strong className="text-[#0e274e] font-normal">HIPAA Hub Health, Inc. — Security Team</strong></p>
+            <p><strong className="text-[#0e274e] font-normal">HIPAA Hub Health, Inc., Security Team</strong></p>
             <p>Email: <span className="text-[#0175a2]">security@hipaahubhealth.com</span></p>
             <p>For urgent security incidents: <span className="text-[#0175a2]">+1-800-HIPAA-HUB</span> (24/7)</p>
             <p>General inquiries: <span className="text-[#0175a2]">support@hipaahubhealth.com</span></p>

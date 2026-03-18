@@ -12,7 +12,7 @@ const steps = [
     number: '2',
     icon: Upload,
     title: 'See Your Audit Readiness Status',
-    description: 'After completing your Security Risk Analysis, HIPAA Hub analyzes your responses and shows you exactly where you stand. Upload your existing documentation or use our templates. The system instantly tells you if you\'re ready for an audit, what\'s missing, and what needs attention—all organized by risk levels and priorities.',
+    description: 'After completing your Security Risk Analysis, HIPAA Hub analyzes your responses and shows you exactly where you stand. Upload your existing documentation or use our templates. The system instantly tells you if you\'re ready for an audit, what\'s missing, and what needs attention, all organized by risk levels and priorities.',
     behindTheScenes: [
       'Your Security Risk Analysis responses are analyzed',
       'Audit readiness status is calculated based on your answers',
@@ -26,7 +26,7 @@ const steps = [
       'Backup copies are created automatically'
     ],
     timeRequired: '30-60 minutes',
-    whyItMatters: 'After answering 150+ questions in your Security Risk Analysis, you need to know: Am I ready for an audit? What\'s missing? What should I fix first? HIPAA Hub takes your responses and creates a clear action plan. You\'ll see everything you need to do, organized by risk level and priority. No guessing. No panic. Just a clear roadmap showing exactly what needs attention—and what can wait. When an auditor arrives, you\'ll already know you\'re ready because you\'ve addressed everything the system flagged.',
+    whyItMatters: 'After answering 150+ questions in your Security Risk Analysis, you need to know: Am I ready for an audit? What\'s missing? What should I fix first? HIPAA Hub takes your responses and creates a clear action plan. You\'ll see everything you need to do, organized by risk level and priority. No guessing. No panic. Just a clear roadmap showing exactly what needs attention, and what can wait. When an auditor arrives, you\'ll already know you\'re ready because you\'ve addressed everything the system flagged.',
     image: '/images/telas/Review Your Compliance.png'
   },
   {
@@ -299,7 +299,7 @@ export default function HowItWorksOptimized() {
                   </div>
 
                   <p className="text-lg text-zinc-600 font-extralight leading-relaxed">
-                    When a breach occurs, time is critical. HIPAA Hub provides pre-formatted breach notification letter templates for patients, HHS OCR, and media—ensuring you meet all regulatory deadlines without legal confusion.
+                    When a breach occurs, time is critical. HIPAA Hub provides pre-formatted breach notification letter templates for patients, HHS OCR, and media, ensuring you meet all regulatory deadlines without legal confusion.
                   </p>
 
                   <div className="bg-white/80 rounded-xl p-6 space-y-3 border border-[#1ad07a]/20">
@@ -394,7 +394,7 @@ export default function HowItWorksOptimized() {
                   </div>
 
                   <p className="text-lg text-zinc-600 font-extralight leading-relaxed">
-                    HIPAA compliance isn't just about policies—it's about people. HIPAA Hub provides comprehensive training modules and certification tracking to ensure every team member understands their role in protecting patient privacy.
+                    HIPAA compliance isn't just about policies, it's about people. HIPAA Hub provides comprehensive training modules and certification tracking to ensure every team member understands their role in protecting patient privacy.
                   </p>
 
                   <div className="bg-white/80 rounded-xl p-6 space-y-3 border border-[#0c0b1d]/20">
@@ -422,7 +422,7 @@ export default function HowItWorksOptimized() {
                   <div className="bg-[#0c0b1d]/5 rounded-xl p-6 border border-[#0c0b1d]/20">
                     <p className="text-sm font-semibold text-[#0c0b1d] mb-2">Why This Matters:</p>
                     <p className="text-sm text-zinc-700 font-extralight leading-relaxed">
-                      Auditors want proof that your staff is trained. HIPAA Hub tracks who completed training, when they completed it, and generates certificates automatically—creating an unbreakable chain of evidence for compliance.
+                      Auditors want proof that your staff is trained. HIPAA Hub tracks who completed training, when they completed it, and generates certificates automatically, creating an unbreakable chain of evidence for compliance.
                     </p>
                   </div>
                 </div>

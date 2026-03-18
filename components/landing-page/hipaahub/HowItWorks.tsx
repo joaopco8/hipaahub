@@ -112,7 +112,7 @@ const HowItWorks: React.FC = () => {
           <CTACard 
             icon={<CheckCircle2 size={32} strokeWidth={1} />}
             title="Ready to Get Started?"
-            description="Join 500+ healthcare organizations that trust HIPAA Hub for continuous compliance. Transform your compliance posture today."
+            description="HIPAA compliance for independent practices, with everything you need to stay organized and audit ready."
             ctaText="Get Started"
           />
         </div>

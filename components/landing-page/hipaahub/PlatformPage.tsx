@@ -209,7 +209,7 @@ const PlatformPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </div>
           <h2 className="text-4xl md:text-6xl font-thin mb-10 leading-[1.2]">Transform Your <br /> Compliance Posture.</h2>
           <p className="text-gray-400 text-lg md:text-xl font-thin mb-12 leading-relaxed max-w-2xl mx-auto">
-            HIPAA Hub transforms compliance from reactive crisis management into continuous operational infrastructure. Join 500+ healthcare organizations that trust us.
+            HIPAA Hub transforms compliance from reactive crisis management into continuous operational infrastructure.
           </p>
           <button 
             onClick={handleGetStarted}

@@ -144,7 +144,7 @@ const SolutionsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         id="sprint"
         title="7-Day Audit Readiness Sprint"
         subtitle="Rapid implementation for organizations with existing documentation but lacking structure."
-        body="Organizations often have compliance documentation scattered across multiple systems—Google Drive, email, paper files. When OCR requests documentation, retrieval takes weeks. Gaps emerge. Violations accumulate. The 7-Day Audit Readiness Sprint consolidates existing documentation, identifies gaps, and creates audit-defensible evidence packages."
+        body="Organizations often have compliance documentation scattered across multiple systems: Google Drive, email, paper files. When OCR requests documentation, retrieval takes weeks. Gaps emerge. Violations accumulate. The 7-Day Audit Readiness Sprint consolidates existing documentation, identifies gaps, and creates audit-defensible evidence packages."
         deliverables={[
           "Regulatory risk assessment",
           "9 customized HIPAA policies",
@@ -165,7 +165,7 @@ const SolutionsPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         reverse
         title="Full Compliance Implementation"
         subtitle="Comprehensive compliance framework for organizations requiring complete infrastructure build."
-        body="Some organizations lack not just structure, but foundational compliance infrastructure. Policies don't exist. Risk assessments have never been conducted. Staff training is informal. Full Compliance Implementation builds compliance infrastructure from ground up—regulatory mapping, policy development, risk assessment, staff certification, and ongoing monitoring."
+        body="Some organizations lack not just structure, but foundational compliance infrastructure. Policies don't exist. Risk assessments have never been conducted. Staff training is informal. Full Compliance Implementation builds compliance infrastructure from ground up: regulatory mapping, policy development, risk assessment, staff certification, and ongoing monitoring."
         deliverables={[
           "Regulatory mapping and gap analysis",
           "Complete policy framework (9+ policies)",

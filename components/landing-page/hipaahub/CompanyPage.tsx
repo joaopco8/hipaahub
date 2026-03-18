@@ -25,7 +25,7 @@ const CompanyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     {
       name: 'Priya Nair',
       title: 'VP of Customer Success',
-      background: 'Onboarded 400+ healthcare organizations to compliance infrastructure. Former compliance director.',
+      background: 'Onboarded healthcare organizations to compliance infrastructure. Former compliance director.',
       image: '/images/Priya Nair.png'
     }
   ];
@@ -34,7 +34,7 @@ const CompanyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     {
       icon: Shield,
       title: 'Security by Design',
-      description: 'Every architectural decision begins with a security question. AES-256 encryption, zero-trust access models, and quarterly penetration testing are not optional add-ons — they are foundational.'
+      description: 'Every architectural decision begins with a security question. AES-256 encryption, zero-trust access models, and quarterly penetration testing are not optional add-ons, they are foundational.'
     },
     {
       icon: Target,
@@ -55,10 +55,10 @@ const CompanyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
   const milestones = [
     { year: '2021', event: 'HIPAA Hub founded in response to rising OCR enforcement actions against independent practices.' },
-    { year: '2022', event: 'First version of the Risk Assessment Engine deployed. 120+ pilot organizations onboarded.' },
+    { year: '2022', event: 'First version of the Risk Assessment Engine deployed. Pilot organizations onboarded.' },
     { year: '2023', event: 'SOC 2 Type II certification achieved. Policy Generator and Evidence Center launched.' },
     { year: '2024', event: 'Breach Notification Builder and Vendor BAA Tracker released. Expanded to multi-provider clinics.' },
-    { year: '2025', event: 'Growth tier launched with Incident Management and Compliance Dashboard. 1,200+ active organizations.' },
+    { year: '2025', event: 'Growth tier launched with Incident Management and Compliance Dashboard.' },
     { year: '2026', event: 'PRO tier introduced. HITRUST CSF alignment completed. Continued expansion across all 50 states.' }
   ];
 
@@ -105,15 +105,15 @@ const CompanyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               The Office for Civil Rights investigates hundreds of organizations annually. The majority of enforcement actions involve documentation failures that could have been prevented with organized, accessible compliance infrastructure.
             </p>
             <p className="text-gray-500 font-thin leading-relaxed">
-              We provide that infrastructure — purpose-built, security-certified, and aligned to the specific requirements of HIPAA's Privacy Rule, Security Rule, and Breach Notification Rule.
+              We provide that infrastructure: purpose-built, security-certified, and aligned to the specific requirements of HIPAA's Privacy Rule, Security Rule, and Breach Notification Rule.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-6">
             {[
-              { value: '1,200+', label: 'Healthcare Organizations' },
-              { value: '40+', label: 'States Covered' },
+              { value: '50', label: 'States Covered' },
               { value: '99.99%', label: 'Platform Uptime SLA' },
-              { value: 'SOC 2', label: 'Type II Certified' }
+              { value: 'SOC 2', label: 'Type II Certified' },
+              { value: 'HIPAA', label: 'Compliant Platform' }
             ].map((stat, idx) => (
               <div key={idx} className="border border-gray-100 p-8">
                 <div className="text-3xl font-thin text-[#0175a2] mb-2">{stat.value}</div>
@@ -242,7 +242,7 @@ const CompanyPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               },
               {
                 cert: 'Pen Testing',
-                issuer: 'Quarterly — Third Party',
+                issuer: 'Quarterly, Third Party',
                 desc: 'Quarterly penetration testing by independent security firm. Critical findings remediated within 72 hours, medium within 30 days.'
               }
             ].map((item, idx) => (

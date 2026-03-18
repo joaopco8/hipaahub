@@ -63,7 +63,7 @@ export default function CoreModulesSection() {
             </h2>
             
             <p className="text-xl md:text-2xl text-zinc-600 max-w-3xl mx-auto font-extralight">
-              Every requirement. Every control. Every proof — connected, tracked, defensible.
+              Every requirement. Every control. Every proof: connected, tracked, defensible.
             </p>
           </div>
 

@@ -80,7 +80,7 @@ const ResearchPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           <div className="flex flex-wrap gap-6 mt-10 text-xs font-thin text-gray-400">
             <span className="flex items-center gap-2"><FileText size={14} className="text-[#0175a2]" /> 48 pages</span>
             <span className="flex items-center gap-2"><CheckCircle size={14} className="text-[#1ad07a]" /> Published Q1 2026</span>
-            <span className="flex items-center gap-2"><Lock size={14} className="text-gray-400" /> Complimentary — registration required</span>
+            <span className="flex items-center gap-2"><Lock size={14} className="text-gray-400" /> Complimentary, registration required</span>
           </div>
         </div>
       </div>
@@ -238,7 +238,7 @@ const ResearchPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       ) : (
                         <>
                           <Download size={16} />
-                          Download Report — Free
+                          Download Report, Free
                         </>
                       )}
                     </button>

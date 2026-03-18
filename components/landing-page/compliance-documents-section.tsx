@@ -19,7 +19,7 @@ export default function ComplianceDocumentsSection() {
                   All HIPAA Policies. Generated. Audit-Ready.
                 </h2>
                 <p className="text-xl md:text-2xl text-zinc-600 font-extralight leading-relaxed">
-                  Everything your organization is legally required to have — generated automatically, customized to your practice, and defensible in an OCR audit.
+                  Everything your organization is legally required to have: generated automatically, customized to your practice, and defensible in an OCR audit.
                 </p>
                 <p className="text-base md:text-lg text-zinc-500 font-extralight leading-relaxed">
                   HIPAA Hub generates the complete set of required HIPAA policies based on your organization profile and security risk analysis.

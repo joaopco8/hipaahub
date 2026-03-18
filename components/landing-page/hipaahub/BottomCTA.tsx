@@ -4,9 +4,6 @@ import { CheckCircle2, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 
 const BottomCTA: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void }> = ({ onAssessmentClick, onDemoClick }) => {
   const trustItems = [
-    "500+ healthcare organizations",
-    "100% audit success rate",
-    "Average risk reduction: 50 pts",
     "99.99% platform uptime",
     "SOC 2 Type II certified",
     "HIPAA compliant",
@@ -70,25 +67,12 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => 
             
             <div className="mt-12 pt-8 border-t border-white/5 flex items-center gap-6">
                <div className="flex -space-x-3">
-                  {[
-                    "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200",
-                    "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=200",
-                    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
-                    "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=200"
-                  ].map((img, i) => (
-                    <div key={i} className="relative w-10 h-10 rounded-full bg-gray-600 border-2 border-white/20 overflow-hidden">
-                      <Image 
-                        src={img} 
-                        alt={`Healthcare professional ${i + 1}`} 
-                        fill
-                        className="object-cover grayscale brightness-95" 
-                        quality={90}
-                        sizes="40px"
-                      />
-                    </div>
-                  ))}
+                  {/* Neutral placeholder group avatar */}
+                  <div className="relative w-10 h-10 rounded-full bg-gray-700 border-2 border-white/20 flex items-center justify-center text-[10px] text-gray-300 font-thin">
+                    HIPAA
+                  </div>
                </div>
-               <p className="text-xs text-gray-500 font-thin leading-tight">Join 500+ <br /> Secure Clinics</p>
+               <p className="text-xs text-gray-500 font-thin leading-tight">HIPAA compliance for independent practices</p>
             </div>
           </div>
         </div>

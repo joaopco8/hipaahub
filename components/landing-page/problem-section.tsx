@@ -17,7 +17,7 @@ export default function ProblemSection() {
             
             <p className="text-xl md:text-2xl text-zinc-600 max-w-3xl mx-auto font-extralight">
               HIPAA is not about knowing the rules.<br />
-              It's about proving you follow them — with evidence.
+              It's about proving you follow them, with evidence.
             </p>
           </div>
 

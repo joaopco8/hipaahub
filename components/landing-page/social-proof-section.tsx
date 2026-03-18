@@ -135,7 +135,7 @@ export default function SocialProofSection() {
                 whileHover={{ scale: 1.05 }}
               >
                 <Users className="w-5 h-5 text-[#1ad07a]" />
-                <span className="text-base font-light text-zinc-700">Used by 500+ clinics across the U.S.</span>
+                <span className="text-base font-light text-zinc-700">HIPAA compliance for independent practices</span>
               </motion.div>
             </motion.div>
 

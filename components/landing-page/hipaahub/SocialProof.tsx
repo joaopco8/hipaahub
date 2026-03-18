@@ -9,73 +9,48 @@ interface Testimonial {
   author: string;
   role: string;
   organization: string;
-  image: string;
 }
 
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    quote: "Implementing HIPAA Hub reduced our documentation retrieval time by 80%. When our OCR audit request came in, we had everything organized and ready within hours instead of weeks.",
-    author: "Marcus Thorne",
-    role: "Director of Compliance",
-    organization: "Regional Medical Associates",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=800",
+    quote:
+      "Honestly? I almost cried when I got the OCR inquiry letter. I'm a one-person practice, I see 24 clients a week, I don't have an IT department or a compliance officer, I have me. I spent that whole first night panicking. Then I remembered I had everything in HIPAA Hub. Pulled up the audit export, had the full package ready by noon the next day. The investigator closed the inquiry in 3 weeks. I still can't believe it was that straightforward.",
+    author: "Sarah K.",
+    role: "LCSW · Solo Private Practice",
+    organization: "Portland, OR",
   },
   {
     id: 2,
-    quote: "As a solo practitioner, I had no idea where to begin with HIPAA. HIPAA Hub gave me a clear roadmap, generated all my policies, and now I actually feel confident in my compliance posture.",
-    author: "Dr. Sarah Mitchell",
-    role: "Family Medicine Physician",
-    organization: "Mitchell Family Practice",
-    image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=800",
+    quote:
+      "We're a three-provider behavioral health clinic. Before HIPAA Hub, our 'compliance system' was a shared Google Drive folder and a prayer. Our policies hadn't been updated since 2019. When our malpractice insurance carrier asked for our risk assessment documentation during renewal, we had nothing. Signed up for HIPAA Hub on a Tuesday, had a completed risk assessment and all nine policies activated by Thursday. Renewal went through without issue. At $297 a month it's genuinely one of the easiest ROI decisions we've made.",
+    author: "Marcus T.",
+    role: "Practice Administrator",
+    organization: "3-Provider Behavioral Health Clinic · Denver, CO",
   },
   {
     id: 3,
-    quote: "We were spending thousands on compliance consultants every year. HIPAA Hub replaced that entirely. The automated risk assessments and policy generation are accurate and built for real clinical environments.",
-    author: "James Okafor",
-    role: "Chief Operating Officer",
-    organization: "Westside Mental Health Clinic",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800",
+    quote:
+      "Ok so I just opened my practice last year and HIPAA compliance was lowkey the thing I was most stressed about. Like they don't really teach you this stuff in grad school? I looked into hiring a consultant and the quotes I got were anywhere from $3,500 to $8,000 just to get started. A colleague mentioned HIPAA Hub and I figured I'd try the trial. Set everything up in a weekend, got my policies done, did the risk assessment. It's been eight months and I genuinely don't stress about compliance anymore. That alone is worth every penny.",
+    author: "Jordan M.",
+    role: "LPC · Private Practice",
+    organization: "Nashville, TN",
   },
   {
     id: 4,
-    quote: "Our staff training compliance went from 40% to 100% within the first month. The platform tracks everything automatically and sends reminders. I no longer chase people down for attestations.",
-    author: "Linda Park",
-    role: "HR & Compliance Manager",
-    organization: "Harmony Dental Group",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800",
+    quote:
+      "I'll be candid: I was skeptical of a software solution for something as serious as HIPAA compliance. We're a four-physician specialty clinic and I've seen practices get fined not because they lacked documentation, but because their documentation couldn't be produced in time or wasn't in the format OCR expected. What changed my mind about HIPAA Hub was the audit export feature. The package it generates is structured exactly the way federal investigators expect to receive it. We've since moved our entire compliance infrastructure to the platform. I'd recommend it to any practice that takes regulatory risk seriously.",
+    author: "Dr. R. Patel, MD",
+    role: "Specialty Clinic",
+    organization: "Houston, TX",
   },
   {
     id: 5,
-    quote: "After a breach incident at a peer clinic, we knew we needed to get serious. HIPAA Hub helped us build an incident response plan, vendor BAA registry, and a complete audit trail in under two weeks.",
-    author: "Robert Vasquez",
-    role: "Practice Administrator",
-    organization: "Southwest Orthopedic Center",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 6,
-    quote: "The breach notification builder alone is worth the subscription. It walks you through every regulatory requirement and generates a properly formatted letter. What used to take days now takes 30 minutes.",
-    author: "Dr. Amara Osei",
-    role: "Medical Director",
-    organization: "Northview Women's Health",
-    image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 7,
-    quote: "We manage 14 providers across three locations. HIPAA Hub gives us a centralized view of compliance across all sites. The dashboard makes it easy to identify gaps before they become violations.",
-    author: "Thomas Bergmann",
-    role: "VP of Operations",
-    organization: "Tri-State Physical Therapy",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 8,
-    quote: "I reviewed every HIPAA compliance tool on the market before choosing HIPAA Hub. The risk assessment engine is clinically accurate, the documentation is professional, and the support team actually understands healthcare.",
-    author: "Christine Nakamura",
-    role: "Privacy Officer",
-    organization: "Pacific Coast Pediatrics",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&q=80&w=800",
+    quote:
+      "I'm gonna be real with you: I knew we had compliance gaps for two years. Just kept putting it off because it felt overwhelming and expensive to fix. Then we had a ransomware incident. Nothing catastrophic, our EHR vendor contained it, but we had to self-report. Do you know how fast you need to move when you're self-reporting a breach to OCR with no documentation ready? It's a nightmare. We found HIPAA Hub during that exact crisis. Got the breach notification letter drafted in the platform, had our incident log organized, had our policies updated within the week. We got through it. But I wish I hadn't waited for an incident to take this seriously.",
+    author: "T. Okafor",
+    role: "Practice Owner · Family Mental Health Clinic",
+    organization: "Atlanta, GA",
   },
 ];
 
@@ -113,47 +88,36 @@ const SocialProof: React.FC = () => {
 
         {/* Section label */}
         <div className="mb-12 text-center">
-          <p className="text-[11px] font-thin text-[#0175a2] tracking-widest uppercase mb-3">Customer Stories</p>
-          <h2 className="text-3xl font-thin text-[#0e274e]">Trusted by healthcare organizations across the US</h2>
+          <p className="text-[11px] font-thin text-[#0175a2] tracking-widest uppercase mb-3">
+            Customer Stories
+          </p>
+          <h2 className="text-3xl font-thin text-[#0e274e]">
+            How private practices use HIPAA Hub in real incidents
+          </h2>
         </div>
 
-        {/* Main testimonial card */}
-        <div className={`bg-white border border-gray-100 shadow-sm flex flex-col lg:flex-row min-h-[420px] transition-opacity duration-200 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-
-          {/* Quote area */}
-          <div className="flex-grow p-10 md:p-16 lg:w-3/4 flex flex-col justify-between">
+        {/* Main testimonial card (no photos) */}
+        <div
+          className={`bg-white border border-gray-100 shadow-sm flex flex-col min-h-[320px] transition-opacity duration-200 ${
+            isTransitioning ? 'opacity-0' : 'opacity-100'
+          }`}
+        >
+          <div className="flex-grow p-10 md:p-16 flex flex-col justify-between">
             <div>
-              {/* Large decorative quote mark */}
-              <div className="text-[80px] leading-none font-thin text-gray-100 select-none -mb-4">&ldquo;</div>
-              <p className="text-gray-700 leading-relaxed text-lg md:text-xl font-thin max-w-3xl">
+              <div className="text-[40px] leading-none font-thin text-gray-200 select-none mb-4">
+                “
+              </div>
+              <p className="text-gray-700 leading-relaxed text-base md:text-lg font-thin max-w-3xl">
                 {current.quote}
               </p>
             </div>
 
-            <div className="mt-10 flex items-center gap-4">
-              <img
-                src={current.image}
-                alt={current.author}
-                className="w-12 h-12 rounded-full object-cover grayscale brightness-95 flex-shrink-0"
-              />
-              <div>
-                <p className="font-thin text-[#0e274e] text-sm">{current.author}</p>
-                <p className="text-gray-400 text-xs font-thin mt-0.5">
-                  {current.role} &mdash; {current.organization}
-                </p>
-              </div>
+            <div className="mt-8">
+              <p className="font-thin text-[#0e274e] text-sm">{current.author}</p>
+              <p className="text-gray-400 text-xs font-thin mt-0.5">
+                {current.role} · {current.organization}
+              </p>
             </div>
-          </div>
-
-          {/* Right full photo */}
-          <div className="lg:w-1/4 relative min-h-[280px] lg:min-h-full overflow-hidden border-l border-gray-50">
-            <img
-              key={current.id}
-              src={current.image}
-              alt={current.author}
-              className="absolute inset-0 w-full h-full object-cover object-top grayscale brightness-90"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0e274e]/40 to-transparent" />
           </div>
         </div>
 

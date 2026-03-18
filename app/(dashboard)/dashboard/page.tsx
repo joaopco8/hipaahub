@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   CheckCircle2,
@@ -9,19 +9,23 @@ import {
   FileText,
   Users,
   AlertTriangle,
-  TrendingDown,
-  TrendingUp,
   Clock,
   Calendar,
   Building2,
-  Activity
+  Activity,
+  ArrowRight,
+  Download,
+  FileCheck,
+  UserCheck,
+  FileX,
+  XCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import {
   getCachedUser,
   getCachedDashboardData
 } from '@/lib/cache/dashboard-cache';
-import { getPolicyDocumentsCount, getActivityFeed } from '@/utils/supabase/queries';
+import { getPolicyDocumentsCount } from '@/utils/supabase/queries';
 import { getEvidenceStatistics } from '@/app/actions/compliance-evidence';
 
 export const revalidate = 30;
@@ -41,8 +45,6 @@ export default async function DashboardPage() {
   }
 
   const supabase = createClient();
-
-  // Get organization ID
   const orgId = (organization as any).id;
 
   // Fetch all data in parallel
@@ -51,8 +53,7 @@ export default async function DashboardPage() {
     evidenceStatsResult,
     trainingResult,
     businessAssociatesResult,
-    incidentsResult,
-    breachNotificationsResult
+    incidentsResult
   ] = await Promise.all([
     getPolicyDocumentsCount(supabase, user.id),
     getEvidenceStatistics().catch(() => ({
@@ -77,18 +78,9 @@ export default async function DashboardPage() {
       .eq('organization_id', orgId)
       .order('date_discovered', { ascending: false })
       .then((result: any) => result.error ? { data: [] } : result)
-      .catch(() => ({ data: [] })),
-    (supabase as any)
-      .from('breach_notifications')
-      .select('*')
-      .eq('organization_id', orgId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .then((result: any) => result.error ? { data: [] } : result)
       .catch(() => ({ data: [] }))
   ]);
 
-  // Handle results with error checking
   const evidenceStats = evidenceStatsResult || {
     total: 0, by_status: {} as any, by_type: {} as any,
     by_category: {} as any, expiring_soon: 0, requires_review: 0
@@ -97,15 +89,11 @@ export default async function DashboardPage() {
   const trainingRecords: any[] = trainingResult?.data || [];
   const vendors: any[] = businessAssociatesResult?.data || [];
   const incidents: any[] = incidentsResult?.data || [];
-  const lastBreachNotification = breachNotificationsResult?.data?.[0] || null;
 
   // ── Training Metrics ──────────────────────────────────────────────────────
   const now = new Date();
   const completedTrainings = trainingRecords.filter(
     (r: any) => r.completion_status === 'completed' && new Date(r.expiration_date) > now
-  );
-  const expiredTrainings = trainingRecords.filter(
-    (r: any) => r.completion_status === 'expired' || (r.completion_status === 'completed' && new Date(r.expiration_date) <= now)
   );
   const employeesTrained = completedTrainings.length;
   const employeesTotal = Math.max(staffMembers.length, employeesTrained, trainingRecords.length > 0 ? 1 : 0) || 1;
@@ -115,50 +103,161 @@ export default async function DashboardPage() {
   const pendingActionItems = actionItems.filter(item => item.status === 'pending');
   const criticalItems = pendingActionItems.filter(item => item.priority === 'critical');
   const highItems = pendingActionItems.filter(item => item.priority === 'high');
-  const completedItems = actionItems.filter(item => item.status === 'completed');
 
-  // ── Risk Level ────────────────────────────────────────────────────────────
-  const riskLevel = riskAssessment?.risk_level || 'high';
-  const riskColor = riskLevel === 'low' ? '#71bc48' : riskLevel === 'medium' ? '#fbab18' : '#e2231a';
-  const riskLabel = riskLevel === 'low' ? 'Low Risk' : riskLevel === 'medium' ? 'Moderate Risk' : 'High Risk';
+  // ── Compliance Score Calculation (4 components, 25 pts each) ─────────────
+  // 1. Documentation (Policies) - 25 pts
+  const documentationScore = Math.round((policiesCompleted / Math.max(policiesTotal, 9)) * 25);
+  
+  // 2. Risk Management - 25 pts (based on risk assessment)
+  const hasRiskAssessment = !!riskAssessment;
+  const riskAssessmentDate = riskAssessment?.updated_at || riskAssessment?.created_at;
+  let riskManagementScore = 0;
+  if (hasRiskAssessment && riskAssessmentDate) {
+    const assessmentDate = new Date(riskAssessmentDate);
+    const monthsSinceAssessment = (now.getTime() - assessmentDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
+    if (monthsSinceAssessment <= 12) {
+      riskManagementScore = 25; // Current
+    } else if (monthsSinceAssessment <= 24) {
+      riskManagementScore = 15; // Outdated
+    } else {
+      riskManagementScore = 5; // Very outdated
+    }
+  }
 
-  // ── Compliance Score Calculation ─────────────────────────────────────────
-  const policyScore = Math.round((policiesCompleted / policiesTotal) * 30);
+  // 3. Training - 25 pts
   const trainingScore = Math.round((trainingRate / 100) * 25);
-  const actionScore = actionItems.length > 0
-    ? Math.round((1 - pendingActionItems.length / actionItems.length) * 25)
-    : 25;
-  const validEvidence = (evidenceStats.by_status as any)['VALID'] || 0;
-  const evidenceScore = evidenceStats.total > 0
-    ? Math.round((validEvidence / evidenceStats.total) * 20)
-    : 0;
-  const complianceScore = Math.min(100, policyScore + trainingScore + actionScore + evidenceScore);
-  const scoreColor = complianceScore >= 80 ? '#71bc48' : complianceScore >= 60 ? '#fbab18' : '#e2231a';
-  const scoreLabel = complianceScore >= 80 ? 'Compliant' : complianceScore >= 60 ? 'Moderate Risk' : 'At Risk';
 
-  // ── Top 3 Active Risks ────────────────────────────────────────────────────
-  const topRisks = [...criticalItems, ...highItems].slice(0, 3).map(item => ({
-    title: item.title,
-    priority: item.priority
-  }));
-
-  // ── Open Mitigation Items ─────────────────────────────────────────────────
-  const openMitigations = pendingActionItems.length;
-
-  // ── Documentation Health ───────────────────────────────────────────────────
-  const riskAssessmentCurrent = !!riskAssessment;
-  const nextReviewDate = organization.next_review_date 
-    ? new Date(organization.next_review_date)
-    : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // Default: 1 year from now
-
-  // ── Vendor & BAA Status ────────────────────────────────────────────────────
-  const totalVendors = vendors.length;
+  // 4. Incident & Vendor Control - 25 pts
   const today = new Date();
   const validBAAs = vendors.filter((v: any) => {
     if (!v.baa_signed || !v.baa_expiration_date) return false;
     const expDate = new Date(v.baa_expiration_date);
     return expDate > today;
   }).length;
+  const totalVendorsWithPHI = vendors.filter((v: any) => v.has_phi_access).length || 1;
+  const baaScore = Math.round((validBAAs / totalVendorsWithPHI) * 15);
+  const openIncidents = incidents.filter((inc: any) => inc.status === 'open').length;
+  const incidentScore = openIncidents === 0 ? 10 : Math.max(0, 10 - openIncidents * 2);
+  const incidentVendorScore = Math.min(25, baaScore + incidentScore);
+
+  const complianceScore = documentationScore + riskManagementScore + trainingScore + incidentVendorScore;
+  const scoreTier = complianceScore < 30 ? 'low' : complianceScore < 70 ? 'medium' : 'high';
+  const scoreColor = scoreTier === 'high' ? '#1ad07a' : scoreTier === 'medium' ? '#fbab18' : '#e2231a';
+  const scoreLabel = scoreTier === 'high' ? 'Protected' : scoreTier === 'medium' ? 'Partial' : 'At Risk';
+
+  // ── Header Contextual Status ─────────────────────────────────────────────
+  const getHeaderStatus = () => {
+    if (complianceScore < 30) {
+      const criticalGaps = [
+        policiesCompleted === 0 ? 'policies' : null,
+        !hasRiskAssessment ? 'risk assessment' : null,
+        trainingRate === 0 ? 'training' : null,
+        validBAAs === 0 && totalVendorsWithPHI > 0 ? 'BAAs' : null
+      ].filter(Boolean);
+      const gapCount = criticalGaps.length;
+      return {
+        title: `Your practice is not yet protected — ${gapCount} critical step${gapCount > 1 ? 's' : ''} remaining`,
+        subtitle: criticalGaps.slice(0, 2).join(' and ')
+      };
+    } else if (complianceScore < 70) {
+      const gaps = [
+        policiesCompleted < policiesTotal ? 'policies' : null,
+        trainingRate < 100 ? 'training' : null,
+        validBAAs < totalVendorsWithPHI ? 'BAAs' : null
+      ].filter(Boolean);
+      const gapCount = gaps.length;
+      return {
+        title: `Your practice is partially protected — ${gapCount} gap${gapCount > 1 ? 's' : ''} need attention`,
+        subtitle: gaps.slice(0, 2).join(' and ')
+      };
+    } else {
+      const lastReviewDate = riskAssessmentDate 
+        ? new Date(riskAssessmentDate)
+        : new Date();
+      return {
+        title: `Your practice is protected — last reviewed ${lastReviewDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`,
+        subtitle: 'All critical compliance requirements are met'
+      };
+    }
+  };
+
+  const headerStatus = getHeaderStatus();
+  const lastUpdated = riskAssessmentDate ? new Date(riskAssessmentDate) : new Date();
+  const nextReviewDate = organization.next_review_date 
+    ? new Date(organization.next_review_date)
+    : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+
+  // ── Action Center Items (max 3, prioritized) ────────────────────────────
+  const actionCenterItems: Array<{
+    severity: 'critical' | 'warning' | 'info';
+    title: string;
+    description: string;
+    link: string;
+    icon: React.ReactNode;
+  }> = [];
+
+  // Priority 1: Missing policies
+  if (policiesCompleted === 0) {
+    actionCenterItems.push({
+      severity: 'critical',
+      title: 'Activate your Privacy Policy',
+      description: 'Missing policies are the #1 reason OCR fines small practices',
+      link: '/dashboard/policies',
+      icon: <FileX className="w-5 h-5" />
+    });
+  }
+
+  // Priority 2: No training
+  if (trainingRate === 0) {
+    actionCenterItems.push({
+      severity: 'critical',
+      title: 'Add employees to HIPAA training',
+      description: '0% completion leaves you exposed',
+      link: '/dashboard/training',
+      icon: <UserCheck className="w-5 h-5" />
+    });
+  }
+
+  // Priority 3: Missing BAAs
+  const missingBAAs = vendors.filter((v: any) => !v.baa_signed && v.has_phi_access).length;
+  if (missingBAAs > 0) {
+    actionCenterItems.push({
+      severity: 'warning',
+      title: `Register your first vendor BAA`,
+      description: 'Every vendor handling PHI needs a signed agreement',
+      link: '/dashboard/policies/vendors',
+      icon: <FileCheck className="w-5 h-5" />
+    });
+  }
+
+  // If we have less than 3, add more based on priority
+  if (actionCenterItems.length < 3) {
+    if (!hasRiskAssessment) {
+      actionCenterItems.push({
+        severity: 'critical',
+        title: 'Complete your Risk Assessment',
+        description: 'A documented Risk Assessment is federally required',
+        link: '/dashboard/risk-assessment',
+        icon: <Shield className="w-5 h-5" />
+      });
+    }
+  }
+
+  if (actionCenterItems.length < 3 && policiesCompleted > 0 && policiesCompleted < policiesTotal) {
+    actionCenterItems.push({
+      severity: 'warning',
+      title: `Complete remaining policies (${policiesTotal - policiesCompleted} left)`,
+      description: 'All 9 HIPAA policies must be active',
+      link: '/dashboard/policies',
+      icon: <FileText className="w-5 h-5" />
+    });
+  }
+
+  // Limit to 3
+  const prioritizedActions = actionCenterItems.slice(0, 3);
+  const totalActionItems = pendingActionItems.length;
+
+  // ── Vendor & BAA Status ────────────────────────────────────────────────────
   const expiringBAAs = vendors.filter((v: any) => {
     if (!v.baa_expiration_date) return false;
     const expDate = new Date(v.baa_expiration_date);
@@ -172,347 +271,644 @@ export default async function DashboardPage() {
   }).length;
 
   // ── Incident Status ───────────────────────────────────────────────────────
-  const openIncidents = incidents.filter((inc: any) => inc.status === 'open').length;
-  const highSeverityIncidents = incidents.filter((inc: any) => inc.severity === 'high' && inc.status === 'open').length;
   const lastIncident = incidents.length > 0 ? incidents[0] : null;
+  const highSeverityIncidents = incidents.filter((inc: any) => inc.severity === 'high' && inc.status === 'open').length;
 
-  // ── Action Center Items ────────────────────────────────────────────────────
-  const actionCenterItems: Array<{
-    type: 'warning' | 'info';
-    text: string;
-    link?: string;
+  // ── Compliance Timeline Events ───────────────────────────────────────────
+  const timelineEvents: Array<{
+    date: Date;
+    type: 'policy_review' | 'training_renewal' | 'baa_expiration' | 'risk_assessment';
+    title: string;
+    status: 'upcoming' | 'due_soon' | 'overdue';
+    icon: React.ReactNode;
   }> = [];
 
-  // Staff training overdue
-  if (expiredTrainings.length > 0) {
-    actionCenterItems.push({
-      type: 'warning',
-      text: `Staff training overdue (${expiredTrainings.length} employees)`,
-      link: '/dashboard/training'
+  // Policy review
+  const daysUntilPolicyReview = Math.ceil((nextReviewDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  if (daysUntilPolicyReview <= 365) {
+    timelineEvents.push({
+      date: nextReviewDate,
+      type: 'policy_review',
+      title: 'Annual Policy Review due',
+      status: daysUntilPolicyReview <= 30 ? (daysUntilPolicyReview < 0 ? 'overdue' : 'due_soon') : 'upcoming',
+      icon: <FileText className="w-4 h-4" />
     });
   }
 
-  // Vendor BAA issues
-  if (expiredBAAs > 0) {
-    actionCenterItems.push({
-      type: 'warning',
-      text: `${expiredBAAs} vendor BAA${expiredBAAs > 1 ? 's' : ''} expired`,
-      link: '/dashboard/policies/vendors'
-    });
-  }
-  if (expiringBAAs > 0) {
-    actionCenterItems.push({
-      type: 'warning',
-      text: `${expiringBAAs} vendor BAA${expiringBAAs > 1 ? 's' : ''} expiring soon`,
-      link: '/dashboard/policies/vendors'
-    });
-  }
-  const missingBAAs = vendors.filter((v: any) => !v.baa_signed && v.has_phi_access).length;
-  if (missingBAAs > 0) {
-    actionCenterItems.push({
-      type: 'warning',
-      text: `${missingBAAs} vendor${missingBAAs > 1 ? 's' : ''} with missing BAA${missingBAAs > 1 ? 's' : ''}`,
-      link: '/dashboard/policies/vendors'
-    });
-  }
-
-  // High severity incidents
-  if (highSeverityIncidents > 0) {
-    actionCenterItems.push({
-      type: 'warning',
-      text: `${highSeverityIncidents} high severity incident${highSeverityIncidents > 1 ? 's' : ''} requiring attention`,
-      link: '/dashboard/breach-notifications/incidents'
-    });
-  }
+  // Training renewals
+  const trainingExpirations = trainingRecords
+    .filter((r: any) => r.expiration_date)
+    .map((r: any) => new Date(r.expiration_date))
+    .filter((d: Date) => d > now && d.getTime() - now.getTime() <= 365 * 24 * 60 * 60 * 1000)
+    .sort((a: Date, b: Date) => a.getTime() - b.getTime());
   
-  // Open incidents older than 7 days
-  const staleIncidents = incidents.filter((inc: any) => {
-    if (inc.status !== 'open') return false;
-    const discoveredDate = new Date(inc.date_discovered);
-    const daysSinceDiscovery = (now.getTime() - discoveredDate.getTime()) / (1000 * 60 * 60 * 24);
-    return daysSinceDiscovery > 7;
-  }).length;
-  if (staleIncidents > 0) {
-    actionCenterItems.push({
-      type: 'warning',
-      text: `${staleIncidents} incident${staleIncidents > 1 ? 's' : ''} open for more than 7 days`,
-      link: '/dashboard/breach-notifications/incidents'
+  if (trainingExpirations.length > 0) {
+    const nextTrainingExpiry = trainingExpirations[0];
+    const daysUntilTraining = Math.ceil((nextTrainingExpiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    timelineEvents.push({
+      date: nextTrainingExpiry,
+      type: 'training_renewal',
+      title: `Staff training renewal (${trainingExpirations.length} employee${trainingExpirations.length > 1 ? 's' : ''})`,
+      status: daysUntilTraining <= 30 ? (daysUntilTraining < 0 ? 'overdue' : 'due_soon') : 'upcoming',
+      icon: <Users className="w-4 h-4" />
     });
   }
 
-  // Risk reassessment recommended
-  if (riskAssessment) {
-    const assessmentDate = new Date(riskAssessment.updated_at || riskAssessment.created_at);
-    const monthsSinceAssessment = (now.getTime() - assessmentDate.getTime()) / (1000 * 60 * 60 * 24 * 30);
-    if (monthsSinceAssessment >= 11) {
-      actionCenterItems.push({
-        type: 'warning',
-        text: 'Risk reassessment recommended',
-        link: '/dashboard/risk-assessment'
+  // BAA expirations
+  const baaExpirations = vendors
+    .filter((v: any) => v.baa_expiration_date)
+    .map((v: any) => ({
+      date: new Date(v.baa_expiration_date),
+      name: v.vendor_name
+    }))
+    .filter((v: any) => v.date > now && v.date.getTime() - now.getTime() <= 365 * 24 * 60 * 60 * 1000)
+    .sort((a: any, b: any) => a.date.getTime() - b.date.getTime());
+
+  if (baaExpirations.length > 0) {
+    const nextBAAExpiry = baaExpirations[0];
+    const daysUntilBAA = Math.ceil((nextBAAExpiry.date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    timelineEvents.push({
+      date: nextBAAExpiry.date,
+      type: 'baa_expiration',
+      title: `BAA expiration: ${nextBAAExpiry.name}`,
+      status: daysUntilBAA <= 30 ? (daysUntilBAA < 0 ? 'overdue' : 'due_soon') : 'upcoming',
+      icon: <FileCheck className="w-4 h-4" />
+    });
+  }
+
+  // Risk Assessment
+  if (riskAssessmentDate) {
+    const assessmentDate = new Date(riskAssessmentDate);
+    const nextAssessmentDate = new Date(assessmentDate);
+    nextAssessmentDate.setFullYear(nextAssessmentDate.getFullYear() + 1);
+    const daysUntilAssessment = Math.ceil((nextAssessmentDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    if (daysUntilAssessment <= 365) {
+      timelineEvents.push({
+        date: nextAssessmentDate,
+        type: 'risk_assessment',
+        title: 'Risk Assessment valid until',
+        status: daysUntilAssessment <= 90 ? (daysUntilAssessment < 0 ? 'overdue' : 'due_soon') : 'upcoming',
+        icon: <Shield className="w-4 h-4" />
       });
     }
   }
 
-  // Policy review approaching
-  const daysUntilReview = Math.ceil((nextReviewDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  if (daysUntilReview <= 30 && daysUntilReview > 0) {
-    actionCenterItems.push({
-      type: 'warning',
-      text: 'Policy review approaching',
-      link: '/dashboard/policies'
-    });
-  }
+  // Sort timeline by date
+  timelineEvents.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-  // Critical action items
-  if (criticalItems.length > 0) {
-    actionCenterItems.push({
-      type: 'warning',
-      text: `${criticalItems.length} critical action item${criticalItems.length > 1 ? 's' : ''} pending`,
-      link: '/dashboard/action-items'
-    });
-  }
-
-  // Last updated date
-  const lastUpdated = riskAssessment?.updated_at 
-    ? new Date(riskAssessment.updated_at)
-    : new Date();
+  // ── Context Line Below Score ──────────────────────────────────────────────
+  const getScoreContext = () => {
+    if (complianceScore < 30) {
+      return 'A practice at this score level faces $50k–$250k in potential OCR fines';
+    } else if (complianceScore < 70) {
+      return 'You\'re in the top 40% of practices at your size — 2 gaps remain';
+    } else {
+      return 'Audit-ready. Your evidence package can be exported in one click.';
+    }
+  };
 
   return (
-    <div className="flex flex-col gap-6 font-sans max-w-[1600px] mx-auto">
-      {/* ── Page Header ─────────────────────────────────────────────────── */}
-      <div className="flex items-end justify-between border-b border-gray-200 pb-3">
+    <div className="flex flex-col gap-8 font-sans max-w-[1600px] mx-auto px-4 md:px-8">
+      {/* ── 1. Header Contextual ───────────────────────────────────────────── */}
+      <div className="border-b border-gray-200 pb-4">
+        <h1 className="text-2xl md:text-3xl font-thin text-[#0e274e] leading-tight mb-2">
+          {headerStatus.title}
+        </h1>
+        <p className="text-sm text-[#565656] font-thin">
+          {organization.name} · Last updated {lastUpdated.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · Next review {nextReviewDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        </p>
+      </div>
+
+      {/* ── 2. Compliance Score Gauge ─────────────────────────────────────── */}
+      <Card className="border-0 shadow-sm bg-white rounded-none">
+        <CardContent className="p-8 md:p-12">
+          <div className="grid md:grid-cols-[auto_1fr] gap-8 md:gap-12 items-center">
+            {/* Gauge Circle */}
+            <div className="flex flex-col items-center justify-center">
+              <div className="relative w-48 h-48 md:w-64 md:h-64">
+                <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
+                  <circle cx="100" cy="100" r="85" stroke="#f3f5f9" strokeWidth="20" fill="none" />
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="85"
+                    stroke={scoreColor}
+                    strokeWidth="20"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 85}`}
+                    strokeDashoffset={`${2 * Math.PI * 85 * (1 - complianceScore / 100)}`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-5xl md:text-6xl font-thin text-[#0e274e]" style={{ color: scoreColor }}>
+                    {complianceScore}
+                  </span>
+                  <span className="text-sm md:text-base font-thin text-gray-500 mt-1" style={{ color: scoreColor }}>
+                    {scoreLabel}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Score Breakdown */}
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-thin text-[#565656]">Documentation</span>
+                  <span className="text-sm font-thin text-[#0e274e]">{documentationScore} / 25 pts</span>
+                </div>
+                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full transition-all"
+                    style={{ 
+                      width: `${(documentationScore / 25) * 100}%`,
+                      backgroundColor: documentationScore >= 20 ? '#1ad07a' : documentationScore >= 10 ? '#fbab18' : '#e2231a'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-thin text-[#565656]">Risk Management</span>
+                  <span className="text-sm font-thin text-[#0e274e]">{riskManagementScore} / 25 pts</span>
+                </div>
+                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full transition-all"
+                    style={{ 
+                      width: `${(riskManagementScore / 25) * 100}%`,
+                      backgroundColor: riskManagementScore >= 20 ? '#1ad07a' : riskManagementScore >= 10 ? '#fbab18' : '#e2231a'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-thin text-[#565656]">Training</span>
+                  <span className="text-sm font-thin text-[#0e274e]">{trainingScore} / 25 pts</span>
+                </div>
+                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full transition-all"
+                    style={{ 
+                      width: `${(trainingScore / 25) * 100}%`,
+                      backgroundColor: trainingScore >= 20 ? '#1ad07a' : trainingScore >= 10 ? '#fbab18' : '#e2231a'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-thin text-[#565656]">Incident & Vendor Control</span>
+                  <span className="text-sm font-thin text-[#0e274e]">{incidentVendorScore} / 25 pts</span>
+                </div>
+                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full transition-all"
+                    style={{ 
+                      width: `${(incidentVendorScore / 25) * 100}%`,
+                      backgroundColor: incidentVendorScore >= 20 ? '#1ad07a' : incidentVendorScore >= 10 ? '#fbab18' : '#e2231a'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-500 font-thin mt-4 pt-4 border-t border-gray-100">
+                {getScoreContext()}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── 3. Action Center (max 3 cards) ─────────────────────────────────── */}
+      {prioritizedActions.length > 0 && (
         <div>
-          <h1 className="text-3xl font-thin text-[#0e274e] leading-tight">Compliance Overview</h1>
-          <p className="text-sm text-[#565656] font-light mt-0.5">
-            {organization.name} &nbsp;·&nbsp; {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-thin text-[#0e274e]">Action Center</h2>
+            {totalActionItems > 3 && (
+              <Link href="/dashboard/action-items" className="text-sm font-thin text-[#0175a2] hover:underline">
+                View all action items ({totalActionItems})
+              </Link>
+            )}
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            {prioritizedActions.map((action, i) => (
+              <Card key={i} className="border-0 shadow-sm bg-white rounded-none">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4 mb-4">
+                    <div 
+                      className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        action.severity === 'critical' ? 'bg-red-50 text-red-600' :
+                        action.severity === 'warning' ? 'bg-yellow-50 text-yellow-600' :
+                        'bg-blue-50 text-blue-600'
+                      }`}
+                    >
+                      {action.icon}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-base font-thin text-[#0e274e] mb-1">{action.title}</h3>
+                      <p className="text-xs text-gray-500 font-thin leading-relaxed">{action.description}</p>
+                    </div>
+                  </div>
+                  <Link href={action.link}>
+                    <Button 
+                      className={`w-full rounded-none font-thin text-xs ${
+                        action.severity === 'critical' 
+                          ? 'bg-[#e2231a] text-white hover:bg-[#c01e17]' 
+                          : 'bg-[#0175a2] text-white hover:bg-[#0e274e]'
+                      }`}
+                    >
+                      {action.severity === 'critical' ? 'Activate now' : action.severity === 'warning' ? 'Fix now' : 'View'} <ArrowRight className="w-3 h-3 ml-2" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 4. Documentation Health (4 cards) ──────────────────────────────── */}
+      <div>
+        <h2 className="text-xl font-thin text-[#0e274e] mb-4">Documentation Health</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Policies Card */}
+          <Card className="border-0 shadow-sm bg-white rounded-none">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <FileText className="w-5 h-5 text-[#0175a2]" />
+                <h3 className="text-sm font-thin text-[#0e274e]">Policies</h3>
+              </div>
+              {policiesCompleted === 0 ? (
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <XCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-sm font-thin text-red-600">No policies active</span>
+                  </div>
+                  <Link href="/dashboard/policies">
+                    <Button className="w-full rounded-none font-thin text-xs bg-[#0175a2] text-white hover:bg-[#0e274e]">
+                      Activate policies <ArrowRight className="w-3 h-3 ml-2" />
+                    </Button>
+                  </Link>
+                </>
+              ) : policiesCompleted < policiesTotal ? (
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                    <span className="text-sm font-thin text-[#0e274e]">{policiesCompleted} of {policiesTotal} active</span>
+                  </div>
+                  <Link href="/dashboard/policies">
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-gray-200 text-[#565656] hover:bg-gray-50">
+                      Complete remaining <ArrowRight className="w-3 h-3 ml-2" />
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-thin text-green-600">All {policiesTotal} policies active</span>
+                  </div>
+                  <Link href="/dashboard/policies">
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-gray-200 text-[#565656] hover:bg-gray-50">
+                      View policies
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Training Card */}
+          <Card className="border-0 shadow-sm bg-white rounded-none">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Users className="w-5 h-5 text-[#0175a2]" />
+                <h3 className="text-sm font-thin text-[#0e274e]">Training</h3>
+              </div>
+              {trainingRate === 0 ? (
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <XCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-sm font-thin text-red-600">0% completion</span>
+                  </div>
+                  <Link href="/dashboard/training">
+                    <Button className="w-full rounded-none font-thin text-xs bg-[#0175a2] text-white hover:bg-[#0e274e]">
+                      Add team members <ArrowRight className="w-3 h-3 ml-2" />
+                    </Button>
+                  </Link>
+                </>
+              ) : trainingRate < 100 ? (
+                <>
+                  <div className="mb-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-thin text-[#0e274e]">{trainingRate}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-yellow-500"
+                        style={{ width: `${trainingRate}%` }}
+                      />
+                    </div>
+                  </div>
+                  <Link href="/dashboard/training">
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-gray-200 text-[#565656] hover:bg-gray-50">
+                      Complete training
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-thin text-green-600">100% complete</span>
+                  </div>
+                  <p className="text-xs text-gray-500 font-thin mb-3">
+                    Last completed: {completedTrainings.length > 0 && completedTrainings[0].training_date 
+                      ? new Date(completedTrainings[0].training_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                      : 'N/A'}
+                  </p>
+                  <Link href="/dashboard/training">
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-gray-200 text-[#565656] hover:bg-gray-50">
+                      View records
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Risk Assessment Card */}
+          <Card className="border-0 shadow-sm bg-white rounded-none">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <Shield className="w-5 h-5 text-[#0175a2]" />
+                <h3 className="text-sm font-thin text-[#0e274e]">Risk Assessment</h3>
+              </div>
+              {!hasRiskAssessment ? (
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <XCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-sm font-thin text-red-600">Not completed</span>
+                  </div>
+                  <Link href="/dashboard/risk-assessment">
+                    <Button className="w-full rounded-none font-thin text-xs bg-[#0175a2] text-white hover:bg-[#0e274e]">
+                      Run assessment <ArrowRight className="w-3 h-3 ml-2" />
+                    </Button>
+                  </Link>
+                </>
+              ) : (() => {
+                const assessmentDate = new Date(riskAssessmentDate!);
+                const daysUntilExpiry = Math.ceil((assessmentDate.getTime() + 365 * 24 * 60 * 60 * 1000 - now.getTime()) / (1000 * 60 * 60 * 24));
+                if (daysUntilExpiry < 0) {
+                  return (
+                    <>
+                      <div className="flex items-center gap-2 mb-3">
+                        <XCircle className="w-4 h-4 text-red-600" />
+                        <span className="text-sm font-thin text-red-600">Overdue</span>
+                      </div>
+                      <Link href="/dashboard/risk-assessment">
+                        <Button className="w-full rounded-none font-thin text-xs bg-[#e2231a] text-white hover:bg-[#c01e17]">
+                          Re-run assessment <ArrowRight className="w-3 h-3 ml-2" />
+                        </Button>
+                      </Link>
+                    </>
+                  );
+                } else if (daysUntilExpiry <= 90) {
+                  return (
+                    <>
+                      <div className="flex items-center gap-2 mb-3">
+                        <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                        <span className="text-sm font-thin text-yellow-600">Review due in {daysUntilExpiry} days</span>
+                      </div>
+                      <Link href="/dashboard/risk-assessment">
+                        <Button variant="outline" className="w-full rounded-none font-thin text-xs border-yellow-200 text-yellow-700 hover:bg-yellow-50">
+                          Review now
+                        </Button>
+                      </Link>
+                    </>
+                  );
+                } else {
+                  return (
+                    <>
+                      <div className="flex items-center gap-2 mb-3">
+                        <CheckCircle2 className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-thin text-green-600">Current</span>
+                      </div>
+                      <p className="text-xs text-gray-500 font-thin mb-3">
+                        Completed: {assessmentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </p>
+                      <Link href="/dashboard/risk-assessment">
+                        <Button variant="outline" className="w-full rounded-none font-thin text-xs border-gray-200 text-[#565656] hover:bg-gray-50">
+                          View assessment
+                        </Button>
+                      </Link>
+                    </>
+                  );
+                }
+              })()}
+            </CardContent>
+          </Card>
+
+          {/* BAAs Card */}
+          <Card className="border-0 shadow-sm bg-white rounded-none">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <FileCheck className="w-5 h-5 text-[#0175a2]" />
+                <h3 className="text-sm font-thin text-[#0e274e]">BAAs</h3>
+              </div>
+              {totalVendorsWithPHI === 0 ? (
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-sm font-thin text-gray-500">No vendors registered</span>
+                  </div>
+                  <Link href="/dashboard/policies/vendors">
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-gray-200 text-[#565656] hover:bg-gray-50">
+                      Add your first vendor <ArrowRight className="w-3 h-3 ml-2" />
+                    </Button>
+                  </Link>
+                </>
+              ) : expiringBAAs > 0 || expiredBAAs > 0 ? (
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                    <span className="text-sm font-thin text-yellow-600">
+                      {expiringBAAs + expiredBAAs} {expiredBAAs > 0 ? 'expired' : 'expiring'} in {expiringBAAs > 0 ? '30 days' : ''}
+                    </span>
+                  </div>
+                  <Link href="/dashboard/policies/vendors">
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-yellow-200 text-yellow-700 hover:bg-yellow-50">
+                      Renew BAAs
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-thin text-green-600">All BAAs valid</span>
+                  </div>
+                  <p className="text-xs text-gray-500 font-thin mb-3">
+                    {validBAAs} of {totalVendorsWithPHI} vendors
+                  </p>
+                  <Link href="/dashboard/policies/vendors">
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-gray-200 text-[#565656] hover:bg-gray-50">
+                      Manage vendors
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* ── 1. COMPLIANCE SCORE (Card grande no topo) ───────────────────── */}
-      <Card className="border-0 shadow-sm bg-white rounded-none">
-        <CardContent className="p-8">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h2 className="text-sm font-light text-[#565656] mb-4 uppercase tracking-wide">Overall Compliance Status</h2>
-              <div className="flex items-baseline gap-4 mb-4">
-                <span className="text-6xl font-thin text-[#0e274e]">{complianceScore}</span>
-                <span className="text-2xl font-thin text-gray-400">/ 100</span>
-              </div>
-              <div className="flex items-center gap-4 mb-6">
-                <span className={`text-sm font-light px-4 py-2 ${scoreColor === '#71bc48' ? 'bg-[#71bc48]/10 text-[#71bc48]' : scoreColor === '#fbab18' ? 'bg-[#fbab18]/10 text-[#fbab18]' : 'bg-[#e2231a]/10 text-[#e2231a]'}`}>
-                  {scoreLabel}
-                </span>
-                <span className="text-xs text-gray-400 font-light">
-                  Last Updated: {lastUpdated.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                </span>
-              </div>
-              <div className="flex items-center gap-6 text-xs text-gray-500 font-light">
-                <span>Next Review: {nextReviewDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-              </div>
-            </div>
-            <div className="w-32 h-32 relative">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 120 120">
-                <circle cx="60" cy="60" r="52" stroke="#f3f5f9" strokeWidth="8" fill="none" />
-                <circle
-                  cx="60" cy="60"
-                  r="52"
-                  stroke={scoreColor}
-                  strokeWidth="8"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 52}`}
-                  strokeDashoffset={`${2 * Math.PI * 52 * (1 - complianceScore / 100)}`}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-thin" style={{ color: scoreColor }}>{complianceScore}%</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* ── 2. RISK STATUS (3 cards menores) ─────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {/* ── 5. Incidents | Vendors (2 cards side by side) ──────────────────── */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Incidents Card */}
         <Card className="border-0 shadow-sm bg-white rounded-none">
           <CardContent className="p-6">
-            <h3 className="text-sm font-light text-[#0e274e] mb-4">Current Risk Level</h3>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: `${riskColor}20` }}>
-                <Shield className="h-6 w-6" style={{ color: riskColor }} />
-              </div>
-              <div>
-                <p className="text-xl font-thin text-[#0e274e]">{riskLabel}</p>
-                <p className="text-xs text-gray-400 font-light">
-                  {riskAssessment ? 'Assessment completed' : 'No assessment yet'}
-                </p>
-              </div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-thin text-[#0e274e]">Incidents</h3>
+              <Link href="/dashboard/breach-notifications/incidents" className="text-xs font-thin text-[#0175a2] hover:underline">
+                View incident log <ArrowRight className="w-3 h-3 inline ml-1" />
+              </Link>
             </div>
-            <Link href="/dashboard/risk-assessment">
-              <Button variant="outline" className="w-full border-gray-200 text-[#565656] hover:bg-gray-50 rounded-none font-light text-xs mt-4">
-                View Assessment
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-sm bg-white rounded-none">
-          <CardContent className="p-6">
-            <h3 className="text-sm font-light text-[#0e274e] mb-4">Top 3 Active Risks</h3>
-            {topRisks.length > 0 ? (
-              <div className="space-y-3">
-                {topRisks.map((risk, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full mt-1.5 ${risk.priority === 'critical' ? 'bg-[#e2231a]' : 'bg-[#fbab18]'}`} />
-                    <p className="text-xs text-[#565656] font-light flex-1 leading-snug">{risk.title}</p>
-                  </div>
-                ))}
+            {openIncidents === 0 ? (
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-8 h-8 text-green-600" />
+                <div>
+                  <p className="text-2xl font-thin text-[#0e274e]">0</p>
+                  <p className="text-xs text-gray-500 font-thin">No open incidents — practice is clean</p>
+                </div>
               </div>
             ) : (
-              <div className="py-4 text-center">
-                <CheckCircle2 className="h-6 w-6 text-[#71bc48] mx-auto mb-2" />
-                <p className="text-xs text-gray-400 font-light">No active risks</p>
+              <div>
+                <p className="text-3xl font-thin text-[#0e274e] mb-2">{openIncidents}</p>
+                {lastIncident && (
+                  <div className="pt-3 border-t border-gray-100">
+                    <p className="text-xs text-gray-500 font-thin mb-1">Most recent</p>
+                    <p className="text-sm font-thin text-[#0e274e]">
+                      {new Date(lastIncident.date_discovered).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                    <p className="text-xs text-gray-500 font-thin">
+                      Status: {lastIncident.status === 'open' ? 'Open' : lastIncident.status === 'under_review' ? 'Under Review' : 'Closed'}
+                    </p>
+                  </div>
+                )}
+                {highSeverityIncidents > 0 && (
+                  <p className="text-xs text-red-600 font-thin mt-2">{highSeverityIncidents} high severity</p>
+                )}
               </div>
             )}
-            <Link href="/dashboard/action-items">
-              <Button variant="outline" className="w-full border-gray-200 text-[#565656] hover:bg-gray-50 rounded-none font-light text-xs mt-4">
-                View All Risks
-              </Button>
-            </Link>
           </CardContent>
         </Card>
 
+        {/* Vendors Card */}
         <Card className="border-0 shadow-sm bg-white rounded-none">
           <CardContent className="p-6">
-            <h3 className="text-sm font-light text-[#0e274e] mb-4">Open Mitigation Items</h3>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-100">
-                <AlertTriangle className="h-6 w-6 text-[#565656]" />
-              </div>
-              <div>
-                <p className="text-2xl font-thin text-[#0e274e]">{openMitigations}</p>
-                <p className="text-xs text-gray-400 font-light">Items pending</p>
-              </div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-thin text-[#0e274e]">Vendors</h3>
+              <Link href="/dashboard/policies/vendors" className="text-xs font-thin text-[#0175a2] hover:underline">
+                Manage vendors <ArrowRight className="w-3 h-3 inline ml-1" />
+              </Link>
             </div>
-            <Link href="/dashboard/action-items">
-              <Button variant="outline" className="w-full border-gray-200 text-[#565656] hover:bg-gray-50 rounded-none font-light text-xs mt-4">
-                View Action Items
-              </Button>
-            </Link>
+            {totalVendorsWithPHI === 0 ? (
+              <div>
+                <p className="text-2xl font-thin text-[#0e274e] mb-2">0</p>
+                <p className="text-xs text-gray-500 font-thin mb-3">No vendors registered — every vendor handling PHI needs a BAA</p>
+                <Link href="/dashboard/policies/vendors">
+                  <Button className="w-full rounded-none font-thin text-xs bg-[#0175a2] text-white hover:bg-[#0e274e]">
+                    Add vendor
+                  </Button>
+                </Link>
+              </div>
+            ) : (
+              <div>
+                <p className="text-3xl font-thin text-[#0e274e] mb-2">{totalVendorsWithPHI}</p>
+                <p className="text-xs text-gray-500 font-thin mb-2">Total vendors registered</p>
+                {expiringBAAs > 0 && (
+                  <div className="pt-3 border-t border-gray-100">
+                    <p className={`text-sm font-thin ${expiringBAAs > 0 ? 'text-yellow-600' : 'text-[#0e274e]'}`}>
+                      {expiringBAAs} BAA{expiringBAAs > 1 ? 's' : ''} expiring in 30 days
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
 
-      {/* ── 3. DOCUMENTATION HEALTH ──────────────────────────────────────── */}
+      {/* ── 6. Compliance Timeline ─────────────────────────────────────────── */}
+      {timelineEvents.length > 0 && (
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardContent className="p-6">
+            <h3 className="text-base font-thin text-[#0e274e] mb-6">Compliance Timeline</h3>
+            <div className="space-y-4">
+              {timelineEvents.slice(0, 12).map((event, i) => {
+                const daysUntil = Math.ceil((event.date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                const statusColor = event.status === 'overdue' ? 'text-red-600' : event.status === 'due_soon' ? 'text-yellow-600' : 'text-gray-500';
+                return (
+                  <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0">
+                    <div className={`mt-0.5 ${statusColor}`}>
+                      {event.icon}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-thin text-[#0e274e]">{event.title}</p>
+                        <span className={`text-xs font-thin ${statusColor}`}>
+                          {event.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </div>
+                      {event.status === 'overdue' && (
+                        <p className="text-xs text-red-600 font-thin mt-1">Overdue by {Math.abs(daysUntil)} days</p>
+                      )}
+                      {event.status === 'due_soon' && daysUntil > 0 && (
+                        <p className="text-xs text-yellow-600 font-thin mt-1">Due in {daysUntil} days</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── 7. Export Audit CTA ───────────────────────────────────────────── */}
       <Card className="border-0 shadow-sm bg-white rounded-none">
-        <CardHeader className="border-b border-gray-100 pb-4">
-          <CardTitle className="text-base font-light text-[#0e274e]">Documentation Health</CardTitle>
-        </CardHeader>
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-400 font-light mb-1">Policies Up to Date</p>
-              <p className="text-2xl font-thin text-[#0e274e]">{policiesCompleted} / {policiesTotal}</p>
+              <h3 className="text-base font-thin text-[#0e274e] mb-1">Audit Package</h3>
+              <p className="text-sm text-gray-500 font-thin">
+                Your audit package is {complianceScore >= 60 ? 'ready' : 'not ready'}. Last exported: never.
+              </p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 font-light mb-1">Staff Training Completed</p>
-              <p className="text-2xl font-thin text-[#0e274e]">{trainingRate}%</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 font-light mb-1">Risk Assessment Current</p>
-              <p className="text-2xl font-thin text-[#0e274e]">{riskAssessmentCurrent ? 'Yes' : 'No'}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 font-light mb-1">BAAs Valid</p>
-              <p className="text-2xl font-thin text-[#0e274e]">{validBAAs} / {totalVendors || 0}</p>
-              {expiringBAAs > 0 && (
-                <p className="text-xs text-yellow-600 mt-1">{expiringBAAs} expiring soon</p>
+              {complianceScore >= 60 ? (
+                <Link href="/dashboard/audit-export">
+                  <Button className="rounded-none font-thin text-sm bg-[#0175a2] text-white hover:bg-[#0e274e]">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export Audit Package <ArrowRight className="w-3 h-3 ml-2" />
+                  </Button>
+                </Link>
+              ) : (
+                <Button 
+                  disabled 
+                  className="rounded-none font-thin text-sm bg-gray-200 text-gray-500 cursor-not-allowed"
+                >
+                  Complete {Math.ceil((60 - complianceScore) / 10)} more steps to generate
+                </Button>
               )}
-            </div>
-            <div>
-              <p className="text-xs text-gray-400 font-light mb-1">Next Policy Review Due</p>
-              <p className="text-sm font-thin text-[#0e274e]">{nextReviewDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* ── 4. INCIDENT & VENDOR STATUS ──────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <Card className="border-0 shadow-sm bg-white rounded-none">
-          <CardHeader className="border-b border-gray-100 pb-4">
-            <CardTitle className="text-base font-light text-[#0e274e]">Incidents</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs text-gray-400 font-light mb-1">Open Incidents</p>
-                <p className="text-2xl font-thin text-[#0e274e]">{openIncidents}</p>
-              </div>
-              {lastIncident ? (
-                <div className="pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-400 font-light mb-1">Last Incident</p>
-                  <p className="text-sm font-thin text-[#0e274e] mb-1">{new Date(lastIncident.date_discovered).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</p>
-                  <p className="text-xs text-gray-500 font-light">Status: {lastIncident.status === 'open' ? 'Open' : lastIncident.status === 'under_review' ? 'Under Review' : 'Closed'}</p>
-                </div>
-              ) : (
-                <div className="pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-400 font-light">No incidents reported</p>
-                </div>
-              )}
-              {highSeverityIncidents > 0 && (
-                <div className="pt-2">
-                  <p className="text-xs text-red-600 font-light">{highSeverityIncidents} high severity</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-0 shadow-sm bg-white rounded-none">
-          <CardHeader className="border-b border-gray-100 pb-4">
-            <CardTitle className="text-base font-light text-[#0e274e]">Vendors</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs text-gray-400 font-light mb-1">Total Vendors</p>
-                <p className="text-2xl font-thin text-[#0e274e]">{totalVendors}</p>
-              </div>
-              <div className="pt-4 border-t border-gray-100">
-                <p className="text-xs text-gray-400 font-light mb-1">BAAs Expiring in 30 days</p>
-                <p className={`text-2xl font-thin ${expiringBAAs > 0 ? 'text-[#fbab18]' : 'text-[#0e274e]'}`}>{expiringBAAs}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* ── 5. ACTION CENTER (Lista vertical) ────────────────────────────── */}
-      <Card className="border-0 shadow-sm bg-white rounded-none">
-        <CardHeader className="border-b border-gray-100 pb-4">
-          <CardTitle className="text-base font-light text-[#0e274e]">Action Center</CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          {actionCenterItems.length > 0 ? (
-            <div className="space-y-3">
-              {actionCenterItems.map((item, i) => (
-                <Link key={i} href={item.link || '#'}>
-                  <div className="flex items-start gap-3 p-3 hover:bg-gray-50 transition-colors group">
-                    <AlertTriangle className={`h-4 w-4 mt-0.5 flex-shrink-0 ${item.type === 'warning' ? 'text-[#fbab18]' : 'text-[#00bceb]'}`} />
-                    <p className="text-sm text-[#565656] font-light flex-1">{item.text}</p>
-                    <span className="text-xs text-gray-400 group-hover:text-[#00bceb] transition-colors">View →</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="py-8 text-center">
-              <CheckCircle2 className="h-10 w-10 text-[#71bc48] mx-auto mb-3" />
-              <p className="text-sm text-gray-500 font-light">All compliance items are up to date.</p>
-            </div>
-          )}
         </CardContent>
       </Card>
     </div>

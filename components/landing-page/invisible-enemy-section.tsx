@@ -132,7 +132,7 @@ export default function InvisibleEnemySection() {
                 
                 <p className="text-xl md:text-2xl text-zinc-600 font-extralight leading-relaxed max-w-3xl mx-auto">
                   The biggest compliance risk isn't what you know is wrong.<br />
-                  <span className="text-[#0c0b1d] font-normal">It's what you assume is correct — without proof.</span>
+                  <span className="text-[#0c0b1d] font-normal">It's what you assume is correct, without proof.</span>
                 </p>
               </motion.div>
 

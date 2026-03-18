@@ -375,7 +375,7 @@ export default function FrustrationSection() {
                 </div>
               </motion.div>
 
-              <SectionCTA label="Stop the Chaos — Get Organized Now" href="/signup" />
+              <SectionCTA label="Stop the Chaos, Get Organized Now" href="/signup" />
 
             </div>
           </FadeIn>

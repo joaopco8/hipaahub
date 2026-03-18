@@ -47,7 +47,7 @@ const ImplementationServicesPage: React.FC<{ onBack: () => void }> = ({ onBack }
               Expert-Led <br /> Implementation.
             </h1>
             <p className="text-gray-600 text-lg md:text-xl font-thin leading-relaxed mb-10">
-              Compliance isn't just software—it's execution. Our services ensure your 
+              Compliance isn't just software, it's execution. Our services ensure your 
               platform is mapped to your specific clinical reality from Day 1.
             </p>
             <div className="flex flex-wrap gap-4">

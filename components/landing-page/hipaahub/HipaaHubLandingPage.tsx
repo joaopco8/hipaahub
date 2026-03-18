@@ -9,6 +9,8 @@ import StatsSection from './StatsSection';
 import HowItWorks from './HowItWorks';
 import HowItWorksSteps from './HowItWorksSteps';
 import WhatsIncluded from './WhatsIncluded';
+import BuiltForYourPractice from './BuiltForYourPractice';
+import WhyPracticesChoose from './WhyPracticesChoose';
 import SocialProof from './SocialProof';
 import BlogSection from './BlogSection';
 import AuditGuarantee from './AuditGuarantee';
@@ -51,7 +53,7 @@ const HipaaHubLandingPage: React.FC = () => {
   };
 
   const handleAssessmentClick = () => {
-    router.push('/onboarding');
+    router.push('/signup');
   };
 
   const isLegalView = ['privacy-policy', 'terms-of-service', 'security', 'hipaa-baa'].includes(view);
@@ -79,12 +81,14 @@ const HipaaHubLandingPage: React.FC = () => {
             <Hero onAssessmentClick={handleAssessmentClick} onDemoClick={() => setIsDemoModalOpen(true)} />
             <SolutionSection />
             <StatsSection />
+            <BuiltForYourPractice />
             <HowItWorks />
             <HowItWorksSteps />
             <WhatsIncluded onDemoClick={() => setIsDemoModalOpen(true)} />
             <SocialProof />
             <BlogSection onReadMore={(post) => navigateTo('blog', post)} />
             <AuditGuarantee />
+            <WhyPracticesChoose />
             <PricingSection onDemoClick={() => setIsDemoModalOpen(true)} />
             <FAQSection />
             <BottomCTA onAssessmentClick={handleAssessmentClick} onDemoClick={() => setIsDemoModalOpen(true)} />

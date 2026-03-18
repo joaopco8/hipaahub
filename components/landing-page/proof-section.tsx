@@ -87,7 +87,7 @@ export default function ProofSection() {
                     <TextHighlight variant="bold" color="default">
                       6-person
                     </TextHighlight>
-                    {' '}practice in Arizona. They had some HIPAA documentation—a few policies here, training records there, but nothing{' '}
+                    {' '}practice in Arizona. They had some HIPAA documentation: a few policies here, training records there, but nothing{' '}
                     <TextHighlight variant="semibold-italic" color="red">
                       complete or organized
                     </TextHighlight>
@@ -123,7 +123,7 @@ export default function ProofSection() {
                     <TextHighlight variant="bold" color="amber">
                       whole day
                     </TextHighlight>
-                    {' '}trying to gather everything. They still weren't sure they had it all—or if what they had was even current.
+                    {' '}trying to gather everything. They still weren't sure they had it all, or if what they had was even current.
                   </motion.p>
                   <motion.p
                     initial={{ opacity: 0, x: -20 }}
@@ -149,7 +149,7 @@ export default function ProofSection() {
                     </li>
                     <li className="flex items-start gap-3">
                       <CheckCircle2 className="w-5 h-5 text-[#1ad07a] shrink-0 mt-0.5" />
-                      <span>Organized everything in one place—policies, evidence, training records</span>
+                      <span>Organized everything in one place: policies, evidence, training records</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <CheckCircle2 className="w-5 h-5 text-[#1ad07a] shrink-0 mt-0.5" />
@@ -245,7 +245,7 @@ export default function ProofSection() {
               >
                 <div className="text-center mb-8">
                   <p className="text-xl md:text-2xl text-[#0c0b1d] font-extralight">
-                    200+ clinics have used HIPAA Hub to pass audits.
+                    Independent practices use HIPAA Hub to pass audits.
                   </p>
                   <p className="text-lg text-zinc-600 font-extralight mt-2">
                     Here's what they say:
