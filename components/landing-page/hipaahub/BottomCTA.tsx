@@ -12,12 +12,8 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => 
   ];
 
   const handleGetStarted = () => {
-    const pricingSection = document.getElementById('pricing');
-    if (pricingSection) {
-      pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else if (onAssessmentClick) {
-      onAssessmentClick();
-    }
+    // Keep the "Start free" destination consistent across the landing experience.
+    if (onAssessmentClick) onAssessmentClick();
   };
 
   return (

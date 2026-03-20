@@ -34,7 +34,10 @@ const WhatsIncluded: React.FC<{ onDemoClick?: () => void }> = ({ onDemoClick }) 
         </div>
 
         {/* YouTube Video Embed */}
-        <div className="mb-20 bg-white/5 border border-white/10 rounded-none relative overflow-hidden aspect-video">
+        <div
+          id="demo-video"
+          className="mb-20 bg-white/5 border border-white/10 rounded-none relative overflow-hidden aspect-video"
+        >
           <iframe
             className="w-full h-full"
             src="https://www.youtube.com/embed/YOUR_VIDEO_ID_HERE"

@@ -60,16 +60,18 @@ const FeatureBlock: React.FC<{
   </div>
 );
 
-const PlatformPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const PlatformPage: React.FC<{
+  onBack: () => void;
+  onWatchDemo?: () => void;
+  onAssessmentClick?: () => void;
+}> = ({
+  onBack,
+  onWatchDemo,
+  onAssessmentClick,
+}) => {
   const handleGetStarted = () => {
-    onBack();
-    // Wait a bit for the page to render, then scroll to pricing
-    setTimeout(() => {
-      const pricingSection = document.getElementById('pricing');
-      if (pricingSection) {
-        pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
+    // Keep the "Start free" destination consistent across the landing experience.
+    onAssessmentClick?.();
   };
 
   return (
@@ -194,7 +196,11 @@ const PlatformPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                   <p className="text-gray-500 text-xs font-thin mt-1">Quarterly reviews, annual assessments, and regulatory update alerts.</p>
                 </div>
              </div>
-             <button className="bg-cisco-navy text-white px-10 py-4 text-xs font-bold hover:bg-cisco-blue transition-all">
+             <button
+               type="button"
+               onClick={onWatchDemo}
+               className="bg-cisco-navy text-white px-10 py-4 text-xs font-bold hover:bg-cisco-blue transition-all"
+             >
                 Watch 3 min demo
              </button>
           </div>

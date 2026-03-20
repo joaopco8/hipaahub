@@ -46,6 +46,26 @@ const HipaaHubLandingPage: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
+  const demoVideoId = 'demo-video';
+
+  const scrollToDemoVideo = () => {
+    const element = document.getElementById(demoVideoId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleWatchDemoClick = () => {
+    if (view !== 'home') {
+      setView('home');
+      // Wait for the home view to render before attempting to scroll.
+      setTimeout(scrollToDemoVideo, 120);
+      return;
+    }
+
+    requestAnimationFrame(scrollToDemoVideo);
+  };
+
   const navigateTo = (newView: AppView, post?: any) => {
     if (post) setSelectedPost(post);
     setView(newView);
@@ -62,7 +82,7 @@ const HipaaHubLandingPage: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       {(!isLegalView) && (
-        <Navbar onNavigate={(v) => navigateTo(v as AppView)} onDemoClick={() => setIsDemoModalOpen(true)} />
+        <Navbar onNavigate={(v) => navigateTo(v as AppView)} onDemoClick={handleWatchDemoClick} />
       )}
 
       <main className="flex-grow">
@@ -78,20 +98,20 @@ const HipaaHubLandingPage: React.FC = () => {
               </div>
             </div>
 
-            <Hero onAssessmentClick={handleAssessmentClick} onDemoClick={() => setIsDemoModalOpen(true)} />
+            <Hero onAssessmentClick={handleAssessmentClick} onDemoClick={handleWatchDemoClick} />
             <SolutionSection />
             <StatsSection />
             <BuiltForYourPractice />
             <HowItWorks />
             <HowItWorksSteps />
-            <WhatsIncluded onDemoClick={() => setIsDemoModalOpen(true)} />
+            <WhatsIncluded onDemoClick={handleWatchDemoClick} />
             <SocialProof />
             <BlogSection onReadMore={(post) => navigateTo('blog', post)} />
             <AuditGuarantee />
             <WhyPracticesChoose />
-            <PricingSection onDemoClick={() => setIsDemoModalOpen(true)} />
+            <PricingSection onDemoClick={handleWatchDemoClick} />
             <FAQSection />
-            <BottomCTA onAssessmentClick={handleAssessmentClick} onDemoClick={() => setIsDemoModalOpen(true)} />
+            <BottomCTA onAssessmentClick={handleAssessmentClick} onDemoClick={handleWatchDemoClick} />
           </>
         )}
 
@@ -111,7 +131,11 @@ const HipaaHubLandingPage: React.FC = () => {
         )}
 
         {view === 'platform' && (
-          <PlatformPage onBack={() => navigateTo('home')} />
+          <PlatformPage
+            onBack={() => navigateTo('home')}
+            onWatchDemo={handleWatchDemoClick}
+            onAssessmentClick={handleAssessmentClick}
+          />
         )}
 
         {view === 'privacy-policy' && (
