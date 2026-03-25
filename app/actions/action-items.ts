@@ -30,7 +30,7 @@ export async function updateActionItemStatus(
     updateData.completed_at = null;
   }
 
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('action_items')
     .update(updateData)
     .eq('id', itemId)

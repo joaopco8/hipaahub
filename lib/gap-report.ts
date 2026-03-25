@@ -15,6 +15,8 @@
 import { QUESTIONS } from '@/app/(onboarding)/onboarding/risk-assessment/questions';
 import { getRemediation, type RiskLevel } from '@/config/remediations';
 
+export type { RiskLevel };
+
 export interface GapItem {
   question_id: string;
   category: 'administrative' | 'physical' | 'technical';
