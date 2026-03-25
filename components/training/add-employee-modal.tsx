@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { UserPlus, Mail, Loader2, CheckCircle2, Copy, ExternalLink } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AddEmployeeModalProps {
   open: boolean;
@@ -35,6 +36,7 @@ export default function AddEmployeeModal({ open, onClose, onSuccess }: AddEmploy
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [roleTitle, setRoleTitle] = useState('');
+  const [roleGroup, setRoleGroup] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [inviteResult, setInviteResult] = useState<InviteResult | null>(null);
 
@@ -42,6 +44,7 @@ export default function AddEmployeeModal({ open, onClose, onSuccess }: AddEmploy
     setName('');
     setEmail('');
     setRoleTitle('');
+    setRoleGroup('');
     setInviteResult(null);
   };
 
@@ -74,6 +77,7 @@ export default function AddEmployeeModal({ open, onClose, onSuccess }: AddEmploy
           name: name.trim(),
           email: email.toLowerCase().trim(),
           role_title: roleTitle.trim(),
+          role_group: roleGroup || null,
         }),
       });
 
@@ -238,6 +242,23 @@ export default function AddEmployeeModal({ open, onClose, onSuccess }: AddEmploy
                 className="h-10 border-gray-200 focus:border-[#1ad07a] rounded-none font-light"
                 disabled={isSubmitting}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-light text-[#0e274e]">
+                Role Group <span className="text-gray-400">(optional)</span>
+              </Label>
+              <Select value={roleGroup} onValueChange={setRoleGroup} disabled={isSubmitting}>
+                <SelectTrigger className="h-10 border-gray-200 rounded-none font-light">
+                  <SelectValue placeholder="Select role group…" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="clinical">Clinical</SelectItem>
+                  <SelectItem value="admin">Administrative</SelectItem>
+                  <SelectItem value="contractor">Contractor</SelectItem>
+                  <SelectItem value="intern">Intern</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="bg-[#f3f5f9] p-3 flex items-start gap-2">

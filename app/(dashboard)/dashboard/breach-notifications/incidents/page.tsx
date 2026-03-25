@@ -29,6 +29,12 @@ interface Incident {
   estimated_individuals_affected: number;
   breach_confirmed: boolean;
   breach_notification_id: string | null;
+  employees_involved: string | null;
+  sanction_applied: boolean;
+  sanction_description: string | null;
+  requires_admin_approval: boolean;
+  approved_by: string | null;
+  approved_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -76,7 +82,10 @@ export default function IncidentsPage() {
     severity: 'medium' as 'low' | 'medium' | 'high',
     status: 'open' as 'open' | 'under_review' | 'closed',
     estimated_individuals_affected: 0,
-    breach_confirmed: false
+    breach_confirmed: false,
+    employees_involved: '',
+    sanction_applied: false,
+    sanction_description: '',
   });
 
   useEffect(() => {
@@ -185,8 +194,35 @@ export default function IncidentsPage() {
       severity: 'medium',
       status: 'open',
       estimated_individuals_affected: 0,
-      breach_confirmed: false
+      breach_confirmed: false,
+      employees_involved: '',
+      sanction_applied: false,
+      sanction_description: '',
     });
+  }
+
+  async function handleApprove(incidentId: string) {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { error } = await (supabase as any)
+        .from('incident_logs')
+        .update({
+          status: 'closed',
+          approved_by: user.id,
+          approved_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', incidentId);
+
+      if (error) throw error;
+      loadIncidents();
+    } catch (error) {
+      console.error('Error approving incident:', error);
+      alert('Failed to approve incident.');
+    }
   }
 
   function handleEdit(incident: Incident) {
@@ -201,7 +237,10 @@ export default function IncidentsPage() {
       severity: incident.severity,
       status: incident.status,
       estimated_individuals_affected: incident.estimated_individuals_affected,
-      breach_confirmed: incident.breach_confirmed
+      breach_confirmed: incident.breach_confirmed,
+      employees_involved: incident.employees_involved || '',
+      sanction_applied: incident.sanction_applied || false,
+      sanction_description: incident.sanction_description || '',
     });
     setIsDialogOpen(true);
   }
@@ -408,6 +447,20 @@ export default function IncidentsPage() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="employees_involved" className="text-[#0c0b1d] font-light text-sm">
+                  Employees Involved
+                </Label>
+                <Textarea
+                  id="employees_involved"
+                  value={formData.employees_involved}
+                  onChange={(e) => setFormData({ ...formData, employees_involved: e.target.value })}
+                  rows={2}
+                  className="rounded-none text-[#0c0b1d]"
+                  placeholder="Names and roles of employees involved..."
+                />
+              </div>
+
               <div className="space-y-4 border-t border-gray-200 pt-4">
                 <div className="flex items-center space-x-2">
                   <input
@@ -433,6 +486,33 @@ export default function IncidentsPage() {
                     Breach Confirmed
                   </Label>
                 </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="sanction_applied"
+                    checked={formData.sanction_applied}
+                    onChange={(e) => setFormData({ ...formData, sanction_applied: e.target.checked })}
+                    className="rounded h-4 w-4 text-[#1ad07a] border-gray-300 focus:ring-[#1ad07a]"
+                  />
+                  <Label htmlFor="sanction_applied" className="font-light cursor-pointer text-[#0c0b1d] text-sm">
+                    Sanction Applied (per Sanction Policy)
+                  </Label>
+                </div>
+                {formData.sanction_applied && (
+                  <div className="space-y-2 pl-6">
+                    <Label htmlFor="sanction_description" className="text-[#0c0b1d] font-light text-sm">
+                      Sanction Description
+                    </Label>
+                    <Textarea
+                      id="sanction_description"
+                      value={formData.sanction_description}
+                      onChange={(e) => setFormData({ ...formData, sanction_description: e.target.value })}
+                      rows={2}
+                      className="rounded-none text-[#0c0b1d]"
+                      placeholder="Describe the sanction applied..."
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-2">
@@ -493,7 +573,7 @@ export default function IncidentsPage() {
                   <tr>
                     <th className="text-left p-4 text-xs font-medium text-[#565656]">Title</th>
                     <th className="text-left p-4 text-xs font-medium text-[#565656]">Severity</th>
-                    <th className="text-left p-4 text-xs font-medium text-[#565656]">PHI Involved</th>
+                    <th className="text-left p-4 text-xs font-medium text-[#565656]">PHI / Sanction</th>
                     <th className="text-left p-4 text-xs font-medium text-[#565656]">Status</th>
                     <th className="text-left p-4 text-xs font-medium text-[#565656]">Date Discovered</th>
                     <th className="text-right p-4 text-xs font-medium text-[#565656]">Actions</th>
@@ -514,20 +594,26 @@ export default function IncidentsPage() {
                         </Badge>
                       </td>
                       <td className="p-4">
-                        {incident.phi_involved ? (
-                          <Badge className="bg-red-50 text-red-600 border-red-200 rounded-none">
-                            Yes
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-gray-50 text-gray-600 border-gray-200 rounded-none">
-                            No
-                          </Badge>
-                        )}
+                        <div className="flex flex-col gap-1">
+                          {incident.phi_involved ? (
+                            <Badge className="bg-red-50 text-red-600 border-red-200 rounded-none w-fit">PHI</Badge>
+                          ) : (
+                            <Badge className="bg-gray-50 text-gray-600 border-gray-200 rounded-none w-fit">No PHI</Badge>
+                          )}
+                          {incident.sanction_applied && (
+                            <Badge className="bg-amber-50 text-amber-600 border-amber-200 rounded-none w-fit">Sanction Applied</Badge>
+                          )}
+                        </div>
                       </td>
                       <td className="p-4">
-                        <Badge className={`${getStatusColor(incident.status)} rounded-none capitalize`}>
-                          {incident.status.replace('_', ' ')}
-                        </Badge>
+                        <div className="flex flex-col gap-1">
+                          <Badge className={`${getStatusColor(incident.status)} rounded-none capitalize w-fit`}>
+                            {incident.status.replace('_', ' ')}
+                          </Badge>
+                          {incident.requires_admin_approval && !incident.approved_by && incident.status !== 'closed' && (
+                            <Badge className="bg-purple-50 text-purple-600 border-purple-200 rounded-none w-fit text-xs">Pending Approval</Badge>
+                          )}
+                        </div>
                       </td>
                       <td className="p-4">
                         <span className="text-sm text-[#565656]">
@@ -536,6 +622,16 @@ export default function IncidentsPage() {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center justify-end gap-2">
+                          {incident.requires_admin_approval && !incident.approved_by && incident.status !== 'closed' && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleApprove(incident.id)}
+                              className="h-8 rounded-none text-purple-600 border-purple-200 hover:bg-purple-50 text-xs"
+                            >
+                              Approve & Close
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"

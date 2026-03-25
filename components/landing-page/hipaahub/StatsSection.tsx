@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, TrendingDown, Clock, CheckCircle2 } from 'lucide-react';
 
-const StatsSection: React.FC = () => {
+const StatsSection: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessmentClick }) => {
   return (
     <section className="py-24 bg-gray-50 border-b border-gray-200 border-[0.5px]">
       <div className="max-w-7xl mx-auto px-4 md:px-12">
@@ -16,10 +16,13 @@ const StatsSection: React.FC = () => {
             <p className="text-gray-600 text-lg font-thin leading-relaxed mb-10">
               HIPAA Hub Risk Assessment Engine evaluates your organization against regulatory requirements and produces a compliance risk score.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-6">
-              <button className="bg-cisco-blue text-white px-10 py-5 text-xs font-thin hover:bg-cisco-navy transition-all">
-                Get Your Risk Assessment
+              <button
+                onClick={onAssessmentClick}
+                className="bg-cisco-blue text-white px-10 py-5 text-xs font-thin hover:bg-cisco-navy transition-all"
+              >
+                Start Free — Get Your Risk Score
               </button>
             </div>
           </div>

@@ -18,7 +18,11 @@ import {
   FileCheck,
   UserCheck,
   FileX,
-  XCircle
+  XCircle,
+  GraduationCap,
+  Package,
+  FolderOpen,
+  UserPlus
 } from 'lucide-react';
 import Link from 'next/link';
 import {
@@ -27,6 +31,7 @@ import {
 } from '@/lib/cache/dashboard-cache';
 import { getPolicyDocumentsCount } from '@/utils/supabase/queries';
 import { getEvidenceStatistics } from '@/app/actions/compliance-evidence';
+import { getRecentActivity } from '@/lib/activity-feed';
 
 export const revalidate = 30;
 
@@ -355,6 +360,78 @@ export default async function DashboardPage() {
 
   // Sort timeline by date
   timelineEvents.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  // ── Upcoming Expirations (next 90 days) ───────────────────────────────────
+  const ninety = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+  interface ExpirationItem {
+    label: string;
+    category: string;
+    daysLeft: number;
+    date: Date;
+    link: string;
+    isOverdue: boolean;
+  }
+  const upcomingExpirations: ExpirationItem[] = [];
+
+  // Individual training expirations within 90 days
+  trainingRecords
+    .filter((r: any) => r.expiration_date && r.completion_status === 'completed')
+    .forEach((r: any) => {
+      const d = new Date(r.expiration_date);
+      const daysLeft = Math.ceil((d.getTime() - now.getTime()) / 86400000);
+      if (daysLeft <= 90) {
+        upcomingExpirations.push({
+          label: `${r.full_name} — training expires`,
+          category: 'Training',
+          daysLeft,
+          date: d,
+          link: '/dashboard/training',
+          isOverdue: daysLeft < 0,
+        });
+      }
+    });
+
+  // Individual BAA expirations within 90 days
+  vendors
+    .filter((v: any) => v.baa_expiration_date)
+    .forEach((v: any) => {
+      const d = new Date(v.baa_expiration_date);
+      const daysLeft = Math.ceil((d.getTime() - now.getTime()) / 86400000);
+      if (daysLeft <= 90) {
+        upcomingExpirations.push({
+          label: `${v.vendor_name} — BAA expires`,
+          category: 'BAA',
+          daysLeft,
+          date: d,
+          link: '/dashboard/policies/vendors',
+          isOverdue: daysLeft < 0,
+        });
+      }
+    });
+
+  // Risk Assessment expiration
+  if (riskAssessmentDate) {
+    const assessmentDate = new Date(riskAssessmentDate);
+    const nextAssessment = new Date(assessmentDate);
+    nextAssessment.setFullYear(nextAssessment.getFullYear() + 1);
+    const daysLeft = Math.ceil((nextAssessment.getTime() - now.getTime()) / 86400000);
+    if (daysLeft <= 90) {
+      upcomingExpirations.push({
+        label: 'Annual Risk Assessment due',
+        category: 'Risk Assessment',
+        daysLeft,
+        date: nextAssessment,
+        link: '/dashboard/risk-assessment',
+        isOverdue: daysLeft < 0,
+      });
+    }
+  }
+
+  // Sort: overdue first, then by days remaining
+  upcomingExpirations.sort((a, b) => a.daysLeft - b.daysLeft);
+
+  // ── Recent Activity Feed ──────────────────────────────────────────────────
+  const recentActivity = await getRecentActivity(10);
 
   // ── Context Line Below Score ──────────────────────────────────────────────
   const getScoreContext = () => {
@@ -845,7 +922,44 @@ export default async function DashboardPage() {
         </Card>
       </div>
 
-      {/* ── 6. Compliance Timeline ─────────────────────────────────────────── */}
+      {/* ── 6. Upcoming Expirations (next 90 days) ─────────────────────────── */}
+      {upcomingExpirations.length > 0 && (
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-thin text-[#0e274e]">Upcoming Expirations</h3>
+              <span className="text-xs text-gray-400 font-thin">Next 90 days</span>
+            </div>
+            <div className="space-y-2">
+              {upcomingExpirations.map((item, i) => (
+                <Link key={i} href={item.link} className="flex items-center gap-3 p-3 rounded-none hover:bg-gray-50 transition-colors group">
+                  <div className={`shrink-0 ${item.isOverdue ? 'text-red-500' : item.daysLeft <= 14 ? 'text-yellow-500' : 'text-gray-400'}`}>
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-thin text-[#0e274e] truncate">{item.label}</p>
+                    <p className="text-xs text-gray-400 font-thin">{item.category}</p>
+                  </div>
+                  <div className="shrink-0 text-right">
+                    <span className={`text-xs font-normal ${item.isOverdue ? 'text-red-600' : item.daysLeft <= 14 ? 'text-yellow-600' : 'text-gray-500'}`}>
+                      {item.isOverdue
+                        ? `${Math.abs(item.daysLeft)}d overdue`
+                        : item.daysLeft === 0
+                        ? 'Today'
+                        : `${item.daysLeft}d left`}
+                    </span>
+                    <p className="text-xs text-gray-400 font-thin">
+                      {item.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── 8. Compliance Timeline ─────────────────────────────────────────── */}
       {timelineEvents.length > 0 && (
         <Card className="border-0 shadow-sm bg-white rounded-none">
           <CardContent className="p-6">
@@ -881,7 +995,53 @@ export default async function DashboardPage() {
         </Card>
       )}
 
-      {/* ── 7. Export Audit CTA ───────────────────────────────────────────── */}
+      {/* ── 9. Recent Activity Feed ────────────────────────────────────────── */}
+      {recentActivity.length > 0 && (
+        <Card className="border-0 shadow-sm bg-white rounded-none">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-base font-thin text-[#0e274e]">Recent Activity</h3>
+              <Link href="/dashboard/activity" className="text-xs font-thin text-[#0175a2] hover:underline">
+                View all <ArrowRight className="w-3 h-3 inline ml-1" />
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {recentActivity.map((event) => {
+                const iconMap: Record<string, React.ReactNode> = {
+                  policy_activated: <FileCheck className="w-4 h-4 text-[#1ad07a]" />,
+                  policy_draft: <FileText className="w-4 h-4 text-[#0175a2]" />,
+                  training_completed: <GraduationCap className="w-4 h-4 text-[#1ad07a]" />,
+                  training_invited: <UserPlus className="w-4 h-4 text-[#0175a2]" />,
+                  incident_opened: <AlertTriangle className="w-4 h-4 text-red-500" />,
+                  incident_closed: <CheckCircle2 className="w-4 h-4 text-[#1ad07a]" />,
+                  vendor_added: <Building2 className="w-4 h-4 text-[#0175a2]" />,
+                  evidence_uploaded: <FolderOpen className="w-4 h-4 text-[#0175a2]" />,
+                  risk_assessment_completed: <Shield className="w-4 h-4 text-[#0175a2]" />,
+                  asset_added: <Package className="w-4 h-4 text-[#0175a2]" />,
+                };
+                return (
+                  <div key={event.id} className="flex items-start gap-3 pb-3 border-b border-gray-50 last:border-0 last:pb-0">
+                    <div className="mt-0.5 shrink-0">
+                      {iconMap[event.type] ?? <Activity className="w-4 h-4 text-gray-400" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-thin text-[#0e274e] truncate">{event.title}</p>
+                        <span className="text-xs text-gray-400 font-thin shrink-0">
+                          {event.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-400 font-thin truncate">{event.description}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* ── 10. Export Audit CTA ──────────────────────────────────────────── */}
       <Card className="border-0 shadow-sm bg-white rounded-none">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">

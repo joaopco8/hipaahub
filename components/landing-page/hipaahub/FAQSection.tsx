@@ -38,6 +38,10 @@ const FAQSection: React.FC = () => {
       answer: "For most small practices, yes. HIPAA Hub gives you the same policies, assessments, and documentation a consultant would produce, at a fraction of the cost. If you face an active OCR investigation, we recommend pairing our platform with legal counsel."
     },
     {
+      question: "My EHR is HIPAA compliant — do I still need this?",
+      answer: "Yes. Your EHR being HIPAA compliant means the vendor has secured their platform. It does not mean your organization is HIPAA compliant.\n\nAs a covered entity, you are independently responsible for: maintaining written HIPAA policies, conducting annual risk assessments, training your staff, managing Business Associate Agreements with every vendor (including your EHR), and having a documented breach response plan.\n\nNone of those obligations are fulfilled by your EHR. HIPAA Hub covers exactly what your EHR doesn't."
+    },
+    {
       question: "How long does setup actually take?",
       answer: "Most practices are fully configured in 1–3 hours. You create your account, complete the risk assessment questionnaire (about 45 minutes), customize your 9 policy templates, and add your team. Your compliance score updates in real time as you complete each step."
     },
@@ -55,7 +59,7 @@ const FAQSection: React.FC = () => {
     },
     {
       question: "What support do you offer?",
-      answer: "Starter plan includes email support. Professional and Enterprise plans include phone support and priority response times. Enterprise customers receive a dedicated compliance advisor."
+      answer: "Solo plan includes email support with 48-hour response. Practice and Clinic plans include phone support and priority response times. Enterprise customers receive a dedicated compliance advisor with direct escalation."
     }
   ];
 

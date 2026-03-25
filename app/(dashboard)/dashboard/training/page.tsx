@@ -14,6 +14,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import Link from 'next/link';
+import { CertificateDownloadButton } from '@/components/training/certificate-download-button';
 import {
   getTrainingRecords,
   getTrainingStats,
@@ -235,6 +236,12 @@ export default async function TrainingPage() {
 
                         {/* Actions */}
                         <div className="flex gap-2">
+                          {isCurrent && (
+                            <CertificateDownloadButton
+                              recordId={record.id}
+                              employeeName={record.full_name}
+                            />
+                          )}
                           {record.completion_status === 'completed' && (
                             <Link href={`/dashboard/training/${record.id}/evidence`}>
                               <Button

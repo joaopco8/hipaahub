@@ -21,7 +21,7 @@ const Hero: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void 
         <div className="text-white max-w-5xl">
           <div className="animate-reveal [animation-delay:200ms] opacity-0">
             <p className="text-sm md:text-lg font-thin mb-4 md:mb-6 text-cisco-blue">
-              For private practice therapists &amp; mental health clinics
+              For independent healthcare practices — therapists, dentists, PT clinics &amp; specialty providers
             </p>
           </div>
           <div className="animate-reveal [animation-delay:400ms] opacity-0">
@@ -34,7 +34,7 @@ const Hero: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void 
           <div className="animate-reveal [animation-delay:600ms] opacity-0">
             <div className="max-w-2xl text-base md:text-lg text-gray-300 font-thin leading-relaxed mb-10 md:mb-12 space-y-6">
               <p className="text-white font-thin opacity-90">
-                HIPAA Hub gives solo therapists and small clinics ready-made policies, automated risk assessments, and one-click audit exports, so you stay protected without the paperwork.
+                HIPAA Hub gives independent practices ready-made policies, automated risk assessments, and one-click audit exports — so you stay protected without the paperwork or the $10,000 consultant.
               </p>
             </div>
           </div>

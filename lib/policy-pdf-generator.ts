@@ -10,6 +10,8 @@ interface PolicyPDFOptions {
   organizationName: string;
   policyId?: string;
   generatedDate?: Date;
+  versionNumber?: number | string;
+  activationDate?: string; // ISO date string
 }
 
 /**
@@ -133,14 +135,28 @@ export async function generatePolicyPDF(options: PolicyPDFOptions): Promise<Blob
     });
     yPosition += 5;
 
-    // Policy ID and metadata
+    // Policy ID, version, and activation date metadata
+    checkPageBreak(20);
+    doc.setFontSize(9);
+    doc.setFont('times', 'normal');
+    doc.setTextColor(100, 100, 100);
     if (options.policyId) {
-      checkPageBreak(10);
-      doc.setFontSize(9);
-      doc.setFont('times', 'normal');
-      doc.setTextColor(100, 100, 100);
       doc.text(`Policy ID: ${options.policyId}`, margin, yPosition);
-      yPosition += 6;
+      yPosition += 5;
+    }
+    if (options.versionNumber !== undefined) {
+      doc.text(`Version: ${options.versionNumber}`, margin, yPosition);
+      yPosition += 5;
+    }
+    if (options.activationDate) {
+      const activationDisplay = new Date(options.activationDate).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'long', day: 'numeric',
+      });
+      doc.text(`Activation Date: ${activationDisplay}`, margin, yPosition);
+      yPosition += 5;
+    }
+    if (options.policyId || options.versionNumber !== undefined || options.activationDate) {
+      yPosition += 2;
     }
 
     // Confidential notice
@@ -273,26 +289,20 @@ function addFooter(
     doc.setTextColor(100, 100, 100);
     doc.setFont('times', 'normal');
     
-    // Page number (centered)
+    // Footer: "Confidential — [Org Name] HIPAA Policy" centered
+    doc.text(
+      `Confidential \u2014 ${organizationName} HIPAA Policy`,
+      pageWidth / 2,
+      pageHeight - 14,
+      { align: 'center' }
+    );
+
+    // Page number (centered, below confidential line)
     doc.text(
       `Page ${i} of ${pageCount}`,
       pageWidth / 2,
-      pageHeight - 10,
+      pageHeight - 8,
       { align: 'center' }
-    );
-    
-    // Organization and date (left and right)
-    doc.text(
-      organizationName,
-      margin,
-      pageHeight - 10
-    );
-    
-    doc.text(
-      `Generated: ${dateStr}`,
-      pageWidth - margin,
-      pageHeight - 10,
-      { align: 'right' }
     );
   }
 }

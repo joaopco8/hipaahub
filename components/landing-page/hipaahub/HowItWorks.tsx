@@ -34,12 +34,13 @@ const FeatureCard: React.FC<{
   </div>
 );
 
-const CTACard: React.FC<{ 
+const CTACard: React.FC<{
   title: string;
   description: string;
   ctaText: string;
   icon: React.ReactNode;
-}> = ({ title, description, ctaText, icon }) => (
+  onClick?: () => void;
+}> = ({ title, description, ctaText, icon, onClick }) => (
   <div className="bg-white/5 backdrop-blur-md border border-white/10 p-10 flex flex-col h-full hover:bg-white/10 transition-all duration-300 group">
     <div className="mb-6">
       <div className="text-cisco-green mb-4 group-hover:scale-110 transition-transform inline-block">
@@ -50,14 +51,17 @@ const CTACard: React.FC<{
     <p className="text-gray-300 text-[15px] font-thin leading-relaxed mb-8 flex-grow">
       {description}
     </p>
-    <button className="bg-cisco-green text-cisco-navy px-8 py-4 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all flex items-center justify-center gap-3 group-hover:shadow-lg shadow-cisco-green/20">
+    <button
+      onClick={onClick}
+      className="bg-cisco-green text-cisco-navy px-8 py-4 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all flex items-center justify-center gap-3 group-hover:shadow-lg shadow-cisco-green/20"
+    >
       {ctaText}
       <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
     </button>
   </div>
 );
 
-const HowItWorks: React.FC = () => {
+const HowItWorks: React.FC<{ onGetStarted?: () => void }> = ({ onGetStarted }) => {
   return (
     <section id="how-it-works" className="py-24 bg-cisco-navy border-t border-b border-white/5">
       <div className="max-w-7xl mx-auto px-4 md:px-12">
@@ -109,11 +113,12 @@ const HowItWorks: React.FC = () => {
             subtitle="One-Click Audit Evidence Export"
             description="Compile all evidence into organized package. Export to PDF. Auditors receive comprehensive documentation within hours."
           />
-          <CTACard 
+          <CTACard
             icon={<CheckCircle2 size={32} strokeWidth={1} />}
             title="Ready to Get Started?"
             description="HIPAA compliance for independent practices, with everything you need to stay organized and audit ready."
-            ctaText="Get Started"
+            ctaText="Start Free Trial"
+            onClick={onGetStarted}
           />
         </div>
       </div>

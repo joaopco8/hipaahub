@@ -92,7 +92,7 @@ const SolutionSection: React.FC = () => {
           <CircularProgress 
             percentage={40} 
             valueDisplay="40%"
-            label="increase in OCR audits (2023-2024)" 
+            label="increase in OCR audits (2024-2025)"
           />
           <SolidCircleStat 
             value="$50k" 

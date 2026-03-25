@@ -23,13 +23,18 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { name, email, role_title } = body;
+    const { name, email, role_title, role_group } = body;
 
     if (!name || !email || !role_title) {
       return NextResponse.json(
         { error: 'name, email, and role_title are required' },
         { status: 400 }
       );
+    }
+
+    const validRoleGroups = ['clinical', 'admin', 'contractor', 'intern'];
+    if (role_group && !validRoleGroups.includes(role_group)) {
+      return NextResponse.json({ error: 'Invalid role_group' }, { status: 400 });
     }
 
     // Get organization
@@ -82,6 +87,7 @@ export async function POST(request: Request) {
         name: name.trim(),
         email: email.toLowerCase().trim(),
         role_title: role_title.trim(),
+        role_group: role_group || null,
         invite_token: token,
         status: 'invited',
       })

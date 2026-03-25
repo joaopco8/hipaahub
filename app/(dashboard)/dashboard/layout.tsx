@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/contexts/sidebar-context';
 import SidebarLayout from '@/components/sidebar-layout';
 import { SavingStateProvider } from '@/hooks/use-saving-state';
 import { SavingBarGlobal } from '@/components/saving-bar-global';
+import { CrispChat } from '@/components/support/crisp-chat';
 import {
   getCachedUser,
   getCachedUserDetails,
@@ -65,6 +66,10 @@ export default async function DashboardLayout({
   return (
     <SavingStateProvider>
       <SavingBarGlobal />
+      <CrispChat
+        userEmail={user.email}
+        userName={userDetails?.full_name || user.email}
+      />
       <SidebarProvider>
         <SidebarLayout
           userDetails={userDetails}

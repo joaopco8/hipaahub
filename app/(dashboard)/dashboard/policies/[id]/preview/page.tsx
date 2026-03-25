@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
-import { getUser } from '@/utils/supabase/queries';
+import { getUser, getSubscription } from '@/utils/supabase/queries';
 import { redirect } from 'next/navigation';
+import { getPolicyGenerationStatus } from '@/app/actions/policy-documents';
 import { getOrganizationData, getComplianceState } from '@/app/actions/organization';
 import { getEvidenceByDocumentId } from '@/app/actions/compliance-evidence';
 import { processDocumentTemplate } from '@/lib/document-generator';
@@ -83,8 +84,15 @@ export default async function DocumentPreviewPage({
     return redirect('/signin');
   }
 
-  // Get organization data
-  const organization = await getOrganizationData();
+  // Check subscription — trial/no subscription locks PDF download
+  const [organization, subscription, policyStatusMap] = await Promise.all([
+    getOrganizationData(),
+    getSubscription(supabase, user.id),
+    getPolicyGenerationStatus(),
+  ]);
+  const isLocked = !subscription || subscription.status === 'trialing';
+
+  const policyStatus = policyStatusMap.get(Number(params.id));
 
   if (!organization) {
     return redirect('/dashboard/organization');
@@ -236,12 +244,15 @@ export default async function DocumentPreviewPage({
           </div>
         </div>
         <div className="sm:shrink-0">
-          <DocumentActions 
-          documentTitle={document.name}
-          documentContent={processedContent}
-          organizationName={organization.name}
-          policyId={document.policyId}
-          policyNumericId={Number(params.id)}
+          <DocumentActions
+            documentTitle={document.name}
+            documentContent={processedContent}
+            organizationName={organization.name}
+            policyId={document.policyId}
+            policyNumericId={Number(params.id)}
+            isLocked={isLocked}
+            versionNumber={policyStatus?.generation_count}
+            activationDate={policyStatus?.signed_at ?? undefined}
           />
         </div>
       </div>

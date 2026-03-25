@@ -27,6 +27,8 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     let fileUrl = searchParams.get('file_url');
     const bucket = searchParams.get('bucket') || 'evidence';
+    const evidenceId = searchParams.get('evidence_id');
+    const evidenceTitle = searchParams.get('evidence_title');
 
     if (!fileUrl) {
       return NextResponse.json(
@@ -190,6 +192,21 @@ export async function GET(request: NextRequest) {
         { error: 'Failed to generate download URL - no URL returned' },
         { status: 500 }
       );
+    }
+
+    // Log the download access (non-blocking)
+    if (evidenceId && evidenceTitle) {
+      (supabase as any)
+        .from('evidence_access_logs')
+        .insert({
+          user_id: user.id,
+          organization_id: String((organization as any).id),
+          evidence_id: evidenceId,
+          evidence_title: decodeURIComponent(evidenceTitle),
+          action: 'download',
+        })
+        .then(() => {})
+        .catch(() => {});
     }
 
     return NextResponse.json({

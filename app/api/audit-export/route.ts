@@ -179,6 +179,27 @@ export async function POST(req: NextRequest) {
 
     const fileName = `HIPAA_Hub_Audit_Package_${orgSlug}_${exportDate}.zip`;
 
+    // Log the export (non-blocking)
+    const sectionsIncluded = [
+      '01_Executive_Summary',
+      ...(data.riskAssessment.exists ? ['02_Risk_Assessment'] : []),
+      ...(policiesWithDocs.length > 0 ? ['03_Policies'] : []),
+      ...(data.vendors.length > 0 ? ['04_Vendor_Management'] : []),
+      ...(data.trainingRecords.length > 0 ? ['05_Training'] : []),
+      ...((data.incidents.length > 0 || data.breachNotifications.length > 0) ? ['06_Incidents'] : []),
+      '07_Audit_Checklist',
+    ];
+    (supabase as any)
+      .from('audit_export_logs')
+      .insert({
+        user_id: user.id,
+        organization_id: String(data.organization.id),
+        sections_included: sectionsIncluded,
+        file_name: fileName,
+      })
+      .then(() => {})
+      .catch(() => {});
+
     return new NextResponse(zipBuffer, {
       status: 200,
       headers: {

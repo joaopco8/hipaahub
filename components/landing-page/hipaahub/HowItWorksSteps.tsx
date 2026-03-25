@@ -65,7 +65,7 @@ const HowItWorksSteps: React.FC = () => {
         </div>
         
         <div className="mt-20 text-center">
-           <p className="text-xl font-thin text-cisco-navy">Timeline: Audit-ready within 7-14 days.</p>
+           <p className="text-xl font-thin text-cisco-navy">Timeline: Audit-ready in 7 days.</p>
         </div>
       </div>
     </section>

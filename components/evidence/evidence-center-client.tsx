@@ -129,7 +129,10 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
   const getDownloadUrl = async (evidence: ComplianceEvidence) => {
     if (!evidence.file_url) return null;
     try {
-      const response = await fetch(`/api/compliance-evidence/download?file_url=${encodeURIComponent(evidence.file_url)}`);
+      const params = new URLSearchParams({ file_url: evidence.file_url });
+      if (evidence.id) params.set('evidence_id', evidence.id);
+      if (evidence.title) params.set('evidence_title', evidence.title);
+      const response = await fetch(`/api/compliance-evidence/download?${params.toString()}`);
       const data = await response.json();
       return data.download_url;
     } catch (error) {

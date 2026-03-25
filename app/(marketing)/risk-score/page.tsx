@@ -769,7 +769,7 @@ export default function RiskScorePage() {
               <p className="mb-4 text-[13px] text-gray-700">
                 We&apos;ve calculated your HIPAA risk score and identified your top
                 vulnerabilities. Enter your details to see your results and receive your
-                free PDF-ready report.
+                score summary by email (optional) along with a few compliance tips.
               </p>
               <div className="mb-4 flex items-center justify-between gap-3 border border-dashed border-gray-300 bg-white px-3.5 py-2.5">
                 <div>
@@ -827,7 +827,7 @@ export default function RiskScorePage() {
                 </button>
               </form>
               <p className="mt-3 text-[11px] leading-relaxed text-gray-500">
-                No spam. We&apos;ll send your PDF report and occasional HIPAA compliance
+                No spam. We&apos;ll send your score summary and occasional HIPAA compliance
                 tips. Unsubscribe anytime.
               </p>
             </section>
@@ -973,13 +973,6 @@ export default function RiskScorePage() {
                     >
                       Start my free 14-day trial, no credit card →
                     </a>
-                    <button
-                      type="button"
-                      onClick={() => window.print()}
-                      className="inline-flex w-full items-center justify-center rounded-none border border-gray-300 bg-white px-4 py-2.5 text-xs font-light text-cisco-navy shadow-sm transition hover:bg-gray-50"
-                    >
-                      Download my PDF report
-                    </button>
                   </div>
                   <p className="text-[11px] text-gray-500">
                     Free trial includes all 9 HIPAA policies, risk assessment, breach

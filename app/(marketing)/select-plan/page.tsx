@@ -6,11 +6,6 @@ import Image from 'next/image';
 import { initiateCheckout } from '@/app/actions/checkout';
 import { getStripe } from '@/utils/stripe/client';
 
-const ESSENTIAL_PRICE_ID =
-  process.env.NEXT_PUBLIC_STRIPE_ESSENTIAL_PRICE_ID || 'price_1T4lRNFjJxHsNvNGBzEXKgYv';
-const GROWTH_PRICE_ID =
-  process.env.NEXT_PUBLIC_STRIPE_GROWTH_PRICE_ID || 'price_1T4lRNFjJxHsNvNGCH2pkACR';
-
 interface Plan {
   id: string;
   name: string;
@@ -21,39 +16,91 @@ interface Plan {
   features: string[];
 }
 
+const SOLO_PRICE_ID =
+  process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID || 'price_1TEHcrFjJxHsNvNGmvH3pQur';
+const PRACTICE_PRICE_ID =
+  process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID || 'price_1TEHd6FjJxHsNvNGahdVbS6N';
+const CLINIC_PRICE_ID =
+  process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8';
+const ENTERPRISE_PRICE_ID =
+  process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8';
+
 const plans: Plan[] = [
   {
-    id: 'essential',
-    name: 'ESSENTIAL',
-    price: '$297',
-    description: 'For solo practices & small clinics (1–5 staff)',
-    priceId: ESSENTIAL_PRICE_ID,
+    id: 'solo',
+    name: 'SOLO',
+    price: '$79',
+    description: 'For solo practices & small clinics (1-5 staff)',
+    priceId: SOLO_PRICE_ID,
     featured: false,
     features: [
-      'Secure access with MFA',
-      'Role-based permissions',
-      'HIPAA-aligned Risk Assessment',
-      '9 customized HIPAA policies',
-      'Breach notification letter generator',
-      'One-click Audit Package export',
-      'Email support (48h response)',
+      'Encrypted cloud storage with role-based access and MFA',
+      'Full activity log: every action recorded for audit trail',
+      'HIPAA Business Associate Agreement included',
+      'Email support, 48-hour response',
     ],
   },
   {
-    id: 'growth',
-    name: 'GROWTH',
-    price: '$697',
-    description: 'For scaling & multi-provider clinics (6–20 staff)',
-    priceId: GROWTH_PRICE_ID,
+    id: 'practice',
+    name: 'PRACTICE',
+    price: '$197',
+    description: 'Your practice is growing. Your compliance needs to keep up.',
+    priceId: PRACTICE_PRICE_ID,
     featured: true,
     features: [
-      'Everything in Essential',
-      'Custom risk scoring & mitigation tracking',
-      'Vendor & BAA tracking with alerts',
-      'Incident logging & response timeline',
+      "Staff training tracker: see who's certified, who's overdue, and who's never been trained",
+      'Automated annual training reminders with certificate generation',
+      'Role-based training assignment: clinical staff, admin, contractors',
+      'Completion reports formatted for OCR review',
+      'BAA tracker with expiration alerts',
+      'Asset-based risk identification',
+      'Mitigation tracking workflow with deadlines and owners',
       'Real-time compliance dashboard',
-      'Staff training tracking',
-      'Priority email + phone support',
+      'Incident logging with full response timeline and chain-of-custody documentation',
+      'Priority email support',
+      'Business-hours phone support',
+    ],
+  },
+  {
+    id: 'clinic',
+    name: 'CLINIC',
+    price: '$397',
+    description: 'Multiple providers. Board-level accountability. Zero margin for error.',
+    priceId: CLINIC_PRICE_ID,
+    featured: false,
+    features: [
+      "Multi-location framework: manage each location's compliance status independently or as a unified view",
+      'Executive and board-ready reporting: one-click reports formatted for governance meetings, not just auditors',
+      'Advanced audit export customization: tailor evidence packages by location, department, or audit type',
+      'Compliance program calendar: automated scheduling of all required annual activities',
+      'Quarterly compliance review',
+      'Documentation review guidance',
+      'Dedicated onboarding',
+      'Guided breach response workflow',
+      'Structured notification templates for every breach scenario',
+      '24-hour response SLA',
+      'Direct phone line: not a ticket queue',
+      'Dedicated account contact',
+    ],
+  },
+  {
+    id: 'enterprise',
+    name: 'ENTERPRISE',
+    price: 'Custom',
+    description:
+      'Custom pricing: starting at $1,500/month. Custom compliance infrastructure for networks, DSOs, and health systems.',
+    priceId: ENTERPRISE_PRICE_ID,
+    featured: false,
+    features: [
+      'Unlimited locations and entities under one account',
+      'Custom policy framework aligned to your organizational structure',
+      'Dedicated compliance success manager',
+      'Custom integrations with your existing EHR, HR, and credentialing systems',
+      'Board-level and executive reporting suite',
+      'Annual compliance program audit with written findings',
+      'Priority breach response with direct legal escalation guidance',
+      'SLA-backed uptime and dedicated infrastructure',
+      'Consolidated billing across all locations',
     ],
   },
 ];
@@ -112,7 +159,9 @@ function PlanCard({ plan }: { plan: Plan }) {
 
       <div className="flex items-baseline mb-8">
         <span className="text-5xl font-thin text-[#0e274e]">{plan.price}</span>
-        <span className="text-gray-400 text-sm ml-2 font-thin">/ month</span>
+        {plan.price !== 'Custom' && (
+          <span className="text-gray-400 text-sm ml-2 font-thin">/ month</span>
+        )}
       </div>
 
       <ul className="space-y-3 flex-grow mb-8">

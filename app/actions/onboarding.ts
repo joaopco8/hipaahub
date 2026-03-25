@@ -73,6 +73,7 @@ export interface RiskAssessmentData {
   totalRiskScore: number;
   maxPossibleScore: number;
   riskPercentage: number;
+  criticalFailures?: string[];
 }
 
 export interface StaffMemberData {
@@ -782,6 +783,37 @@ export async function saveRiskAssessment(data: RiskAssessmentData) {
       risk_percentage: data.riskPercentage
     });
     throw new Error(`Failed to save risk assessment: ${error.message || 'Unknown error'}`);
+  }
+
+  // Update expires_at on the main assessment record (non-blocking)
+  const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+  try {
+    await (supabase as any)
+      .from('onboarding_risk_assessments')
+      .update({ expires_at: expiresAt })
+      .eq('user_id', user.id);
+  } catch { /* non-blocking */ }
+
+  // Snapshot to risk_assessment_history with gap report (non-blocking)
+  try {
+    const { buildGapReport } = await import('@/lib/gap-report');
+    const gapReport = buildGapReport(data.answers);
+    await (supabase as any)
+      .from('risk_assessment_history')
+      .insert({
+        user_id: user.id,
+        organization_id: organization.id,
+        risk_level: data.riskLevel,
+        risk_percentage: Number(data.riskPercentage.toFixed(2)),
+        total_risk_score: Number(data.totalRiskScore.toFixed(2)),
+        max_possible_score: Number(data.maxPossibleScore.toFixed(2)),
+        answers: data.answers,
+        critical_failures: data.criticalFailures ?? [],
+        gap_report: gapReport,
+        assessed_at: new Date().toISOString(),
+      });
+  } catch (histErr) {
+    console.warn('Failed to save assessment history (non-blocking):', histErr);
   }
 
   revalidatePath('/dashboard');

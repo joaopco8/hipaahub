@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { getUser } from '@/utils/supabase/queries';
 import { revalidatePath } from 'next/cache';
+import { canTransition, requiresSignature, type PolicyStatus } from '@/lib/policy-transitions';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const ALLOWED_TYPES = [
@@ -374,6 +375,11 @@ export interface GeneratedPolicyStatus {
   generated_at: string;
   last_generated_at: string;
   generation_count: number;
+  policy_status?: string;
+  signed_by?: string | null;
+  signed_at?: string | null;
+  signature_name?: string | null;
+  next_review_date?: string | null;
 }
 
 /**
@@ -381,7 +387,8 @@ export interface GeneratedPolicyStatus {
  */
 export async function markPolicyAsGenerated(
   policyNumericId: number,
-  policyName: string
+  policyName: string,
+  contentSnapshot?: string
 ): Promise<void> {
   const supabase = createClient();
   const user = await getUser(supabase);
@@ -426,6 +433,15 @@ export async function markPolicyAsGenerated(
       });
   }
 
+  // Save version snapshot if content was provided
+  if (contentSnapshot) {
+    try {
+      await savePolicyVersion(policyNumericId, policyName, contentSnapshot, 'draft');
+    } catch {
+      // Non-blocking — generation already succeeded
+    }
+  }
+
   revalidatePath('/dashboard/policies');
 }
 
@@ -448,7 +464,7 @@ export async function getPolicyGenerationStatus(): Promise<Map<number, Generated
 
   const { data } = await (supabase as any)
     .from('generated_policy_documents')
-    .select('policy_id, generated_at, last_generated_at, generation_count')
+    .select('policy_id, generated_at, last_generated_at, generation_count, policy_status, signed_by, signed_at, signature_name, next_review_date')
     .eq('organization_id', organization.id);
 
   const map = new Map<number, GeneratedPolicyStatus>();
@@ -459,6 +475,239 @@ export async function getPolicyGenerationStatus(): Promise<Map<number, Generated
   }
 
   return map;
+}
+
+// ─── Policy Status & Version History ──────────────────────────────────────────
+
+/**
+ * Update policy status. When activating ('active'), requires electronic signature.
+ * Validates the transition using the allowed transitions from lib/policy-transitions.
+ */
+export async function updatePolicyStatus(
+  policyNumericId: number,
+  newStatus: 'draft' | 'active' | 'in_review' | 'archived',
+  signatureName?: string,
+  nextReviewDate?: string,
+  ip?: string
+): Promise<void> {
+  const supabase = createClient();
+  const user = await getUser(supabase);
+  if (!user) throw new Error('Unauthorized');
+
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+  if (!organization) throw new Error('Organization not found');
+
+  // Fetch current status to validate transition
+  const { data: currentDoc } = await (supabase as any)
+    .from('generated_policy_documents')
+    .select('policy_status')
+    .eq('organization_id', organization.id)
+    .eq('policy_id', policyNumericId)
+    .maybeSingle();
+
+  const currentStatus: PolicyStatus = (currentDoc?.policy_status as PolicyStatus) ?? 'draft';
+
+  if (!canTransition(currentStatus, newStatus as PolicyStatus)) {
+    throw new Error('Transition not allowed');
+  }
+
+  const updatePayload: Record<string, any> = {
+    policy_status: newStatus,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (requiresSignature(currentStatus, newStatus as PolicyStatus)) {
+    if (!signatureName) throw new Error('Electronic signature required to activate a policy');
+    updatePayload.signed_by = user.id;
+    updatePayload.signed_at = new Date().toISOString();
+    updatePayload.signature_name = signatureName;
+    // Default next review: 1 year from today
+    updatePayload.next_review_date = nextReviewDate
+      || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    updatePayload.last_reviewed_at = new Date().toISOString();
+    if (ip) {
+      (updatePayload as any).signature_ip = ip;
+    }
+  }
+
+  const { error } = await (supabase as any)
+    .from('generated_policy_documents')
+    .update(updatePayload)
+    .eq('organization_id', organization.id)
+    .eq('policy_id', policyNumericId);
+
+  if (error) throw new Error('Failed to update policy status');
+
+  revalidatePath('/dashboard/policies');
+}
+
+/**
+ * Save a version snapshot of a policy to policy_versions
+ */
+export async function savePolicyVersion(
+  policyNumericId: number,
+  policyName: string,
+  contentSnapshot: string,
+  status: string = 'draft'
+): Promise<void> {
+  const supabase = createClient();
+  const user = await getUser(supabase);
+  if (!user) throw new Error('Unauthorized');
+
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+  if (!organization) throw new Error('Organization not found');
+
+  // Get next version number
+  const { data: lastVersion } = await (supabase as any)
+    .from('policy_versions')
+    .select('version_number')
+    .eq('organization_id', organization.id)
+    .eq('policy_id', policyNumericId)
+    .order('version_number', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const nextVersion = (lastVersion?.version_number || 0) + 1;
+
+  await (supabase as any)
+    .from('policy_versions')
+    .insert({
+      organization_id: organization.id,
+      policy_id: policyNumericId,
+      policy_name: policyName,
+      version_number: nextVersion,
+      content_snapshot: contentSnapshot.substring(0, 50000), // cap at 50k chars
+      status,
+      generated_by: user.id,
+    });
+}
+
+/**
+ * Get version history for a policy
+ */
+export async function getPolicyVersionHistory(policyNumericId: number) {
+  const supabase = createClient();
+  const user = await getUser(supabase);
+  if (!user) return [];
+
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+  if (!organization) return [];
+
+  const { data } = await (supabase as any)
+    .from('policy_versions')
+    .select('id, version_number, status, signature_name, signed_at, next_review_date, notes, created_at, generated_by')
+    .eq('organization_id', organization.id)
+    .eq('policy_id', policyNumericId)
+    .order('version_number', { ascending: false });
+
+  return data || [];
+}
+
+// ─── Version Restore & Content Fetch ──────────────────────────────────────────
+
+/**
+ * Restore an old version: fetch its content_snapshot, save as a new version (status='draft').
+ * Never deletes anything — creates a new version record.
+ */
+export async function restorePolicyVersion(
+  policyNumericId: number,
+  versionId: string
+): Promise<{ newVersionNumber: number }> {
+  const supabase = createClient();
+  const user = await getUser(supabase);
+  if (!user) throw new Error('Unauthorized');
+
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+  if (!organization) throw new Error('Organization not found');
+
+  // Fetch the version to restore
+  const { data: version, error: fetchError } = await (supabase as any)
+    .from('policy_versions')
+    .select('content_snapshot, version_number, policy_name')
+    .eq('id', versionId)
+    .eq('organization_id', organization.id)
+    .single();
+
+  if (fetchError || !version) throw new Error('Version not found');
+
+  // Get next version number
+  const { data: lastVersion } = await (supabase as any)
+    .from('policy_versions')
+    .select('version_number')
+    .eq('organization_id', organization.id)
+    .eq('policy_id', policyNumericId)
+    .order('version_number', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const nextVersion = (lastVersion?.version_number || 0) + 1;
+
+  const { error: insertError } = await (supabase as any)
+    .from('policy_versions')
+    .insert({
+      organization_id: organization.id,
+      policy_id: policyNumericId,
+      policy_name: version.policy_name,
+      version_number: nextVersion,
+      content_snapshot: version.content_snapshot,
+      status: 'draft',
+      notes: `Restored from v${version.version_number}`,
+      generated_by: user.id,
+    });
+
+  if (insertError) throw new Error('Failed to restore version');
+
+  revalidatePath(`/dashboard/policies/${policyNumericId}/history`);
+  return { newVersionNumber: nextVersion };
+}
+
+/**
+ * Get the full content snapshot of a specific version (for diff computation).
+ */
+export async function getPolicyVersionContent(
+  versionId: string
+): Promise<{ content_snapshot: string; version_number: number; policy_name: string } | null> {
+  const supabase = createClient();
+  const user = await getUser(supabase);
+  if (!user) return null;
+
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+  if (!organization) return null;
+
+  const { data, error } = await (supabase as any)
+    .from('policy_versions')
+    .select('content_snapshot, version_number, policy_name')
+    .eq('id', versionId)
+    .eq('organization_id', organization.id)
+    .single();
+
+  if (error || !data) return null;
+
+  return {
+    content_snapshot: data.content_snapshot ?? '',
+    version_number: data.version_number,
+    policy_name: data.policy_name,
+  };
 }
 
 // ─── File Download ─────────────────────────────────────────────────────────────

@@ -199,8 +199,14 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                                       onClick={async () => {
                                         try {
                                           const bucket = ev.storage_bucket || 'evidence';
+                                          const viewParams = new URLSearchParams({
+                                            file_url: ev.file_url || '',
+                                            bucket,
+                                          });
+                                          if (ev.id) viewParams.set('evidence_id', ev.id);
+                                          if (ev.title) viewParams.set('evidence_title', ev.title);
                                           const response = await fetch(
-                                            `/api/compliance-evidence/view?file_url=${encodeURIComponent(ev.file_url || '')}&bucket=${encodeURIComponent(bucket)}`
+                                            `/api/compliance-evidence/view?${viewParams.toString()}`
                                           );
                                           
                                           if (!response.ok) {

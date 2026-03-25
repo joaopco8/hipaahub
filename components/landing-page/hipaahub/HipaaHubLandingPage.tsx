@@ -99,18 +99,38 @@ const HipaaHubLandingPage: React.FC = () => {
             </div>
 
             <Hero onAssessmentClick={handleAssessmentClick} onDemoClick={handleWatchDemoClick} />
+
+            {/* Social proof bar */}
+            <div className="bg-[#f8f9fa] border-b border-gray-100 py-4 px-4 md:px-12">
+              <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
+                {[
+                  'Audit-ready in 7 days',
+                  '14-day free trial',
+                  'Cancel anytime',
+                  'HIPAA BAA included',
+                  'SOC 2 Type II',
+                  'No per-seat pricing',
+                ].map((item) => (
+                  <span key={item} className="flex items-center gap-2 text-[11px] font-thin text-gray-500">
+                    <span className="w-1 h-1 rounded-full bg-cisco-blue inline-block flex-shrink-0" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
             <SolutionSection />
-            <StatsSection />
-            <BuiltForYourPractice />
-            <HowItWorks />
+            <StatsSection onAssessmentClick={handleAssessmentClick} />
             <HowItWorksSteps />
             <WhatsIncluded onDemoClick={handleWatchDemoClick} />
-            <SocialProof />
-            <BlogSection onReadMore={(post) => navigateTo('blog', post)} />
-            <AuditGuarantee />
+            <HowItWorks onGetStarted={handleAssessmentClick} />
+            <BuiltForYourPractice />
             <WhyPracticesChoose />
+            <SocialProof />
             <PricingSection onDemoClick={handleWatchDemoClick} />
             <FAQSection />
+            <AuditGuarantee />
+            <BlogSection onReadMore={(post) => navigateTo('blog', post)} />
             <BottomCTA onAssessmentClick={handleAssessmentClick} onDemoClick={handleWatchDemoClick} />
           </>
         )}

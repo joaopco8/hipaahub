@@ -227,8 +227,11 @@ export default function EmployeeInvitesSection({
                     </div>
 
                     {/* Role */}
-                    <div className="flex items-center md:justify-start">
+                    <div className="flex flex-col gap-0.5 justify-center">
                       <span className="text-xs text-gray-500 font-light">{invite.role_title}</span>
+                      {invite.role_group && (
+                        <span className="text-xs text-[#00bceb] capitalize">{invite.role_group}</span>
+                      )}
                     </div>
 
                     {/* Status */}

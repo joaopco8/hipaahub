@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, FileText, Download, Eye, AlertCircle, RefreshCw, Clock } from 'lucide-react';
+import { CheckCircle2, FileText, Download, Eye, AlertCircle, RefreshCw, Clock, AlertTriangle, History } from 'lucide-react';
 import { AdditionalDocumentsSection } from '@/components/policies/additional-documents-section';
 import { PoliciesNavigation } from '@/components/policies/policies-navigation';
 import { getPolicyGenerationStatus } from '@/app/actions/policy-documents';
+import { PolicyStatusActions } from '@/components/policies/policy-status-actions';
 
 export default async function PoliciesPage() {
   const supabase = createClient();
@@ -82,11 +83,26 @@ export default async function PoliciesPage() {
   // Merge DB generation status into each policy
   const policies = policiesBase.map((p) => {
     const genStatus = generationStatusMap.get(p.id);
+    const reviewDate = genStatus?.next_review_date ? new Date(genStatus.next_review_date) : null;
+    const now = new Date();
+    const daysUntilReview = reviewDate
+      ? Math.ceil((reviewDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      : null;
+    const isOverdue = daysUntilReview !== null && daysUntilReview < 0;
+    const isExpiringSoon = daysUntilReview !== null && daysUntilReview >= 0 && daysUntilReview <= 90;
     return {
       ...p,
       isGenerated: !!genStatus,
       generatedAt: genStatus?.last_generated_at ?? null,
-      generationCount: genStatus?.generation_count ?? 0
+      generationCount: genStatus?.generation_count ?? 0,
+      policyStatus: genStatus?.policy_status ?? 'draft',
+      signedBy: genStatus?.signed_by ?? null,
+      signedAt: genStatus?.signed_at ?? null,
+      signatureName: genStatus?.signature_name ?? null,
+      nextReviewDate: genStatus?.next_review_date ?? null,
+      daysUntilReview,
+      isExpiringSoon,
+      isOverdue,
     };
   });
 
@@ -160,18 +176,41 @@ export default async function PoliciesPage() {
                   </CardDescription>
                 </div>
 
-                {/* Status badge */}
-                {policy.isGenerated ? (
-                  <Badge className="bg-[#00bceb]/10 text-[#00bceb] border-0 rounded-none font-normal shrink-0">
-                    <CheckCircle2 className="h-3 w-3 mr-1" />
-                    Generated
-                  </Badge>
-                ) : (
-                  <Badge className="bg-yellow-50 text-yellow-600 border-0 rounded-none font-normal shrink-0">
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    Pending
-                  </Badge>
-                )}
+                {/* Status badges */}
+                <div className="flex flex-col gap-1 shrink-0">
+                  {policy.isGenerated ? (
+                    <Badge className={`border-0 rounded-none font-normal ${
+                      policy.policyStatus === 'active'   ? 'bg-[#71bc48]/10 text-[#71bc48]' :
+                      policy.policyStatus === 'in_review' ? 'bg-amber-50 text-amber-600' :
+                      policy.policyStatus === 'archived'  ? 'bg-gray-100 text-gray-500' :
+                      'bg-[#00bceb]/10 text-[#00bceb]'
+                    }`}>
+                      {policy.policyStatus === 'active'   && <CheckCircle2 className="h-3 w-3 mr-1" />}
+                      {policy.policyStatus === 'in_review' && <Clock className="h-3 w-3 mr-1" />}
+                      {policy.policyStatus === 'draft'    && <FileText className="h-3 w-3 mr-1" />}
+                      {policy.policyStatus === 'active'    ? 'Active' :
+                       policy.policyStatus === 'in_review' ? 'In Review' :
+                       policy.policyStatus === 'archived'  ? 'Archived' : 'Draft'}
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-yellow-50 text-yellow-600 border-0 rounded-none font-normal">
+                      <AlertCircle className="h-3 w-3 mr-1" />
+                      Pending
+                    </Badge>
+                  )}
+                  {policy.isOverdue && (
+                    <Badge className="bg-red-50 text-red-600 border-0 rounded-none font-normal text-xs">
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      Review {Math.abs(policy.daysUntilReview!)} day{Math.abs(policy.daysUntilReview!) !== 1 ? 's' : ''} overdue
+                    </Badge>
+                  )}
+                  {!policy.isOverdue && policy.isExpiringSoon && (
+                    <Badge className="bg-amber-50 text-amber-600 border-0 rounded-none font-normal text-xs">
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      Review due in {policy.daysUntilReview} day{policy.daysUntilReview !== 1 ? 's' : ''}
+                    </Badge>
+                  )}
+                </div>
               </div>
             </CardHeader>
 
@@ -179,18 +218,33 @@ export default async function PoliciesPage() {
               <div className="space-y-3">
                 {/* Generation metadata */}
                 {policy.isGenerated && policy.generatedAt && (
-                  <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                    <Clock className="h-3 w-3" />
-                    Last generated:{' '}
-                    {new Date(policy.generatedAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}
-                    {policy.generationCount > 1 && (
-                      <span className="ml-1 text-[#565656]">
-                        · {policy.generationCount}× generated
-                      </span>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                      <Clock className="h-3 w-3" />
+                      Last generated:{' '}
+                      {new Date(policy.generatedAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                      {policy.generationCount > 1 && (
+                        <span className="ml-1 text-[#565656]">
+                          · v{policy.generationCount}
+                        </span>
+                      )}
+                    </div>
+                    {policy.signatureName && (
+                      <div className="flex items-center gap-1.5 text-xs text-[#71bc48]">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Signed by {policy.signatureName}{' '}
+                        {policy.signedAt && `on ${new Date(policy.signedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                      </div>
+                    )}
+                    {policy.nextReviewDate && (
+                      <div className={`flex items-center gap-1.5 text-xs ${policy.isOverdue ? 'text-red-500' : policy.isExpiringSoon ? 'text-amber-500' : 'text-gray-400'}`}>
+                        <AlertTriangle className="h-3 w-3" />
+                        Review by {new Date(policy.nextReviewDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </div>
                     )}
                   </div>
                 )}
@@ -198,7 +252,6 @@ export default async function PoliciesPage() {
                 <div className="flex gap-2 flex-wrap">
                   {policy.isGenerated ? (
                     <>
-                      {/* View previews the latest version */}
                       <Link href={`/dashboard/policies/${policy.id}/preview`}>
                         <Button
                           variant="outline"
@@ -210,7 +263,6 @@ export default async function PoliciesPage() {
                         </Button>
                       </Link>
 
-                      {/* Regenerate */}
                       <Link href={`/dashboard/policies/${policy.id}/preview`}>
                         <Button
                           variant="outline"
@@ -221,6 +273,22 @@ export default async function PoliciesPage() {
                           Regenerate
                         </Button>
                       </Link>
+
+                      <Link href={`/dashboard/policies/${policy.id}/history`}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 rounded-none border-gray-200 text-[#565656] hover:text-[#0e274e]"
+                        >
+                          <History className="mr-2 h-3.5 w-3.5" />
+                          History
+                        </Button>
+                      </Link>
+
+                      <PolicyStatusActions
+                        policyId={policy.id}
+                        currentStatus={policy.policyStatus}
+                      />
                     </>
                   ) : (
                     <Link href={`/dashboard/policies/${policy.id}/preview`} className="flex-1">

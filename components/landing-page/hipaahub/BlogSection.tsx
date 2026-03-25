@@ -49,7 +49,7 @@ const BlogSection: React.FC<{ onReadMore: (post: Post) => void }> = ({ onReadMor
       category: "Regulatory",
       title: "OCR Audit Trends: What small clinics need to know for 2026",
       date: "February 18, 2026",
-      author: "Dr. Marcus Chen",
+      author: "Dr. Marcus Chen · Healthcare Compliance Director",
       image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=800"
     },
     {
@@ -57,7 +57,7 @@ const BlogSection: React.FC<{ onReadMore: (post: Post) => void }> = ({ onReadMor
       category: "Cybersecurity",
       title: "The rising threat of ransomware in private medical practices",
       date: "February 10, 2026",
-      author: "Jordan Vasquez",
+      author: "Jordan Vasquez · Clinical Security Analyst",
       image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800"
     },
     {
@@ -65,7 +65,7 @@ const BlogSection: React.FC<{ onReadMore: (post: Post) => void }> = ({ onReadMor
       category: "Best Practices",
       title: "5 common documentation mistakes that lead to HIPAA fines",
       date: "February 3, 2026",
-      author: "Priya Nair",
+      author: "Priya Nair · HIPAA Privacy Officer",
       image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800"
     }
   ];

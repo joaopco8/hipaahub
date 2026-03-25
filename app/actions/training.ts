@@ -176,6 +176,7 @@ export interface EmployeeInvite {
   name: string;
   email: string;
   role_title: string;
+  role_group: 'clinical' | 'admin' | 'contractor' | 'intern' | null;
   status: 'invited' | 'completed' | 'expired';
   invited_at: string;
   completed_at: string | null;
@@ -202,7 +203,7 @@ export async function getEmployeeInvites(): Promise<EmployeeInvite[]> {
 
   const { data, error } = await supabase
     .from('employee_invites' as any)
-    .select('id, name, email, role_title, status, invited_at, completed_at, quiz_score, certificate_id, token_expires_at')
+    .select('id, name, email, role_title, role_group, status, invited_at, completed_at, quiz_score, certificate_id, token_expires_at')
     .eq('organization_id', org.id)
     .order('invited_at', { ascending: false });
 

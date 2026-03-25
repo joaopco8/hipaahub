@@ -3,7 +3,7 @@ import React from 'react';
 const rows = [
   {
     label: 'Starting price',
-    hipaaHub: '$297/mo',
+    hipaaHub: '$79/mo',
     compliancyGroup: '$399/mo',
     manual: 'Your time + legal risk',
   },
