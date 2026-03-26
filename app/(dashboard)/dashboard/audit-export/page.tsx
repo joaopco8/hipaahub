@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
-import { getUser } from '@/utils/supabase/queries';
+import { getUser, getSubscription } from '@/utils/supabase/queries';
 import { redirect } from 'next/navigation';
 import { getAuditExportData } from '@/app/actions/audit-export';
 import { AuditExportClient } from '@/components/audit-export/audit-export-client';
@@ -12,11 +12,16 @@ export default async function AuditExportPage() {
     return redirect('/signin');
   }
 
-  const auditData = await getAuditExportData();
+  const [auditData, subscription] = await Promise.all([
+    getAuditExportData(),
+    getSubscription(supabase, user.id),
+  ]);
 
   if (!auditData) {
     return redirect('/onboarding/expectation');
   }
 
-  return <AuditExportClient auditData={auditData} />;
+  const isLocked = !subscription || subscription.status === 'trialing';
+
+  return <AuditExportClient auditData={auditData} isLocked={isLocked} userEmail={user.email ?? ''} />;
 }

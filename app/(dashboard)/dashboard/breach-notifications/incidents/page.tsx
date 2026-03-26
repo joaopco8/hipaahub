@@ -10,11 +10,21 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertCircle, Plus, Eye, Edit, Trash2, AlertTriangle, CheckCircle2, Clock, FileText } from 'lucide-react';
+import { AlertCircle, Plus, Eye, Edit, Trash2, AlertTriangle, CheckCircle2, Clock, FileText, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { BreachNavigation } from '@/components/breach-notifications/breach-navigation';
+import { useSubscription } from '@/contexts/subscription-context';
+import { Lock } from 'lucide-react';
+
+const SANCTION_TYPES = [
+  { value: 'verbal_warning',  label: 'Verbal Warning'  },
+  { value: 'written_warning', label: 'Written Warning' },
+  { value: 'suspension',      label: 'Suspension'      },
+  { value: 'termination',     label: 'Termination'     },
+  { value: 'other',           label: 'Other'           },
+];
 
 interface Incident {
   id: string;
@@ -67,11 +77,18 @@ function getStatusColor(status: string) {
 
 export default function IncidentsPage() {
   const router = useRouter();
+  const { planTier } = useSubscription();
+  const isPlanPractice = planTier === 'practice' || planTier === 'clinic' || planTier === 'enterprise';
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingIncident, setEditingIncident] = useState<Incident | null>(null);
-  
+
+  // Practice plan: employee list for multi-select
+  const [practiceEmployees, setPracticeEmployees] = useState<{ id: string; first_name: string; last_name: string }[]>([]);
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([]);
+  const [isPracticePlan, setIsPracticePlan] = useState(false);
+
   const [formData, setFormData] = useState({
     incident_title: '',
     description: '',
@@ -85,12 +102,45 @@ export default function IncidentsPage() {
     breach_confirmed: false,
     employees_involved: '',
     sanction_applied: false,
+    sanction_type: '',
     sanction_description: '',
+    reviewed_by_admin: false,
   });
 
   useEffect(() => {
     loadIncidents();
+    loadPracticeData();
   }, []);
+
+  async function loadPracticeData() {
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: orgData } = await supabase
+        .from('organizations')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      if (!orgData) return;
+
+      // Try to fetch employees (only available on Practice+ plan)
+      const { data: emps } = await (supabase as any)
+        .from('employees')
+        .select('id, first_name, last_name')
+        .eq('org_id', orgData.id)
+        .eq('is_active', true)
+        .order('last_name');
+
+      if (emps && emps.length > 0) {
+        setPracticeEmployees(emps);
+        setIsPracticePlan(true);
+      }
+    } catch {
+      // Not on Practice plan or employees table doesn't exist
+    }
+  }
 
   async function loadIncidents() {
     try {
@@ -148,12 +198,22 @@ export default function IncidentsPage() {
 
       if (!orgData) return;
 
+      const practiceFields = isPracticePlan
+        ? {
+            sanction_type: formData.sanction_type || null,
+            involved_employee_ids: selectedEmployeeIds.length > 0 ? selectedEmployeeIds : null,
+            reviewed_by_admin: formData.reviewed_by_admin,
+            reviewed_at: formData.reviewed_by_admin ? new Date().toISOString() : null,
+          }
+        : {};
+
       if (editingIncident) {
         // Update existing incident
         const { error } = await (supabase as any)
           .from('incident_logs')
           .update({
             ...formData,
+            ...practiceFields,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingIncident.id)
@@ -162,15 +222,25 @@ export default function IncidentsPage() {
         if (error) throw error;
       } else {
         // Create new incident
-        const { error } = await (supabase as any)
+        const { data: newIncident, error } = await (supabase as any)
           .from('incident_logs')
           .insert({
             ...formData,
+            ...practiceFields,
             organization_id: orgData.id,
             created_by: user.id
-          });
+          })
+          .select('id, incident_title')
+          .single();
 
         if (error) throw error;
+
+        // Notify admin via email
+        fetch('/api/incidents/notify-admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ incidentId: newIncident?.id, title: formData.incident_title }),
+        }).catch(() => {});
       }
 
       setIsDialogOpen(false);
@@ -197,8 +267,11 @@ export default function IncidentsPage() {
       breach_confirmed: false,
       employees_involved: '',
       sanction_applied: false,
+      sanction_type: '',
       sanction_description: '',
+      reviewed_by_admin: false,
     });
+    setSelectedEmployeeIds([]);
   }
 
   async function handleApprove(incidentId: string) {
@@ -240,8 +313,11 @@ export default function IncidentsPage() {
       breach_confirmed: incident.breach_confirmed,
       employees_involved: incident.employees_involved || '',
       sanction_applied: incident.sanction_applied || false,
+      sanction_type: (incident as any).sanction_type || '',
       sanction_description: incident.sanction_description || '',
+      reviewed_by_admin: (incident as any).reviewed_by_admin || false,
     });
+    setSelectedEmployeeIds((incident as any).involved_employee_ids ?? []);
     setIsDialogOpen(true);
   }
 
@@ -447,18 +523,51 @@ export default function IncidentsPage() {
                 />
               </div>
 
+              {/* Employees Involved — Practice+ uses multi-select; Solo is locked */}
               <div className="space-y-2">
-                <Label htmlFor="employees_involved" className="text-[#0c0b1d] font-light text-sm">
+                <Label className="text-[#0c0b1d] font-light text-sm">
                   Employees Involved
+                  {isPlanPractice && isPracticePlan && (
+                    <span className="ml-2 text-xs text-[#00bceb] font-light">— select from roster</span>
+                  )}
                 </Label>
-                <Textarea
-                  id="employees_involved"
-                  value={formData.employees_involved}
-                  onChange={(e) => setFormData({ ...formData, employees_involved: e.target.value })}
-                  rows={2}
-                  className="rounded-none text-[#0c0b1d]"
-                  placeholder="Names and roles of employees involved..."
-                />
+                {!isPlanPractice ? (
+                  <div className="flex items-center gap-2 border border-dashed border-gray-200 px-3 py-2 text-sm text-gray-400 font-light">
+                    <Lock className="h-3.5 w-3.5 shrink-0" />
+                    <span>Requires Practice plan — <Link href="/select-plan" className="text-[#00bceb] hover:underline">Upgrade →</Link></span>
+                  </div>
+                ) : isPracticePlan && practiceEmployees.length > 0 ? (
+                  <div className="border border-gray-200 max-h-32 overflow-y-auto p-2 rounded-none">
+                    {practiceEmployees.map((emp) => (
+                      <label key={emp.id} className="flex items-center gap-2 py-1 cursor-pointer hover:bg-gray-50 px-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedEmployeeIds.includes(emp.id)}
+                          onChange={(e) => {
+                            setSelectedEmployeeIds(
+                              e.target.checked
+                                ? [...selectedEmployeeIds, emp.id]
+                                : selectedEmployeeIds.filter((id) => id !== emp.id)
+                            );
+                          }}
+                          className="w-4 h-4 text-[#00bceb]"
+                        />
+                        <span className="text-sm font-light text-[#0c0b1d]">
+                          {emp.first_name} {emp.last_name}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <Textarea
+                    id="employees_involved"
+                    value={formData.employees_involved}
+                    onChange={(e) => setFormData({ ...formData, employees_involved: e.target.value })}
+                    rows={2}
+                    className="rounded-none text-[#0c0b1d]"
+                    placeholder="Names and roles of employees involved..."
+                  />
+                )}
               </div>
 
               <div className="space-y-4 border-t border-gray-200 pt-4">
@@ -486,31 +595,74 @@ export default function IncidentsPage() {
                     Breach Confirmed
                   </Label>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="sanction_applied"
-                    checked={formData.sanction_applied}
-                    onChange={(e) => setFormData({ ...formData, sanction_applied: e.target.checked })}
-                    className="rounded h-4 w-4 text-[#1ad07a] border-gray-300 focus:ring-[#1ad07a]"
-                  />
-                  <Label htmlFor="sanction_applied" className="font-light cursor-pointer text-[#0c0b1d] text-sm">
-                    Sanction Applied (per Sanction Policy)
-                  </Label>
-                </div>
-                {formData.sanction_applied && (
-                  <div className="space-y-2 pl-6">
-                    <Label htmlFor="sanction_description" className="text-[#0c0b1d] font-light text-sm">
-                      Sanction Description
-                    </Label>
-                    <Textarea
-                      id="sanction_description"
-                      value={formData.sanction_description}
-                      onChange={(e) => setFormData({ ...formData, sanction_description: e.target.value })}
-                      rows={2}
-                      className="rounded-none text-[#0c0b1d]"
-                      placeholder="Describe the sanction applied..."
+                {!isPlanPractice ? (
+                  <div className="flex items-center gap-2 border border-dashed border-gray-200 px-3 py-2 text-sm text-gray-400 font-light">
+                    <Lock className="h-3.5 w-3.5 shrink-0" />
+                    <span>Sanction tracking requires Practice plan — <Link href="/select-plan" className="text-[#00bceb] hover:underline">Upgrade →</Link></span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="sanction_applied"
+                        checked={formData.sanction_applied}
+                        onChange={(e) => setFormData({ ...formData, sanction_applied: e.target.checked })}
+                        className="rounded h-4 w-4 text-[#1ad07a] border-gray-300 focus:ring-[#1ad07a]"
+                      />
+                      <Label htmlFor="sanction_applied" className="font-light cursor-pointer text-[#0c0b1d] text-sm">
+                        Sanction Applied (per Sanction Policy)
+                      </Label>
+                    </div>
+                    {formData.sanction_applied && (
+                      <div className="space-y-3 pl-6">
+                        <div className="space-y-1">
+                          <Label className="text-[#0c0b1d] font-light text-sm">Sanction Type</Label>
+                          <Select
+                            value={formData.sanction_type}
+                            onValueChange={(v) => setFormData({ ...formData, sanction_type: v })}
+                          >
+                            <SelectTrigger className="rounded-none text-[#0c0b1d]">
+                              <SelectValue placeholder="Select sanction type…" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {SANCTION_TYPES.map((s) => (
+                                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label htmlFor="sanction_description" className="text-[#0c0b1d] font-light text-sm">
+                            Sanction Details
+                          </Label>
+                          <Textarea
+                            id="sanction_description"
+                            value={formData.sanction_description}
+                            onChange={(e) => setFormData({ ...formData, sanction_description: e.target.value })}
+                            rows={2}
+                            className="rounded-none text-[#0c0b1d]"
+                            placeholder="Describe the sanction applied..."
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Practice+: Admin Review Toggle */}
+                {isPracticePlan && (
+                  <div className="flex items-center space-x-2 border-t border-gray-100 pt-3">
+                    <input
+                      type="checkbox"
+                      id="reviewed_by_admin"
+                      checked={formData.reviewed_by_admin}
+                      onChange={(e) => setFormData({ ...formData, reviewed_by_admin: e.target.checked })}
+                      className="rounded h-4 w-4 text-[#00bceb] border-gray-300"
                     />
+                    <Label htmlFor="reviewed_by_admin" className="font-light cursor-pointer text-[#0c0b1d] text-sm">
+                      Reviewed by admin (Practice plan)
+                    </Label>
                   </div>
                 )}
               </div>

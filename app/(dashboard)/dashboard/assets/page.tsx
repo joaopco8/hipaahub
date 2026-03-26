@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Shield, AlertTriangle, Monitor, Cloud, Laptop, Server, Wifi } from 'lucide-react';
 import { AssetInventoryClient } from './asset-inventory-client';
+import { getUserPlanTier, isPracticePlus } from '@/lib/plan-gating';
+import { PlanGate } from '@/components/plan-gate';
+import { AssetRiskPanel } from '@/components/assets/asset-risk-panel';
 
 const RISK_COLORS: Record<string, string> = {
   low:      'bg-[#71bc48]/10 text-[#71bc48]',
@@ -25,6 +28,9 @@ export default async function AssetInventoryPage() {
     .single();
 
   if (!org) return redirect('/onboarding/expectation');
+
+  const planTier = await getUserPlanTier();
+  const hasPractice = isPracticePlus(planTier);
 
   const { data: assets } = await (supabase as any)
     .from('assets')
@@ -111,6 +117,27 @@ export default async function AssetInventoryPage() {
       </div>
 
       <AssetInventoryClient initialAssets={allAssets} organizationId={org.id} />
+
+      {/* ── Practice Plan: Risk Identification Panel ── */}
+      <PlanGate
+        requiredPlan="practice"
+        currentPlan={planTier}
+        featureName="Asset-Based Risk Identification"
+        features={[
+          'PHI access level scoring (none / read / read_write / full)',
+          'Real-time risk score calculator as you fill the form',
+          'High-Risk Asset Panel with missing controls and inline recommendations',
+          'Control checklist: encryption at rest/transit, access controls, MFA',
+          'Responsible person + last review date tracking',
+        ]}
+      >
+        <div>
+          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">
+            Asset-Based Risk Identification
+          </h3>
+          <AssetRiskPanel assets={allAssets} organizationId={org.id} />
+        </div>
+      </PlanGate>
     </div>
   );
 }

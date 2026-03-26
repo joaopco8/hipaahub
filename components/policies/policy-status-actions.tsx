@@ -20,6 +20,8 @@ import { Label } from '@/components/ui/label';
 import { ChevronDown, PenLine } from 'lucide-react';
 import { updatePolicyStatus } from '@/app/actions/policy-documents';
 import { useRouter } from 'next/navigation';
+import { useSubscription } from '@/contexts/subscription-context';
+import { TrialActionModal } from '@/components/trial-action-modal';
 import {
   canTransition,
   getAllowedTransitions,
@@ -35,7 +37,9 @@ interface PolicyStatusActionsProps {
 
 export function PolicyStatusActions({ policyId, currentStatus }: PolicyStatusActionsProps) {
   const router = useRouter();
+  const { isLocked, subscriptionStatus } = useSubscription();
   const [signatureOpen, setSignatureOpen] = useState(false);
+  const [showTrialModal, setShowTrialModal] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<PolicyStatus | null>(null);
   const [signatureName, setSignatureName] = useState('');
   const [nextReviewDate, setNextReviewDate] = useState(
@@ -45,6 +49,11 @@ export function PolicyStatusActions({ policyId, currentStatus }: PolicyStatusAct
 
   const handleStatusChange = async (newStatus: PolicyStatus) => {
     if (requiresSignature(currentStatus as PolicyStatus, newStatus)) {
+      // Block finalization for trial/expired users
+      if (isLocked) {
+        setShowTrialModal(true);
+        return;
+      }
       setPendingStatus(newStatus);
       setSignatureOpen(true);
       return;
@@ -81,6 +90,12 @@ export function PolicyStatusActions({ policyId, currentStatus }: PolicyStatusAct
 
   return (
     <>
+      <TrialActionModal
+        open={showTrialModal}
+        onClose={() => setShowTrialModal(false)}
+        documentType="policy"
+        isExpired={subscriptionStatus === 'expired'}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

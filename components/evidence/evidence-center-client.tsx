@@ -26,8 +26,10 @@ import {
   Clock,
   Archive,
   X,
+  Lock,
+  ExternalLink,
 } from 'lucide-react';
-import { 
+import {
   type ComplianceEvidence,
   type EvidenceStatus,
   type EvidenceType,
@@ -35,7 +37,36 @@ import {
   deleteComplianceEvidence
 } from '@/app/actions/compliance-evidence';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { formatFileSize } from '@/utils/helpers';
+
+/** Escape regex special characters */
+function escapeRegex(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Returns the text with matching query terms wrapped in <mark> elements.
+ * Safely handles empty query strings.
+ */
+function HighlightedText({ text, query }: { text: string; query: string }) {
+  if (!query.trim() || !text) return <>{text}</>;
+  const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
+  const parts = text.split(regex);
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark key={i} className="bg-yellow-100 text-yellow-900 rounded-none px-0.5">
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
 
 const STATUS_COLORS: Record<EvidenceStatus, string> = {
   VALID: 'bg-[#71bc48]/10 text-[#71bc48] border border-[#71bc48]/20',
@@ -68,13 +99,14 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
 
   const filteredEvidence = useMemo(() => {
     return evidence.filter((ev) => {
-      // Search filter
+      // Search filter — searches name, description, file name, and extracted PDF text
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           ev.title.toLowerCase().includes(query) ||
           ev.description?.toLowerCase().includes(query) ||
           ev.file_name?.toLowerCase().includes(query) ||
+          ev.extracted_text?.toLowerCase().includes(query) ||
           ev.related_document_ids?.some(id => id.toLowerCase().includes(query)) ||
           ev.related_question_ids?.some(id => id.toLowerCase().includes(query));
         if (!matchesSearch) return false;
@@ -245,6 +277,19 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
               </SelectContent>
             </Select>
 
+            <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as HIPAACategory | 'ALL')}>
+              <SelectTrigger className="w-[200px] rounded-none border-gray-200">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent className="rounded-none">
+                <SelectItem value="ALL">All Categories</SelectItem>
+                <SelectItem value="Administrative">Administrative</SelectItem>
+                <SelectItem value="Physical">Physical</SelectItem>
+                <SelectItem value="Technical">Technical</SelectItem>
+                <SelectItem value="Organizational">Organizational</SelectItem>
+              </SelectContent>
+            </Select>
+
             {(searchQuery || statusFilter !== 'ALL' || typeFilter !== 'ALL' || categoryFilter !== 'ALL') && (
               <Button
                 variant="outline"
@@ -289,43 +334,78 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
               </Badge>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {items.map((item, itemIndex) => (
-                <Card 
-                  key={item.id} 
+              {items.map((item) => {
+                // Snippet from extracted_text when a search query matches it
+                const extractedSnippet = (() => {
+                  if (!searchQuery.trim() || !item.extracted_text) return null;
+                  const lower = item.extracted_text.toLowerCase();
+                  const idx = lower.indexOf(searchQuery.toLowerCase());
+                  if (idx === -1) return null;
+                  const start = Math.max(0, idx - 60);
+                  const end = Math.min(item.extracted_text.length, idx + searchQuery.length + 60);
+                  return (start > 0 ? '…' : '') + item.extracted_text.slice(start, end) + (end < item.extracted_text.length ? '…' : '');
+                })();
+
+                return (
+                <Card
+                  key={item.id}
                   className="hover:shadow-md transition-all duration-200 border-0 shadow-sm bg-white rounded-none"
                 >
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-2 flex-1">
-                        <div className="bg-gray-50 p-1.5 border border-gray-100 rounded-none">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <div className="bg-gray-50 p-1.5 border border-gray-100 rounded-none shrink-0">
                           {getFileIcon(item.evidence_type)}
                         </div>
-                        <CardTitle className="text-base font-light text-[#0e274e] line-clamp-2">{item.title}</CardTitle>
+                        <Link
+                          href={`/dashboard/evidence/${item.id}`}
+                          className="text-base font-light text-[#0e274e] line-clamp-2 hover:text-[#00bceb] transition-colors"
+                        >
+                          <HighlightedText text={item.title} query={searchQuery} />
+                        </Link>
                       </div>
-                      <Badge 
-                        variant="outline"
-                        className={`text-[10px] font-light px-2 py-0.5 rounded-none ${STATUS_COLORS[item.status]}`}
-                      >
-                        <span className="flex items-center gap-1">
-                          {STATUS_ICONS[item.status]}
-                          {item.status.replace('_', ' ')}
-                        </span>
-                      </Badge>
+                      <div className="flex items-center gap-1 shrink-0 ml-2">
+                        {item.visibility === 'admin_only' && (
+                          <Badge
+                            variant="outline"
+                            className="text-[10px] font-light px-1.5 py-0.5 rounded-none bg-[#0e274e]/5 text-[#0e274e] border-[#0e274e]/20 flex items-center gap-0.5"
+                          >
+                            <Lock className="h-2.5 w-2.5" />
+                            Admin
+                          </Badge>
+                        )}
+                        <Badge
+                          variant="outline"
+                          className={`text-[10px] font-light px-2 py-0.5 rounded-none ${STATUS_COLORS[item.status]}`}
+                        >
+                          <span className="flex items-center gap-1">
+                            {STATUS_ICONS[item.status]}
+                            {item.status.replace('_', ' ')}
+                          </span>
+                        </Badge>
+                      </div>
                     </div>
 
                     {item.description && (
-                      <p className="text-sm text-gray-500 mb-4 line-clamp-2 leading-relaxed font-light">
-                        {item.description}
+                      <p className="text-sm text-gray-500 mb-3 line-clamp-2 leading-relaxed font-light">
+                        <HighlightedText text={item.description} query={searchQuery} />
+                      </p>
+                    )}
+
+                    {/* Extracted text snippet shown only when search matches inside the file */}
+                    {extractedSnippet && (
+                      <p className="text-[11px] text-gray-400 italic mb-3 leading-relaxed font-light border-l-2 border-yellow-300 pl-2">
+                        <HighlightedText text={extractedSnippet} query={searchQuery} />
                       </p>
                     )}
 
                     <div className="space-y-2 text-[11px] text-gray-400 mb-4 font-light">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-3.5 w-3.5" />
-                        <span>Uploaded: {new Date(item.upload_date).toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'short', 
-                          day: 'numeric' 
+                        <span>Uploaded: {new Date(item.upload_date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
                         })}</span>
                       </div>
                       {item.file_size && (
@@ -345,9 +425,16 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
                     </div>
 
                     <div className="flex gap-2">
+                      <Link
+                        href={`/dashboard/evidence/${item.id}`}
+                        className="flex-1 flex items-center justify-center h-9 text-xs font-light border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors gap-1.5"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5 text-gray-400" />
+                        Details
+                      </Link>
                       {item.file_url && (
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => handleDownload(item)}
                           className="flex-1 h-9 text-xs font-light border-gray-200 text-gray-600 hover:bg-gray-50 rounded-none"
@@ -367,7 +454,8 @@ export function EvidenceCenterClient({ initialEvidence, userName }: EvidenceCent
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))

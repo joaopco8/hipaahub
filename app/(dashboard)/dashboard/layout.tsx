@@ -5,6 +5,9 @@ import SidebarLayout from '@/components/sidebar-layout';
 import { SavingStateProvider } from '@/hooks/use-saving-state';
 import { SavingBarGlobal } from '@/components/saving-bar-global';
 import { CrispChat } from '@/components/support/crisp-chat';
+import { SubscriptionProvider } from '@/contexts/subscription-context';
+import { getUserPlanTier } from '@/lib/plan-gating';
+import { toSubscriptionStatus, getTrialDaysRemaining } from '@/lib/plans';
 import {
   getCachedUser,
   getCachedUserDetails,
@@ -30,11 +33,12 @@ export default async function DashboardLayout({
   }
 
   // All subsequent fetches use the same cached userId
-  const [userDetails, subscription, organization, commitment] = await Promise.all([
+  const [userDetails, subscription, organization, commitment, planTier] = await Promise.all([
     getCachedUserDetails(),
     getCachedSubscription(user.id),
     getCachedOrganization(user.id),
-    getCachedComplianceCommitment(user.id)
+    getCachedComplianceCommitment(user.id),
+    getUserPlanTier(),
   ]);
   
   // Log for debugging
@@ -63,6 +67,14 @@ export default async function DashboardLayout({
     }
   }
 
+  // Compute subscription state for gating context
+  const subscriptionStatus = toSubscriptionStatus(subscription?.status);
+  const isLocked = subscriptionStatus !== 'active';
+  const isTrialing = subscriptionStatus === 'trial';
+  const trialDaysRemaining = isTrialing
+    ? getTrialDaysRemaining(subscription?.trial_end ?? null)
+    : null;
+
   return (
     <SavingStateProvider>
       <SavingBarGlobal />
@@ -70,15 +82,22 @@ export default async function DashboardLayout({
         userEmail={user.email}
         userName={userDetails?.full_name || user.email}
       />
-      <SidebarProvider>
-        <SidebarLayout
-          userDetails={userDetails}
-          organization={organization}
-          navConfig={navConfig as NavItem[]}
-        >
-          {children}
-        </SidebarLayout>
-      </SidebarProvider>
+      <SubscriptionProvider
+        value={{ isLocked, planTier, subscriptionStatus, trialDaysRemaining }}
+      >
+        <SidebarProvider>
+          <SidebarLayout
+            userDetails={userDetails}
+            organization={organization}
+            navConfig={navConfig as NavItem[]}
+            planTier={planTier}
+            isTrialing={isTrialing}
+            trialDaysRemaining={trialDaysRemaining}
+          >
+            {children}
+          </SidebarLayout>
+        </SidebarProvider>
+      </SubscriptionProvider>
     </SavingStateProvider>
   );
 }

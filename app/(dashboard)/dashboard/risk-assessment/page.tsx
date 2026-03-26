@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, CheckCircle2, XCircle, Shield, Download, History, BarChart3, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { RiskAssessmentExportButton } from '@/components/risk-assessment/risk-assessment-export-button';
+import { CreateMitigationButton } from '@/components/risk-assessment/create-mitigation-button';
+import { getSubscription } from '@/utils/supabase/queries';
 
 export default async function RiskAssessmentPage() {
   const supabase = createClient();
@@ -16,7 +18,11 @@ export default async function RiskAssessmentPage() {
     return redirect('/signin');
   }
 
-  const riskAssessment = await getRiskAssessment(supabase, user.id);
+  const [riskAssessment, subscription] = await Promise.all([
+    getRiskAssessment(supabase, user.id),
+    getSubscription(supabase, user.id),
+  ]);
+  const isLocked = !subscription || subscription.status === 'trialing';
   const hasCompletedAssessment = !!riskAssessment?.risk_level;
   const riskLevel = (riskAssessment?.risk_level as 'low' | 'medium' | 'high' | undefined) ?? undefined;
   const riskPct = Number(riskAssessment?.risk_percentage || 0).toFixed(1);
@@ -77,7 +83,7 @@ export default async function RiskAssessmentPage() {
         </div>
         {hasCompletedAssessment && (
           <div className="flex gap-2 flex-wrap">
-            <RiskAssessmentExportButton />
+            <RiskAssessmentExportButton isLocked={isLocked} />
             <Link href="/dashboard/risk-assessment/history">
               <Button variant="outline" size="sm" className="rounded-none border-gray-200 text-[#565656]">
                 <History className="h-4 w-4 mr-1.5" />
@@ -180,9 +186,12 @@ export default async function RiskAssessmentPage() {
           {/* Gap Report by Category */}
           {Object.keys(gapsByCategory).length > 0 && (
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="h-5 w-5 text-[#00bceb]" />
-                <h3 className="text-xl font-light text-[#0e274e]">Gap Report by Category</h3>
+              <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5 text-[#00bceb]" />
+                  <h3 className="text-xl font-light text-[#0e274e]">Gap Report by Category</h3>
+                </div>
+                <CreateMitigationButton gaps={actionItems || []} />
               </div>
               <div className="space-y-4">
                 {categoryOrder

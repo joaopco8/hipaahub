@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogDescription
 } from '@/components/ui/dialog';
+import { UpgradeModal } from '@/components/ui/upgrade-modal';
 import {
   Download,
   FolderOpen,
@@ -27,14 +28,19 @@ import {
   Lock,
   Archive,
   Loader2,
-  XCircle
+  XCircle,
+  Calendar,
+  BookOpen
 } from 'lucide-react';
 
 interface AuditExportClientProps {
   auditData: AuditExportData;
+  isLocked: boolean;
+  userEmail: string;
 }
 
 interface PackageSection {
+  key: string;
   folder: string;
   label: string;
   description: string;
@@ -42,15 +48,36 @@ interface PackageSection {
   available: boolean;
   fileCount: number;
   reason?: string;
+  required?: boolean;
 }
 
-export function AuditExportClient({ auditData }: AuditExportClientProps) {
+const ALL_SECTION_KEYS = [
+  '01_Executive_Summary',
+  '02_Risk_Assessment',
+  '03_Policies',
+  '04_Vendor_Management',
+  '05_Training',
+  '06_Incidents',
+  '07_Audit_Checklist',
+];
+
+export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExportClientProps) {
   const [modalState, setModalState] = useState<'idle' | 'generating' | 'ready' | 'error'>('idle');
   const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [downloadFilename, setDownloadFilename] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  // Date range
+  const today = new Date().toISOString().split('T')[0];
+  const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const [dateFrom, setDateFrom] = useState(oneYearAgo);
+  const [dateTo, setDateTo] = useState(today);
+
+  // Section selection
+  const [selectedSections, setSelectedSections] = useState<string[]>(ALL_SECTION_KEYS);
 
   const org = auditData.organization;
   const exportDate = new Date().toISOString().split('T')[0];
@@ -58,73 +85,101 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
 
   const sections: PackageSection[] = [
     {
+      key: '01_Executive_Summary',
       folder: '01_Executive_Summary',
       label: 'Executive Summary',
       description: 'Compliance overview, organization info, and overall status report',
       icon: <FileText className="h-4 w-4" />,
       available: true,
-      fileCount: 1
+      fileCount: 1,
+      required: true,
     },
     {
+      key: '02_Risk_Assessment',
       folder: '02_Risk_Assessment',
       label: 'Risk Assessment',
       description: 'Security Risk Analysis report, risk matrix, and mitigation status',
       icon: <ShieldAlert className="h-4 w-4" />,
       available: auditData.riskAssessment.exists,
       fileCount: auditData.riskAssessment.exists ? 1 : 0,
-      reason: !auditData.riskAssessment.exists ? 'No risk assessment completed yet' : undefined
+      reason: !auditData.riskAssessment.exists ? 'No risk assessment completed yet' : undefined,
     },
     {
+      key: '03_Policies',
       folder: '03_Policies',
       label: 'Policies & Documents',
       description: 'HIPAA policy documentation index and status for all required policies',
       icon: <FileText className="h-4 w-4" />,
       available: auditData.policies.some((p) => p.hasDocument),
       fileCount: auditData.policies.some((p) => p.hasDocument) ? 1 : 0,
-      reason: !auditData.policies.some((p) => p.hasDocument) ? 'No policies documented yet' : undefined
+      reason: !auditData.policies.some((p) => p.hasDocument) ? 'No policies documented yet' : undefined,
     },
     {
+      key: '04_Vendor_Management',
       folder: '04_Vendor_Management',
       label: 'Vendor Management',
       description: 'Business associate list, BAA status, expiration tracking',
       icon: <Building2 className="h-4 w-4" />,
       available: auditData.vendors.length > 0,
       fileCount: auditData.vendors.length > 0 ? 1 : 0,
-      reason: auditData.vendors.length === 0 ? 'No vendors registered yet' : undefined
+      reason: auditData.vendors.length === 0 ? 'No vendors registered yet' : undefined,
     },
     {
+      key: '05_Training',
       folder: '05_Training',
       label: 'Training Records',
       description: 'Employee training log, completion status, and renewal tracking',
       icon: <Users className="h-4 w-4" />,
       available: auditData.trainingRecords.length > 0,
       fileCount: auditData.trainingRecords.length > 0 ? 1 : 0,
-      reason: auditData.trainingRecords.length === 0 ? 'No training records found' : undefined
+      reason: auditData.trainingRecords.length === 0 ? 'No training records found' : undefined,
     },
     {
+      key: '06_Incidents',
       folder: '06_Incidents',
       label: 'Incidents & Breaches',
       description: 'Incident log and breach notification documentation',
       icon: <AlertTriangle className="h-4 w-4" />,
       available: auditData.incidents.length > 0 || auditData.breachNotifications.length > 0,
-      fileCount: (auditData.incidents.length > 0 ? 1 : 0) + (auditData.breachNotifications.length > 0 ? 1 : 0),
+      fileCount:
+        (auditData.incidents.length > 0 ? 1 : 0) +
+        (auditData.breachNotifications.length > 0 ? 1 : 0),
       reason:
         auditData.incidents.length === 0 && auditData.breachNotifications.length === 0
           ? 'No incidents or breaches logged'
-          : undefined
+          : undefined,
     },
     {
+      key: '07_Audit_Checklist',
       folder: '07_Audit_Checklist',
       label: 'Audit Checklist',
       description: 'HIPAA compliance checklist with status for all required elements',
       icon: <CheckCircle2 className="h-4 w-4" />,
       available: true,
-      fileCount: 1
-    }
+      fileCount: 1,
+      required: true,
+    },
   ];
 
-  const availableSections = sections.filter((s) => s.available);
-  const totalFiles = sections.reduce((sum, s) => sum + s.fileCount, 0);
+  const includedSections = sections.filter(
+    (s) => s.available && selectedSections.includes(s.key)
+  );
+  const totalFiles = includedSections.reduce((sum, s) => sum + s.fileCount, 0);
+
+  // Estimated page count
+  const policiesWithDocs = auditData.policies.filter((p) => p.hasDocument);
+  const estimatedPages = (() => {
+    let pages = 0;
+    if (selectedSections.includes('01_Executive_Summary')) pages += 2;
+    if (selectedSections.includes('02_Risk_Assessment') && auditData.riskAssessment.exists) pages += 3;
+    if (selectedSections.includes('03_Policies') && policiesWithDocs.length > 0) pages += 1 + policiesWithDocs.length;
+    if (selectedSections.includes('04_Vendor_Management') && auditData.vendors.length > 0) pages += 1 + auditData.vendors.length;
+    if (selectedSections.includes('05_Training') && auditData.trainingRecords.length > 0) pages += 1 + Math.ceil(auditData.trainingRecords.length / 10);
+    if (selectedSections.includes('06_Incidents') && (auditData.incidents.length > 0 || auditData.breachNotifications.length > 0)) pages += 2;
+    if (selectedSections.includes('07_Audit_Checklist')) pages += 2;
+    pages += 1; // back cover
+    return pages;
+  })();
 
   const policiesActive = auditData.policies.filter((p) => p.hasDocument).length;
   const trainedEmployees = auditData.trainingRecords.filter((t) => t.completion_status === 'completed').length;
@@ -143,7 +198,19 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
         ? 'text-yellow-600'
         : 'text-red-600';
 
+  function toggleSection(key: string, required?: boolean) {
+    if (required) return;
+    setSelectedSections((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  }
+
   async function handleExport() {
+    if (isLocked) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     setShowModal(true);
     setModalState('generating');
     setProgress(0);
@@ -161,7 +228,7 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
       { pct: 72, label: 'Processing Vendor Records...' },
       { pct: 83, label: 'Assembling Training Logs...' },
       { pct: 92, label: 'Packaging Incident Reports...' },
-      { pct: 97, label: 'Generating ZIP archive...' }
+      { pct: 97, label: 'Generating ZIP archive...' },
     ];
 
     let stepIndex = 0;
@@ -173,7 +240,16 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
     }, 400);
 
     try {
-      const res = await fetch('/api/audit-export', { method: 'POST' });
+      const res = await fetch('/api/audit-export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          selectedSections,
+          dateFrom,
+          dateTo,
+          userEmail,
+        }),
+      });
 
       clearInterval(interval);
 
@@ -215,16 +291,27 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
 
   return (
     <div className="flex w-full flex-col gap-8">
-      {/* Page Header - Clean, minimal */}
+      {/* Page Header */}
       <div className="mb-4">
-        <h2 className="text-3xl font-light text-[#0c0b1d] mb-2">Export Audit Package</h2>
+        <div className="flex items-center gap-3 mb-2">
+          <h2 className="text-3xl font-light text-[#0c0b1d]">Export Audit Package</h2>
+          {isLocked && (
+            <Badge
+              variant="outline"
+              className="text-[11px] font-light px-2 py-0.5 rounded-none bg-[#0e274e]/5 text-[#0e274e] border-[#0e274e]/20 flex items-center gap-1"
+            >
+              <Lock className="h-3 w-3" />
+              Paid Plan Required
+            </Badge>
+          )}
+        </div>
         <p className="text-sm text-[#565656] font-light leading-relaxed max-w-3xl">
-          Generate a structured, audit-ready ZIP archive with all your HIPAA compliance documentation. 
-          Only sections with actual data are included automatically.
+          Generate a structured, audit-ready ZIP archive with all your HIPAA compliance documentation.
+          Select a date range, choose the sections to include, and export.
         </p>
       </div>
 
-      {/* Compliance Status Row - Clean cards, no heavy borders */}
+      {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white border border-gray-100 p-6 hover:border-[#00bceb]/30 transition-colors">
           <div className="flex items-start justify-between mb-4">
@@ -244,7 +331,8 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
             <div className="flex-1">
               <p className="text-xs text-[#565656] mb-2 font-light uppercase tracking-wide">Policies Documented</p>
               <p className="text-3xl font-light text-[#0c0b1d]">
-                {policiesActive}<span className="text-base text-[#565656] font-light"> / {auditData.policies.length}</span>
+                {policiesActive}
+                <span className="text-base text-[#565656] font-light"> / {auditData.policies.length}</span>
               </p>
             </div>
             <FileText className="h-5 w-5 text-[#565656] opacity-40" />
@@ -256,7 +344,8 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
             <div className="flex-1">
               <p className="text-xs text-[#565656] mb-2 font-light uppercase tracking-wide">Employees Trained</p>
               <p className="text-3xl font-light text-[#0c0b1d]">
-                {trainedEmployees}<span className="text-base text-[#565656] font-light"> / {auditData.trainingRecords.length}</span>
+                {trainedEmployees}
+                <span className="text-base text-[#565656] font-light"> / {auditData.trainingRecords.length}</span>
               </p>
             </div>
             <Users className="h-5 w-5 text-[#565656] opacity-40" />
@@ -266,17 +355,20 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
         <div className="bg-white border border-gray-100 p-6 hover:border-[#00bceb]/30 transition-colors">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-xs text-[#565656] mb-2 font-light uppercase tracking-wide">Files in Package</p>
-              <p className="text-3xl font-light text-[#0c0b1d]">{totalFiles}</p>
+              <p className="text-xs text-[#565656] mb-2 font-light uppercase tracking-wide">Est. Pages</p>
+              <p className="text-3xl font-light text-[#0c0b1d]">
+                ~{estimatedPages}
+                <span className="text-sm text-[#565656] font-light ml-1">pg</span>
+              </p>
             </div>
-            <Archive className="h-5 w-5 text-[#565656] opacity-40" />
+            <BookOpen className="h-5 w-5 text-[#565656] opacity-40" />
           </div>
         </div>
       </div>
 
-      {/* Package Structure Preview - Clean layout */}
+      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Structure */}
+        {/* Left: Section Selection */}
         <div className="lg:col-span-2 flex flex-col gap-4">
           <div className="bg-white border border-gray-100">
             <div className="px-6 py-4 border-b border-gray-100">
@@ -285,7 +377,7 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
                 <h3 className="text-base font-light text-[#0c0b1d]">Package Contents</h3>
               </div>
               <p className="text-xs text-[#565656] font-light mt-1">
-                Only sections with actual data are included. Empty sections are skipped automatically.
+                Toggle sections to include. Executive Summary and Audit Checklist are always required.
               </p>
             </div>
             <div className="p-0">
@@ -298,56 +390,125 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
               </div>
 
               <div className="divide-y divide-gray-50">
-                {sections.map((section) => (
-                  <div
-                    key={section.folder}
-                    className={`flex items-start gap-4 px-6 py-4 hover:bg-gray-50/30 transition-colors ${!section.available ? 'opacity-50' : ''}`}
-                  >
-                    {/* Tree line */}
-                    <div className="flex flex-col items-center pt-1 shrink-0">
-                      <div className="h-2 w-px bg-gray-200" />
-                      <div className="h-px w-3 bg-gray-200" />
-                    </div>
+                {sections.map((section) => {
+                  const isSelected = selectedSections.includes(section.key);
+                  const isIncluded = section.available && isSelected;
+                  const isDisabled = !section.available || section.required;
 
-                    {/* Icon + Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <FolderOpen className={`h-4 w-4 shrink-0 ${section.available ? 'text-[#0c0b1d]' : 'text-gray-300'}`} />
-                        <span className={`text-sm font-light font-mono ${section.available ? 'text-[#0c0b1d]' : 'text-gray-400'}`}>
-                          {section.folder}/
-                        </span>
-                        {section.available ? (
-                          <span className="text-xs text-[#00bceb] font-light px-2 py-0.5 bg-[#00bceb]/5 border border-[#00bceb]/20">
-                            {section.fileCount} file{section.fileCount !== 1 ? 's' : ''}
+                  return (
+                    <div
+                      key={section.folder}
+                      onClick={() => toggleSection(section.key, section.required)}
+                      className={`flex items-start gap-4 px-6 py-4 transition-colors ${
+                        isDisabled
+                          ? 'cursor-default'
+                          : 'cursor-pointer hover:bg-gray-50/30'
+                      } ${!isIncluded ? 'opacity-50' : ''}`}
+                    >
+                      {/* Checkbox */}
+                      <div className="shrink-0 pt-1">
+                        <div
+                          className={`h-4 w-4 border flex items-center justify-center transition-colors ${
+                            section.required
+                              ? 'bg-[#0c0b1d] border-[#0c0b1d] cursor-not-allowed'
+                              : isIncluded
+                                ? 'bg-[#00bceb] border-[#00bceb]'
+                                : 'bg-white border-gray-300'
+                          }`}
+                        >
+                          {(section.required || isIncluded) && (
+                            <svg className="h-2.5 w-2.5 text-white" viewBox="0 0 10 10" fill="none">
+                              <path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Tree line */}
+                      <div className="flex flex-col items-center pt-1 shrink-0">
+                        <div className="h-2 w-px bg-gray-200" />
+                        <div className="h-px w-3 bg-gray-200" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <FolderOpen className={`h-4 w-4 shrink-0 ${isIncluded ? 'text-[#0c0b1d]' : 'text-gray-300'}`} />
+                          <span className={`text-sm font-light font-mono ${isIncluded ? 'text-[#0c0b1d]' : 'text-gray-400'}`}>
+                            {section.folder}/
                           </span>
+                          {isIncluded ? (
+                            <span className="text-xs text-[#00bceb] font-light px-2 py-0.5 bg-[#00bceb]/5 border border-[#00bceb]/20">
+                              {section.fileCount} file{section.fileCount !== 1 ? 's' : ''}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-400 font-light px-2 py-0.5 bg-gray-50 border border-gray-100">
+                              {!section.available ? 'no data' : 'excluded'}
+                            </span>
+                          )}
+                          {section.required && (
+                            <span className="text-xs text-gray-400 font-light">required</span>
+                          )}
+                        </div>
+                        <p className={`text-xs font-light mt-1 ml-6 ${isIncluded ? 'text-[#565656]' : 'text-gray-400'}`}>
+                          {isIncluded ? section.description : (section.reason || section.description)}
+                        </p>
+                      </div>
+
+                      {/* Status icon */}
+                      <div className="shrink-0 pt-1">
+                        {isIncluded ? (
+                          <CheckCircle2 className="h-4 w-4 text-[#00bceb]" />
                         ) : (
-                          <span className="text-xs text-gray-400 font-light px-2 py-0.5 bg-gray-50 border border-gray-100">
-                            skipped
-                          </span>
+                          <Clock className="h-4 w-4 text-gray-300" />
                         )}
                       </div>
-                      <p className={`text-xs font-light mt-1 ml-6 ${section.available ? 'text-[#565656]' : 'text-gray-400'}`}>
-                        {section.available ? section.description : section.reason}
-                      </p>
                     </div>
-
-                    {/* Status icon */}
-                    <div className="shrink-0 pt-1">
-                      {section.available ? (
-                        <CheckCircle2 className="h-4 w-4 text-[#00bceb]" />
-                      ) : (
-                        <Clock className="h-4 w-4 text-gray-300" />
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right: Summary + Info */}
+        {/* Right: Config + Export */}
         <div className="flex flex-col gap-4">
+          {/* Date Range */}
+          <div className="bg-white border border-gray-100">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-[#565656] opacity-60" />
+                <h3 className="text-sm font-light text-[#0c0b1d]">Date Range</h3>
+              </div>
+              <p className="text-xs text-[#565656] font-light mt-1">
+                Shown on cover page and export log
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="text-xs text-[#565656] font-light mb-1.5 block">From</label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  max={dateTo}
+                  className="w-full border border-gray-200 px-3 py-2 text-sm font-light text-[#0c0b1d] focus:outline-none focus:border-[#00bceb] rounded-none bg-white"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-[#565656] font-light mb-1.5 block">To</label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  min={dateFrom}
+                  max={today}
+                  className="w-full border border-gray-200 px-3 py-2 text-sm font-light text-[#0c0b1d] focus:outline-none focus:border-[#00bceb] rounded-none bg-white"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Organization summary */}
           <div className="bg-white border border-gray-100">
             <div className="px-6 py-4 border-b border-gray-100">
@@ -402,7 +563,7 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-3.5 w-3.5 text-[#00bceb] mt-0.5 shrink-0" />
-                  <span>Only sections with real data included</span>
+                  <span>Cover page with date range and organization details</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-3.5 w-3.5 text-[#00bceb] mt-0.5 shrink-0" />
@@ -410,7 +571,7 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-3.5 w-3.5 text-[#00bceb] mt-0.5 shrink-0" />
-                  <span>Executive summary for OCR auditors</span>
+                  <span>Confirmation email sent to {userEmail || 'your account'}</span>
                 </li>
               </ul>
             </div>
@@ -421,7 +582,8 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
             <div className="flex items-start gap-3">
               <AlertCircle className="h-4 w-4 text-[#565656] mt-0.5 shrink-0 opacity-60" />
               <p className="text-xs text-[#565656] font-light leading-relaxed">
-                This package is a compliance support tool, not a substitute for legal advice. Consult a qualified HIPAA consultant or attorney for regulatory guidance.
+                This package is a compliance support tool, not a substitute for legal advice. Consult a
+                qualified HIPAA consultant or attorney for regulatory guidance.
               </p>
             </div>
           </div>
@@ -429,15 +591,35 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
           {/* Export button */}
           <Button
             onClick={handleExport}
-            className="bg-[#0c0b1d] text-white hover:bg-[#0c0b1d]/90 rounded-none font-light h-11 w-full flex items-center justify-center gap-2 transition-all"
+            className={`rounded-none font-light h-11 w-full flex items-center justify-center gap-2 transition-all ${
+              isLocked
+                ? 'bg-gray-200 text-gray-500 hover:bg-gray-200 cursor-not-allowed'
+                : 'bg-[#0c0b1d] text-white hover:bg-[#0c0b1d]/90'
+            }`}
           >
-            <Download className="h-4 w-4" />
-            Export Audit Package
+            {isLocked ? (
+              <>
+                <Lock className="h-4 w-4" />
+                Upgrade to Export
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4" />
+                Export Audit Package
+              </>
+            )}
           </Button>
         </div>
       </div>
 
-      {/* ─── GENERATION MODAL ────────────────────────────────────────── */}
+      {/* ─── UPGRADE MODAL ───────────────────────────────────────────────── */}
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureName="Audit Package Export"
+      />
+
+      {/* ─── GENERATION MODAL ────────────────────────────────────────────── */}
       <Dialog open={showModal} onOpenChange={(open) => { if (!open) handleCloseModal(); }}>
         <DialogContent className="max-w-md bg-white rounded-none p-0 overflow-hidden">
           {/* Header strip */}
@@ -453,7 +635,7 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
               </DialogTitle>
               <DialogDescription className="text-gray-400 font-light text-sm mt-1">
                 {modalState === 'generating' && 'Building your structured compliance documentation...'}
-                {modalState === 'ready' && `${totalFiles} files compiled into a structured ZIP archive`}
+                {modalState === 'ready' && `${totalFiles} files compiled · confirmation email sent`}
                 {modalState === 'error' && 'An error occurred while generating your audit package'}
               </DialogDescription>
             </DialogHeader>
@@ -478,18 +660,19 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
               </div>
             )}
 
-            {/* Sections list (visible during generation and on ready) */}
+            {/* Sections list */}
             {modalState !== 'error' && (
               <div className="space-y-1.5">
                 {sections.map((section, i) => {
+                  const isIncluded = section.available && selectedSections.includes(section.key);
                   const sectionProgress = (i + 1) * (100 / sections.length);
                   const isComplete = progress >= sectionProgress;
-                  const isCurrent = progress < sectionProgress && progress >= (i * (100 / sections.length));
+                  const isCurrent = progress < sectionProgress && progress >= i * (100 / sections.length);
 
                   return (
                     <div key={section.folder} className="flex items-center gap-3 py-1">
                       <div className="w-5 h-5 flex items-center justify-center shrink-0">
-                        {!section.available ? (
+                        {!isIncluded ? (
                           <div className="h-4 w-4 rounded-full bg-gray-100 flex items-center justify-center">
                             <span className="text-gray-400 text-xs">–</span>
                           </div>
@@ -502,11 +685,11 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className={`text-xs font-light ${section.available ? 'text-[#0c0b1d]' : 'text-gray-400'}`}>
+                        <span className={`text-xs font-light ${isIncluded ? 'text-[#0c0b1d]' : 'text-gray-400'}`}>
                           {section.folder}/
                         </span>
                       </div>
-                      {!section.available && (
+                      {!isIncluded && (
                         <span className="text-xs text-gray-400 font-light">skipped</span>
                       )}
                     </div>
@@ -562,7 +745,7 @@ export function AuditExportClient({ auditData }: AuditExportClientProps) {
                   <span className="text-xs text-[#565656] font-light font-mono truncate">{downloadFilename}</span>
                 </div>
                 <p className="text-xs text-[#565656] font-light mt-1 ml-6">
-                  {availableSections.length} folders · {totalFiles} PDF files
+                  {includedSections.length} folders · {totalFiles} PDF files · ~{estimatedPages} pages
                 </p>
               </div>
             )}

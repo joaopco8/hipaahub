@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS risk_assessment_history (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  organization_id uuid REFERENCES organizations(id) ON DELETE CASCADE,
+  organization_id text REFERENCES organizations(id) ON DELETE CASCADE,
   risk_level text NOT NULL CHECK (risk_level IN ('low', 'medium', 'high')),
   risk_percentage numeric(5, 2) NOT NULL DEFAULT 0,
   total_risk_score numeric(10, 2) NOT NULL DEFAULT 0,

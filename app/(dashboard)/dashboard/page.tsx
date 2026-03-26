@@ -32,6 +32,10 @@ import {
 import { getPolicyDocumentsCount } from '@/utils/supabase/queries';
 import { getEvidenceStatistics } from '@/app/actions/compliance-evidence';
 import { getRecentActivity } from '@/lib/activity-feed';
+import { getUserPlanTier, isPracticePlus } from '@/lib/plan-gating';
+import { getMitigationItems } from '@/app/actions/mitigation';
+import { OnboardingChecklist } from '@/components/dashboard/onboarding-checklist';
+import { LockedIndicator } from '@/components/locked-indicator';
 
 export const revalidate = 30;
 
@@ -52,13 +56,19 @@ export default async function DashboardPage() {
   const supabase = createClient();
   const orgId = (organization as any).id;
 
-  // Fetch all data in parallel
+  // Fetch plan tier + all data in parallel
+  const planTier = await getUserPlanTier();
+  const hasPractice = isPracticePlus(planTier);
+
   const [
     { total: policiesTotal, completed: policiesCompleted },
     evidenceStatsResult,
     trainingResult,
     businessAssociatesResult,
-    incidentsResult
+    incidentsResult,
+    mitigationResult,
+    practiceTrainingResult,
+    practiceBAAResult,
   ] = await Promise.all([
     getPolicyDocumentsCount(supabase, user.id),
     getEvidenceStatistics().catch(() => ({
@@ -83,7 +93,27 @@ export default async function DashboardPage() {
       .eq('organization_id', orgId)
       .order('date_discovered', { ascending: false })
       .then((result: any) => result.error ? { data: [] } : result)
-      .catch(() => ({ data: [] }))
+      .catch(() => ({ data: [] })),
+    // Mitigation items for Action Center
+    getMitigationItems().catch(() => [] as any[]),
+    // Practice plan: staff training compliance %
+    hasPractice
+      ? (supabase as any)
+          .from('training_assignments')
+          .select('status')
+          .eq('org_id', orgId)
+          .then((r: any) => r.data ?? [])
+          .catch(() => [])
+      : Promise.resolve(null),
+    // Practice plan: BAAs from dedicated baas table
+    hasPractice
+      ? (supabase as any)
+          .from('baas')
+          .select('status, vendor_id')
+          .eq('org_id', orgId)
+          .then((r: any) => r.data ?? [])
+          .catch(() => [])
+      : Promise.resolve(null),
   ]);
 
   const evidenceStats = evidenceStatsResult || {
@@ -112,7 +142,7 @@ export default async function DashboardPage() {
   // ── Compliance Score Calculation (4 components, 25 pts each) ─────────────
   // 1. Documentation (Policies) - 25 pts
   const documentationScore = Math.round((policiesCompleted / Math.max(policiesTotal, 9)) * 25);
-  
+
   // 2. Risk Management - 25 pts (based on risk assessment)
   const hasRiskAssessment = !!riskAssessment;
   const riskAssessmentDate = riskAssessment?.updated_at || riskAssessment?.created_at;
@@ -130,29 +160,52 @@ export default async function DashboardPage() {
   }
 
   // 3. Training - 25 pts
-  const trainingScore = Math.round((trainingRate / 100) * 25);
+  // Practice+: use staff training assignments. Solo: always 25 (not applicable).
+  let trainingScore: number;
+  if (!hasPractice) {
+    trainingScore = 25; // Solo plan: not applicable, full score
+  } else if (practiceTrainingResult && (practiceTrainingResult as any[]).length > 0) {
+    const allAssignments = practiceTrainingResult as any[];
+    const completedAssignments = allAssignments.filter((a) => a.status === 'completed').length;
+    const staffPctTrained = completedAssignments / allAssignments.length;
+    trainingScore = Math.round(staffPctTrained * 25);
+  } else {
+    // Fall back to legacy training records
+    trainingScore = Math.round((trainingRate / 100) * 25);
+  }
 
-  // 4. Incident & Vendor Control - 25 pts
+  // 4. Vendor/BAA Control - 25 pts
+  // Practice+: use dedicated baas table. Solo: use vendors.baa_signed.
   const today = new Date();
-  const validBAAs = vendors.filter((v: any) => {
-    if (!v.baa_signed || !v.baa_expiration_date) return false;
-    const expDate = new Date(v.baa_expiration_date);
-    return expDate > today;
-  }).length;
-  const totalVendorsWithPHI = vendors.filter((v: any) => v.has_phi_access).length || 1;
-  const baaScore = Math.round((validBAAs / totalVendorsWithPHI) * 15);
+  let validBAAs: number;
+  let totalVendorsWithPHI: number;
+  let baaScore: number;
+
+  if (hasPractice && practiceBAAResult) {
+    const allBaas = practiceBAAResult as any[];
+    validBAAs = allBaas.filter((b) => b.status === 'active').length;
+    totalVendorsWithPHI = allBaas.length || 1;
+    baaScore = Math.round((validBAAs / totalVendorsWithPHI) * 25);
+  } else {
+    validBAAs = vendors.filter((v: any) => {
+      if (!v.baa_signed || !v.baa_expiration_date) return false;
+      return new Date(v.baa_expiration_date) > today;
+    }).length;
+    totalVendorsWithPHI = vendors.filter((v: any) => v.has_phi_access).length || 1;
+    baaScore = Math.round((validBAAs / totalVendorsWithPHI) * 25);
+  }
+
   const openIncidents = incidents.filter((inc: any) => inc.status === 'open').length;
-  const incidentScore = openIncidents === 0 ? 10 : Math.max(0, 10 - openIncidents * 2);
-  const incidentVendorScore = Math.min(25, baaScore + incidentScore);
+  const incidentVendorScore = Math.min(25, baaScore);
 
   const complianceScore = documentationScore + riskManagementScore + trainingScore + incidentVendorScore;
-  const scoreTier = complianceScore < 30 ? 'low' : complianceScore < 70 ? 'medium' : 'high';
+  const scoreTier = complianceScore < 40 ? 'low' : complianceScore < 70 ? 'medium' : 'high';
   const scoreColor = scoreTier === 'high' ? '#1ad07a' : scoreTier === 'medium' ? '#fbab18' : '#e2231a';
   const scoreLabel = scoreTier === 'high' ? 'Protected' : scoreTier === 'medium' ? 'Partial' : 'At Risk';
 
   // ── Header Contextual Status ─────────────────────────────────────────────
   const getHeaderStatus = () => {
-    if (complianceScore < 30) {
+    if (complianceScore < 40) {
       const criticalGaps = [
         policiesCompleted === 0 ? 'policies' : null,
         !hasRiskAssessment ? 'risk assessment' : null,
@@ -191,6 +244,54 @@ export default async function DashboardPage() {
   const nextReviewDate = organization.next_review_date 
     ? new Date(organization.next_review_date)
     : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+
+  // ── Onboarding Checklist (shown when score < 30) ─────────────────────────
+  const onboardingItems = [
+    {
+      id: 'policies',
+      label: 'Activate at least one policy',
+      description: 'Your Privacy Policy or Security Policy protects you from OCR fines',
+      completed: policiesCompleted > 0,
+      link: '/dashboard/policies',
+      cta: 'Go to Policies',
+    },
+    {
+      id: 'risk',
+      label: 'Complete your Risk Assessment',
+      description: 'A documented Security Risk Analysis is federally required',
+      completed: !!hasRiskAssessment,
+      link: '/dashboard/risk-assessment',
+      cta: 'Run Assessment',
+    },
+    {
+      id: 'training',
+      label: hasPractice ? 'Add at least one employee to training' : 'Complete your own HIPAA training',
+      description: hasPractice
+        ? 'Assign training to one staff member to get started'
+        : 'Complete the HIPAA awareness module to satisfy training requirements',
+      completed: hasPractice ? (staffMembers.length > 0 || trainingRecords.length > 0) : trainingRecords.some((r: any) => r.completion_status === 'completed'),
+      link: '/dashboard/training',
+      cta: hasPractice ? 'Add Employee' : 'Start Training',
+    },
+    {
+      id: 'evidence',
+      label: 'Upload a compliance document',
+      description: 'Add your first piece of evidence to the Evidence Center',
+      completed: evidenceStats.total > 0,
+      link: '/dashboard/evidence',
+      cta: 'Upload Document',
+    },
+  ];
+  const onboardingCompleted = onboardingItems.filter((i) => i.completed).length;
+  const showOnboarding = complianceScore < 40 && onboardingCompleted < onboardingItems.length;
+
+  // ── Mitigation items for Action Center ───────────────────────────────────
+  const openMitigationItems = (Array.isArray(mitigationResult) ? mitigationResult : [])
+    .filter((m: any) => m.status === 'open' || m.status === 'in_progress')
+    .sort((a: any, b: any) => {
+      const priorityRank: Record<string, number> = { high: 0, medium: 1, low: 2 };
+      return (priorityRank[a.priority] ?? 2) - (priorityRank[b.priority] ?? 2);
+    });
 
   // ── Action Center Items (max 3, prioritized) ────────────────────────────
   const actionCenterItems: Array<{
@@ -256,6 +357,20 @@ export default async function DashboardPage() {
       link: '/dashboard/policies',
       icon: <FileText className="w-5 h-5" />
     });
+  }
+
+  // Fill remaining slots with top open mitigation items
+  if (actionCenterItems.length < 3 && openMitigationItems.length > 0) {
+    const remaining = 3 - actionCenterItems.length;
+    for (const mItem of openMitigationItems.slice(0, remaining)) {
+      actionCenterItems.push({
+        severity: mItem.priority === 'high' ? 'critical' : mItem.priority === 'medium' ? 'warning' : 'info',
+        title: mItem.title,
+        description: mItem.description ?? 'Open mitigation task',
+        link: '/dashboard/mitigation',
+        icon: <Shield className="w-5 h-5" />,
+      });
+    }
   }
 
   // Limit to 3
@@ -435,7 +550,7 @@ export default async function DashboardPage() {
 
   // ── Context Line Below Score ──────────────────────────────────────────────
   const getScoreContext = () => {
-    if (complianceScore < 30) {
+    if (complianceScore < 40) {
       return 'A practice at this score level faces $50k–$250k in potential OCR fines';
     } else if (complianceScore < 70) {
       return 'You\'re in the top 40% of practices at your size — 2 gaps remain';
@@ -455,6 +570,30 @@ export default async function DashboardPage() {
           {organization.name} · Last updated {lastUpdated.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · Next review {nextReviewDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </p>
       </div>
+
+      {/* ── 1b. No-plan banner ───────────────────────────────────────────── */}
+      {planTier === 'unknown' && (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-[#0e274e] text-white px-6 py-4">
+          <div className="flex items-start sm:items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-[#00bceb] shrink-0 mt-0.5 sm:mt-0" />
+            <div>
+              <p className="text-sm font-light">You don&apos;t have an active plan.</p>
+              <p className="text-xs text-white/60 font-light mt-0.5">
+                Export, certificates, and Practice features are locked until you activate a plan.
+              </p>
+            </div>
+          </div>
+          <Link href="/select-plan" className="shrink-0">
+            <button className="bg-[#00bceb] hover:bg-[#00a8d4] text-white text-sm font-light px-5 py-2 flex items-center gap-2 transition-colors whitespace-nowrap">
+              Choose a plan
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </Link>
+        </div>
+      )}
+
+      {/* ── 1c. Onboarding Checklist (new users, score < 40) ─────────────── */}
+      {showOnboarding && <OnboardingChecklist items={onboardingItems} />}
 
       {/* ── 2. Compliance Score Gauge ─────────────────────────────────────── */}
       <Card className="border-0 shadow-sm bg-white rounded-none">
@@ -666,9 +805,16 @@ export default async function DashboardPage() {
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Users className="w-5 h-5 text-[#0175a2]" />
-                <h3 className="text-sm font-thin text-[#0e274e]">Training</h3>
+                <h3 className="text-sm font-thin text-[#0e274e]">Staff Training</h3>
               </div>
-              {trainingRate === 0 ? (
+              {!hasPractice ? (
+                <>
+                  <div className="mb-3">
+                    <LockedIndicator requiredPlan="practice" />
+                  </div>
+                  <p className="text-xs text-gray-400 font-thin">Staff training tracker requires Practice plan</p>
+                </>
+              ) : trainingRate === 0 ? (
                 <>
                   <div className="flex items-center gap-2 mb-3">
                     <XCircle className="w-4 h-4 text-red-600" />
@@ -799,7 +945,14 @@ export default async function DashboardPage() {
                 <FileCheck className="w-5 h-5 text-[#0175a2]" />
                 <h3 className="text-sm font-thin text-[#0e274e]">BAAs</h3>
               </div>
-              {totalVendorsWithPHI === 0 ? (
+              {!hasPractice ? (
+                <>
+                  <div className="mb-3">
+                    <LockedIndicator requiredPlan="practice" />
+                  </div>
+                  <p className="text-xs text-gray-400 font-thin">BAA tracking requires Practice plan</p>
+                </>
+              ) : totalVendorsWithPHI === 0 ? (
                 <>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-sm font-thin text-gray-500">No vendors registered</span>
@@ -933,7 +1086,7 @@ export default async function DashboardPage() {
             <div className="space-y-2">
               {upcomingExpirations.map((item, i) => (
                 <Link key={i} href={item.link} className="flex items-center gap-3 p-3 rounded-none hover:bg-gray-50 transition-colors group">
-                  <div className={`shrink-0 ${item.isOverdue ? 'text-red-500' : item.daysLeft <= 14 ? 'text-yellow-500' : 'text-gray-400'}`}>
+                  <div className={`shrink-0 ${item.isOverdue ? 'text-red-500' : item.daysLeft <= 30 ? 'text-red-400' : item.daysLeft <= 60 ? 'text-amber-400' : 'text-green-500'}`}>
                     <Clock className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -941,7 +1094,7 @@ export default async function DashboardPage() {
                     <p className="text-xs text-gray-400 font-thin">{item.category}</p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <span className={`text-xs font-normal ${item.isOverdue ? 'text-red-600' : item.daysLeft <= 14 ? 'text-yellow-600' : 'text-gray-500'}`}>
+                    <span className={`text-xs font-normal ${item.isOverdue ? 'text-red-600' : item.daysLeft <= 30 ? 'text-red-500' : item.daysLeft <= 60 ? 'text-amber-500' : 'text-green-600'}`}>
                       {item.isOverdue
                         ? `${Math.abs(item.daysLeft)}d overdue`
                         : item.daysLeft === 0

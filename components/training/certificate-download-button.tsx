@@ -3,16 +3,23 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Award, Loader2 } from 'lucide-react';
+import { UpgradeModal } from '@/components/ui/upgrade-modal';
 
 interface CertificateDownloadButtonProps {
   recordId: string;
   employeeName: string;
+  isLocked?: boolean;
 }
 
-export function CertificateDownloadButton({ recordId, employeeName }: CertificateDownloadButtonProps) {
+export function CertificateDownloadButton({ recordId, employeeName, isLocked = false }: CertificateDownloadButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const handleDownload = async () => {
+    if (isLocked) {
+      setShowUpgradeModal(true);
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch(`/api/training/certificate?id=${encodeURIComponent(recordId)}`);
@@ -35,19 +42,26 @@ export function CertificateDownloadButton({ recordId, employeeName }: Certificat
   };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleDownload}
-      disabled={loading}
-      className="rounded-none border-[#71bc48]/40 text-[#71bc48] hover:bg-[#71bc48]/5"
-    >
-      {loading ? (
-        <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
-      ) : (
-        <Award className="h-3.5 w-3.5 mr-1" />
-      )}
-      Certificate
-    </Button>
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleDownload}
+        disabled={loading}
+        className="rounded-none border-[#71bc48]/40 text-[#71bc48] hover:bg-[#71bc48]/5"
+      >
+        {loading ? (
+          <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" />
+        ) : (
+          <Award className="h-3.5 w-3.5 mr-1" />
+        )}
+        Certificate
+      </Button>
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        featureName="Training certificates"
+      />
+    </>
   );
 }

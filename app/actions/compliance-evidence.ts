@@ -100,6 +100,9 @@ export interface ComplianceEvidence {
   created_at: string;
   updated_at: string;
   deleted_at?: string;
+  // Full-text search & access control
+  extracted_text?: string;
+  visibility?: 'all_members' | 'admin_only';
 }
 
 export interface CreateEvidenceInput {
@@ -130,6 +133,9 @@ export interface CreateEvidenceInput {
   notes?: string;
   external_reference?: string;
   attestation_signed?: boolean;
+  // Full-text search & access control
+  extracted_text?: string;
+  visibility?: 'all_members' | 'admin_only';
 }
 
 /**
@@ -143,30 +149,45 @@ export async function getAllComplianceEvidence(): Promise<ComplianceEvidence[]> 
     return [];
   }
 
-  // Get organization
+  // Get organization — also fetch user_id to determine admin vs member
   const { data: organization } = await supabase
     .from('organizations')
-    .select('id')
+    .select('id, user_id')
     .eq('user_id', user.id)
     .maybeSingle();
 
-  if (!organization) {
+  // If user doesn't own an org, check if they're a staff member in any org
+  let orgId: string | null = organization?.id ?? null;
+  let isAdmin = !!organization; // owner = admin
+
+  if (!orgId) {
+    // Staff member path: find the org via staff_members table
+    const { data: staffRecord } = await (supabase as any)
+      .from('staff_members')
+      .select('organization_id')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    orgId = staffRecord?.organization_id ?? null;
+  }
+
+  if (!orgId) {
     return [];
   }
 
-  // Get client IP and user agent (for audit trail)
-  const forwardedFor = typeof window !== 'undefined' ? 
-    (await fetch('/api/get-client-info').then(r => r.json()).catch(() => ({}))).ip : 
-    'server';
-
-  // Load all evidence (excluding soft-deleted)
-  // Note: compliance_evidence table exists but may not be in TypeScript types yet
-  const { data: evidence, error } = await (supabase as any)
+  // Load evidence (excluding soft-deleted)
+  // Non-admins only see all_members docs; admins see everything
+  let query = (supabase as any)
     .from('compliance_evidence')
     .select('*')
-    .eq('organization_id', organization.id)
+    .eq('organization_id', orgId)
     .is('deleted_at', null)
     .order('upload_date', { ascending: false });
+
+  if (!isAdmin) {
+    query = query.eq('visibility', 'all_members');
+  }
+
+  const { data: evidence, error } = await query;
 
   if (error) {
     console.error('Error loading compliance evidence:', error);
@@ -282,6 +303,8 @@ export async function createComplianceEvidence(
       external_reference: input.external_reference,
       attestation_signed: input.attestation_signed || false,
       status: 'VALID',
+      extracted_text: input.extracted_text || null,
+      visibility: input.visibility || 'all_members',
     })
     .select('id, related_document_ids')
     .single();
@@ -883,4 +906,68 @@ export async function signEvidenceAttestation(
   }
 
   return { success: true };
+}
+
+/**
+ * Access log entry shape returned by getEvidenceAccessLogs
+ */
+export interface EvidenceAccessLogEntry {
+  id: string;
+  user_id: string;
+  user_name?: string;
+  evidence_id: string;
+  evidence_title: string;
+  action: 'view' | 'download';
+  accessed_at: string;
+}
+
+/**
+ * Get access logs for a specific evidence document (admin only).
+ * Returns empty array if the current user is not the org owner.
+ */
+export async function getEvidenceAccessLogs(
+  evidenceId: string
+): Promise<EvidenceAccessLogEntry[]> {
+  const supabase = createClient() as any;
+  const user = await getUser(supabase);
+
+  if (!user) return [];
+
+  // Only org owners (admins) can view access logs
+  const { data: organization } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+  if (!organization) return [];
+
+  const { data: logs, error } = await supabase
+    .from('evidence_access_logs')
+    .select('id, user_id, user_name, evidence_id, evidence_title, action, accessed_at')
+    .eq('evidence_id', evidenceId)
+    .order('accessed_at', { ascending: false })
+    .limit(200);
+
+  if (error) {
+    console.error('Error loading evidence access logs:', error);
+    return [];
+  }
+
+  return logs || [];
+}
+
+/**
+ * Check if current user is admin (org owner) for the given organization
+ */
+export async function getIsAdmin(): Promise<boolean> {
+  const supabase = createClient() as any;
+  const user = await getUser(supabase);
+  if (!user) return false;
+  const { data: org } = await supabase
+    .from('organizations')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+  return !!org;
 }

@@ -14,12 +14,12 @@ ALTER TABLE training_records
   ADD COLUMN IF NOT EXISTS certificate_issued boolean NOT NULL DEFAULT false,
   ADD COLUMN IF NOT EXISTS certificate_issued_at timestamp with time zone;
 
--- Step 4: Create training_modules table
+-- Step 4: Create training_modules table (or add missing columns if it already exists)
 CREATE TABLE IF NOT EXISTS training_modules (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  organization_id text NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
-  module_name text NOT NULL,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  organization_id text REFERENCES organizations(id) ON DELETE CASCADE,
+  module_name text,
   module_description text,
   role_groups text[] NOT NULL DEFAULT ARRAY['clinical','admin','contractor','intern'],
   is_required boolean NOT NULL DEFAULT true,
@@ -27,6 +27,16 @@ CREATE TABLE IF NOT EXISTS training_modules (
   expiration_months integer NOT NULL DEFAULT 12,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
+
+-- Add columns if they don't exist (for pre-existing tables with different schema)
+ALTER TABLE training_modules ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE;
+ALTER TABLE training_modules ADD COLUMN IF NOT EXISTS organization_id text REFERENCES organizations(id) ON DELETE CASCADE;
+ALTER TABLE training_modules ADD COLUMN IF NOT EXISTS module_name text;
+ALTER TABLE training_modules ADD COLUMN IF NOT EXISTS module_description text;
+ALTER TABLE training_modules ADD COLUMN IF NOT EXISTS role_groups text[] NOT NULL DEFAULT ARRAY['clinical','admin','contractor','intern'];
+ALTER TABLE training_modules ADD COLUMN IF NOT EXISTS is_required boolean NOT NULL DEFAULT true;
+ALTER TABLE training_modules ADD COLUMN IF NOT EXISTS duration_minutes integer NOT NULL DEFAULT 30;
+ALTER TABLE training_modules ADD COLUMN IF NOT EXISTS expiration_months integer NOT NULL DEFAULT 12;
 
 CREATE INDEX IF NOT EXISTS training_modules_org_idx ON training_modules(organization_id);
 

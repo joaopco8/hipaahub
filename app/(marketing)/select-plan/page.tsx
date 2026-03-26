@@ -233,7 +233,7 @@ export default function SelectPlanPage() {
       </div>
 
       {/* Plan Cards */}
-      <div className="w-full max-w-3xl grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0 items-center">
+      <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 items-center">
         {plans.map((plan) => (
           <PlanCard key={plan.id} plan={plan} />
         ))}

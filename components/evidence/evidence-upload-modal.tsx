@@ -20,13 +20,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/utils/cn';
-import { 
-  Upload, 
-  X, 
-  ShieldCheck, 
+import {
+  Upload,
+  X,
+  ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  Info
+  Info,
+  Lock,
+  Users,
 } from 'lucide-react';
 import { createComplianceEvidence, type EvidenceType, type HIPAACategory } from '@/app/actions/compliance-evidence';
 import { useRouter } from 'next/navigation';
@@ -94,6 +96,7 @@ export function EvidenceUploadModal({ open, onOpenChange, onSuccess, trigger, fi
     description: fieldConfig?.description || '',
     notes: '',
     attestation_signed: false,
+    visibility: 'all_members' as 'all_members' | 'admin_only',
   });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,6 +158,7 @@ export function EvidenceUploadModal({ open, onOpenChange, onSuccess, trigger, fi
       if (!selectedEvidenceType) throw new Error('Invalid evidence type');
 
       let fileUrl = '';
+      let extractedText = '';
       if (selectedFile) {
         const formDataUpload = new FormData();
         formDataUpload.append('file', selectedFile);
@@ -169,6 +173,7 @@ export function EvidenceUploadModal({ open, onOpenChange, onSuccess, trigger, fi
 
         const uploadData = await uploadResponse.json();
         fileUrl = uploadData.file_url || '';
+        extractedText = uploadData.extracted_text || '';
       }
 
       const storageBucket = 'evidence';
@@ -206,6 +211,8 @@ export function EvidenceUploadModal({ open, onOpenChange, onSuccess, trigger, fi
         validity_period_days: 365, validity_start_date: new Date().toISOString().split('T')[0], tags: [selectedEvidenceType.name, selectedEvidenceType.category],
         notes: formData.notes, attestation_signed: formData.attestation_signed, catalog_id: selectedEvidenceType.id, capture_type: formData.capture_type,
         external_link: formData.capture_type === 'external_link' ? formData.external_link : undefined, frequency: frequencyMap[selectedEvidenceType.frequency || 'annually'] || 'annually',
+        extracted_text: extractedText || undefined,
+        visibility: formData.visibility,
       } as any);
 
       if (result.success) {
@@ -223,6 +230,7 @@ export function EvidenceUploadModal({ open, onOpenChange, onSuccess, trigger, fi
             fieldConfig.evidence_type === 'link' ? 'external_link' : 'attestation'
           ) : 'document_upload',
           external_link: '', title: fieldConfig?.name || '', description: fieldConfig?.description || '', notes: '', attestation_signed: false,
+          visibility: 'all_members',
         });
         setSelectedFile(null);
       } else {
@@ -517,6 +525,44 @@ export function EvidenceUploadModal({ open, onOpenChange, onSuccess, trigger, fi
                       <span className="text-xs text-gray-500 leading-relaxed font-light">Recorded with timestamp and IP address for legal defense</span>
                     </div>
                   </div>
+                </div>
+
+                {/* Visibility / Access Control */}
+                <div className="space-y-2">
+                  <Label className="text-[#0e274e] font-light text-sm flex items-center gap-1">
+                    <Lock className="h-3.5 w-3.5" /> Document Visibility
+                  </Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, visibility: 'all_members' }))}
+                      className={cn(
+                        'flex items-center gap-2 px-3 py-2.5 border text-sm transition-all',
+                        formData.visibility === 'all_members'
+                          ? 'bg-[#00bceb]/5 border-[#00bceb] text-[#0e274e]'
+                          : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
+                      )}
+                    >
+                      <Users className="h-4 w-4 shrink-0" />
+                      <span className="font-light">All Members</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, visibility: 'admin_only' }))}
+                      className={cn(
+                        'flex items-center gap-2 px-3 py-2.5 border text-sm transition-all',
+                        formData.visibility === 'admin_only'
+                          ? 'bg-[#0e274e]/5 border-[#0e274e] text-[#0e274e]'
+                          : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
+                      )}
+                    >
+                      <Lock className="h-4 w-4 shrink-0" />
+                      <span className="font-light">Admin Only</span>
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-gray-400 font-light">
+                    Admin Only restricts this document to organization admins.
+                  </p>
                 </div>
               </div>
             </div>

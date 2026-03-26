@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { CertificateDownloadButton } from '@/components/training/certificate-download-button';
+import { getSubscription } from '@/utils/supabase/queries';
 import {
   getTrainingRecords,
   getTrainingStats,
@@ -23,6 +24,14 @@ import {
 } from '@/app/actions/training';
 import TrainingExportButton from '@/components/training/training-export-button';
 import EmployeeInvitesSection from '@/components/training/employee-invites-section';
+import { getUserPlanTier, isPracticePlus } from '@/lib/plan-gating';
+import { PlanGate } from '@/components/plan-gate';
+import StaffTrainingClient from '@/components/training/staff-training-client';
+import {
+  getEmployeesWithAssignments,
+  getTrainingOverviewStats,
+  getTrainingModules,
+} from '@/app/actions/staff-training';
 
 export default async function TrainingPage() {
   const supabase = createClient();
@@ -40,13 +49,39 @@ export default async function TrainingPage() {
   let employeeInvites: any[] = [];
   let inviteStats = { total: 0, completed: 0, pending: 0, expired: 0, compliancePercent: 0 };
 
+  // Fetch plan tier + subscription in parallel
+  const [planTierResult, subscription] = await Promise.all([
+    getUserPlanTier(),
+    getSubscription(supabase, user.id),
+  ]);
+  let planTier = planTierResult;
+  const isLocked = !subscription || subscription.status === 'trialing';
+  let practiceEmployees: any[] = [];
+  let practiceStats: any = {
+    total_employees: 0, fully_compliant: 0, compliance_pct: 0,
+    total_assignments: 0, completed: 0, in_progress: 0, not_started: 0, expired: 0,
+  };
+  let practiceModules: any[] = [];
+
   try {
-    [trainingRecords, stats, employeeInvites, inviteStats] = await Promise.all([
+    const promises: Promise<any>[] = [
       getTrainingRecords(),
       getTrainingStats(),
       getEmployeeInvites(),
       getEmployeeInviteStats(),
-    ]);
+    ];
+    if (isPracticePlus(planTier)) {
+      promises.push(
+        getEmployeesWithAssignments(),
+        getTrainingOverviewStats(),
+        getTrainingModules(),
+      );
+    }
+    const results = await Promise.all(promises);
+    [trainingRecords, stats, employeeInvites, inviteStats] = results;
+    if (isPracticePlus(planTier)) {
+      [practiceEmployees, practiceStats, practiceModules] = results.slice(4);
+    }
   } catch (error) {
     console.error('Error fetching training data:', error);
   }
@@ -240,6 +275,7 @@ export default async function TrainingPage() {
                             <CertificateDownloadButton
                               recordId={record.id}
                               employeeName={record.full_name}
+                              isLocked={isLocked}
                             />
                           )}
                           {record.completion_status === 'completed' && (
@@ -274,6 +310,27 @@ export default async function TrainingPage() {
           initialStats={inviteStats}
         />
       </div>
+
+      {/* ── Section: Practice Plan — Staff Training Tracker ── */}
+      <PlanGate
+        requiredPlan="practice"
+        currentPlan={planTier}
+        featureName="Staff Training Tracker"
+        features={[
+          'Full employee roster with role-based training assignments',
+          'Auto-assign modules when employees are added',
+          'Completion certificates with org branding and expiration tracking',
+          'Automated renewal reminders at 60, 30, and 7 days',
+          'Training audit report exportable as PDF',
+        ]}
+      >
+        <StaffTrainingClient
+          initialEmployees={practiceEmployees}
+          initialStats={practiceStats}
+          initialModules={practiceModules}
+          isLocked={isLocked}
+        />
+      </PlanGate>
     </div>
   );
 }

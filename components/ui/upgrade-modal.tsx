@@ -20,11 +20,11 @@ export function UpgradeModal({ open, onClose, featureName = 'this feature' }: Up
             <Lock className="h-5 w-5 text-[#0e274e]" />
           </div>
           <DialogTitle className="text-[#0e274e] font-normal text-xl">
-            Upgrade to unlock
+            Export requires an active plan
           </DialogTitle>
           <DialogDescription className="text-center text-gray-500 font-light">
-            {featureName} is available on paid plans. Upgrade to access PDF downloads,
-            version history, and all HIPAA compliance features.
+            Everything you&apos;ve built in HIPAA Hub is ready to download. Activate a plan to
+            export PDFs, certificates, and your full audit package.
           </DialogDescription>
         </DialogHeader>
 
@@ -32,7 +32,7 @@ export function UpgradeModal({ open, onClose, featureName = 'this feature' }: Up
           <Link href="/select-plan" onClick={onClose}>
             <Button className="w-full bg-[#0e274e] text-white hover:bg-[#0e274e]/90 rounded-none font-light h-10">
               <Sparkles className="h-4 w-4 mr-2" />
-              View Plans
+              See plans →
             </Button>
           </Link>
           <Button
@@ -40,7 +40,7 @@ export function UpgradeModal({ open, onClose, featureName = 'this feature' }: Up
             className="w-full rounded-none font-light text-gray-500 h-10"
             onClick={onClose}
           >
-            Maybe later
+            Continue trial
           </Button>
         </div>
       </DialogContent>

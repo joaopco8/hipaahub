@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/baa/reminders",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/training/reminders",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/compliance-reminders",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/trial-reminders",
+      "schedule": "0 10 * * *"
+    }
+  ]
+}

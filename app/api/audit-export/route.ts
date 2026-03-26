@@ -42,6 +42,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Parse optional body params
+    let selectedSections: string[] | null = null;
+    let dateFrom: string | null = null;
+    let dateTo: string | null = null;
+    let userEmail: string = user.email || '';
+    try {
+      const body = await req.json();
+      selectedSections = Array.isArray(body.selectedSections) ? body.selectedSections : null;
+      dateFrom = typeof body.dateFrom === 'string' ? body.dateFrom : null;
+      dateTo = typeof body.dateTo === 'string' ? body.dateTo : null;
+      if (typeof body.userEmail === 'string' && body.userEmail) userEmail = body.userEmail;
+    } catch {
+      // body not required
+    }
+
     const data = await getAuditExportData();
 
     if (!data) {
@@ -72,19 +87,21 @@ export async function POST(req: NextRequest) {
     const exportDate = new Date(data.exportedAt).toISOString().split('T')[0];
     const root = zip.folder('Audit_Package')!;
 
+    const sectionEnabled = (key: string) => !selectedSections || selectedSections.includes(key);
+
     // 01_Executive_Summary — always included
     const summaryFolder = root.folder('01_Executive_Summary')!;
     summaryFolder.file('Compliance_Overview_Report.pdf', buildExecutiveSummaryPDF(data, jsPDF, logoData));
 
-    // 02_Risk_Assessment — only if exists
-    if (data.riskAssessment.exists) {
+    // 02_Risk_Assessment — only if exists and selected
+    if (sectionEnabled('02_Risk_Assessment') && data.riskAssessment.exists) {
       const riskFolder = root.folder('02_Risk_Assessment')!;
       riskFolder.file('Latest_Risk_Assessment_Report.pdf', buildRiskAssessmentPDF(data, jsPDF, logoData));
     }
 
-    // 03_Policies — only if at least one policy is documented
+    // 03_Policies — only if at least one policy is documented and selected
     const policiesWithDocs = data.policies.filter((p) => p.hasDocument);
-    if (policiesWithDocs.length > 0) {
+    if (sectionEnabled('03_Policies') && policiesWithDocs.length > 0) {
       const polFolder = root.folder('03_Policies')!;
       // Summary document (existing)
       polFolder.file('Policy_Documentation_Summary.pdf', buildPoliciesListPDF(data, jsPDF, logoData));
@@ -99,8 +116,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 04_Vendor_Management — only if vendors exist
-    if (data.vendors.length > 0) {
+    // 04_Vendor_Management — only if vendors exist and selected
+    if (sectionEnabled('04_Vendor_Management') && data.vendors.length > 0) {
       const vendorFolder = root.folder('04_Vendor_Management')!;
       // Summary report (existing)
       vendorFolder.file('Vendor_BAA_Status_Report.pdf', buildVendorManagementPDF(data, jsPDF, logoData));
@@ -113,16 +130,16 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 05_Training — only if training records exist
-    if (data.trainingRecords.length > 0) {
+    // 05_Training — only if training records exist and selected
+    if (sectionEnabled('05_Training') && data.trainingRecords.length > 0) {
       const trainFolder = root.folder('05_Training')!;
       trainFolder.file('Employee_Training_Log.pdf', buildTrainingLogPDF(data, jsPDF, logoData));
     }
 
-    // 06_Incidents — only if incidents or breaches exist
+    // 06_Incidents — only if incidents or breaches exist and selected
     const hasIncidents = data.incidents.length > 0;
     const hasBreaches = data.breachNotifications.length > 0;
-    if (hasIncidents || hasBreaches) {
+    if (sectionEnabled('06_Incidents') && (hasIncidents || hasBreaches)) {
       const incFolder = root.folder('06_Incidents')!;
       // Summary documents (existing)
       if (hasIncidents)  incFolder.file('Incident_Log.pdf', buildIncidentLogPDF(data, jsPDF, logoData));
@@ -171,6 +188,9 @@ export async function POST(req: NextRequest) {
     const checklistFolder = root.folder('07_Audit_Checklist')!;
     checklistFolder.file('HIPAA_Compliance_Checklist.pdf', buildAuditChecklistPDF(data, jsPDF, logoData));
 
+    // Back cover — always included at root
+    root.file('Back_Cover.pdf', buildBackCoverPDF(data, jsPDF, logoData, dateFrom, dateTo));
+
     const zipBuffer = await zip.generateAsync({
       type: 'nodebuffer',
       compression: 'DEFLATE',
@@ -182,11 +202,11 @@ export async function POST(req: NextRequest) {
     // Log the export (non-blocking)
     const sectionsIncluded = [
       '01_Executive_Summary',
-      ...(data.riskAssessment.exists ? ['02_Risk_Assessment'] : []),
-      ...(policiesWithDocs.length > 0 ? ['03_Policies'] : []),
-      ...(data.vendors.length > 0 ? ['04_Vendor_Management'] : []),
-      ...(data.trainingRecords.length > 0 ? ['05_Training'] : []),
-      ...((data.incidents.length > 0 || data.breachNotifications.length > 0) ? ['06_Incidents'] : []),
+      ...(sectionEnabled('02_Risk_Assessment') && data.riskAssessment.exists ? ['02_Risk_Assessment'] : []),
+      ...(sectionEnabled('03_Policies') && policiesWithDocs.length > 0 ? ['03_Policies'] : []),
+      ...(sectionEnabled('04_Vendor_Management') && data.vendors.length > 0 ? ['04_Vendor_Management'] : []),
+      ...(sectionEnabled('05_Training') && data.trainingRecords.length > 0 ? ['05_Training'] : []),
+      ...(sectionEnabled('06_Incidents') && (data.incidents.length > 0 || data.breachNotifications.length > 0) ? ['06_Incidents'] : []),
       '07_Audit_Checklist',
     ];
     (supabase as any)
@@ -196,9 +216,73 @@ export async function POST(req: NextRequest) {
         organization_id: String(data.organization.id),
         sections_included: sectionsIncluded,
         file_name: fileName,
+        date_from: dateFrom || null,
+        date_to: dateTo || null,
+        file_size: zipBuffer.length,
       })
       .then(() => {})
       .catch(() => {});
+
+    // Send confirmation email (non-blocking)
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (resendApiKey && userEmail) {
+      const dateRangeStr = dateFrom && dateTo
+        ? `${new Date(dateFrom).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} – ${new Date(dateTo).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
+        : 'All dates';
+      const emailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #0c0b1d;">
+          <div style="background: #0c0b1d; padding: 24px 32px;">
+            <p style="color: white; font-size: 18px; font-weight: 300; margin: 0;">HIPAA Hub</p>
+          </div>
+          <div style="padding: 32px;">
+            <h2 style="font-weight: 300; font-size: 20px; margin-bottom: 8px;">Audit Package Generated</h2>
+            <p style="color: #565656; font-size: 14px; font-weight: 300; margin-bottom: 24px;">
+              Your HIPAA audit package has been successfully generated and downloaded.
+            </p>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; font-weight: 300;">
+              <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px 0; color: #565656;">Organization</td>
+                <td style="padding: 10px 0; text-align: right;">${data.organization.name}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px 0; color: #565656;">Date Range</td>
+                <td style="padding: 10px 0; text-align: right;">${dateRangeStr}</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e7eb;">
+                <td style="padding: 10px 0; color: #565656;">Sections Included</td>
+                <td style="padding: 10px 0; text-align: right;">${sectionsIncluded.length}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0; color: #565656;">File</td>
+                <td style="padding: 10px 0; text-align: right; font-family: monospace; font-size: 11px;">${fileName}</td>
+              </tr>
+            </table>
+            <p style="margin-top: 24px; font-size: 12px; color: #9ca3af; font-weight: 300;">
+              This is a record of your export. The package was downloaded directly to your device.
+              Return to <a href="https://hipaahubhealth.com/dashboard/audit-export" style="color: #00bceb;">HIPAA Hub</a> to generate a new package at any time.
+            </p>
+          </div>
+          <div style="background: #f9fafb; padding: 16px 32px; border-top: 1px solid #e5e7eb;">
+            <p style="font-size: 11px; color: #9ca3af; font-weight: 300; margin: 0;">
+              Generated by HIPAA Hub · hipaahubhealth.com · Confidential compliance documentation
+            </p>
+          </div>
+        </div>
+      `;
+      fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: process.env.RESEND_FROM_EMAIL || 'noreply@hipaahubhealth.com',
+          to: [userEmail],
+          subject: `Audit Package Generated — ${data.organization.name}`,
+          html: emailHtml,
+        }),
+      }).catch(() => {});
+    }
 
     return new NextResponse(zipBuffer, {
       status: 200,
@@ -1469,6 +1553,88 @@ function buildAuditChecklistPDF(data: AuditExportData, jsPDF: any, logoData: Buf
   doc.roundedRect(margin + 52, y + 24, (contentWidth - 56) * (finalScore / 100), 3, 1.5, 1.5, 'F');
 
   addPageNumbers(doc, data.organization.name);
+  return doc.output('arraybuffer') as unknown as Uint8Array;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  BACK COVER
+// ─────────────────────────────────────────────────────────────────────────────
+
+function buildBackCoverPDF(
+  data: AuditExportData,
+  jsPDF: any,
+  logoData: Buffer | null,
+  dateFrom: string | null,
+  dateTo: string | null
+): Uint8Array {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 20;
+
+  // Dark background
+  doc.setFillColor(...C.dark);
+  doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+  // Blue accent bar at top
+  doc.setFillColor(...C.blue);
+  doc.rect(0, 0, pageWidth, 4, 'F');
+
+  // Logo (white version if available — use the same data, it will appear on dark bg)
+  if (logoData) {
+    try {
+      const logoBase64 = logoData.toString('base64');
+      const mimeType = 'image/png';
+      const dataUrl = `data:${mimeType};base64,${logoBase64}`;
+      doc.addImage(dataUrl, 'PNG', margin, pageHeight / 2 - 40, 40, 12, '', 'FAST');
+    } catch { /* skip logo if fails */ }
+  }
+
+  // Main text — centered vertical area
+  const centerY = pageHeight / 2 + 5;
+
+  doc.setTextColor(...C.white);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text('Generated by', pageWidth / 2, centerY - 10, { align: 'center' });
+
+  doc.setFontSize(22);
+  doc.setFont('helvetica', 'normal');
+  doc.text('HIPAA Hub', pageWidth / 2, centerY, { align: 'center' });
+
+  doc.setFontSize(9);
+  doc.setTextColor(...C.grayLight);
+  doc.text('hipaahubhealth.com', pageWidth / 2, centerY + 9, { align: 'center' });
+
+  // Divider
+  doc.setDrawColor(...C.blue);
+  doc.setLineWidth(0.5);
+  doc.line(margin + 40, centerY + 18, pageWidth - margin - 40, centerY + 18);
+
+  // Organization + date range
+  doc.setFontSize(8);
+  doc.setTextColor(...C.grayLight);
+  doc.text(data.organization.name, pageWidth / 2, centerY + 26, { align: 'center' });
+
+  if (dateFrom && dateTo) {
+    const fromStr = new Date(dateFrom).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const toStr = new Date(dateTo).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    doc.text(`${fromStr} – ${toStr}`, pageWidth / 2, centerY + 33, { align: 'center' });
+  }
+
+  doc.text(`Exported ${new Date(data.exportedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`, pageWidth / 2, centerY + (dateFrom && dateTo ? 40 : 33), { align: 'center' });
+
+  // Bottom disclaimer
+  doc.setFontSize(7);
+  doc.setTextColor(...C.grayLight);
+  const disclaimer = 'Confidential compliance documentation. This package is a compliance support tool and does not constitute legal advice.';
+  const lines = doc.splitTextToSize(disclaimer, pageWidth - margin * 4);
+  doc.text(lines, pageWidth / 2, pageHeight - margin - 8, { align: 'center' });
+
+  // Bottom blue bar
+  doc.setFillColor(...C.blue);
+  doc.rect(0, pageHeight - 4, pageWidth, 4, 'F');
+
   return doc.output('arraybuffer') as unknown as Uint8Array;
 }
 

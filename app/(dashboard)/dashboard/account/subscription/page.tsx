@@ -1,12 +1,33 @@
 import { createClient } from '@/utils/supabase/server';
 import { getUser, getSubscription } from '@/utils/supabase/queries';
+import { getUserPlanTier } from '@/lib/plan-gating';
 import { redirect } from 'next/navigation';
 import { createStripePortal } from '@/utils/stripe/server';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { ExternalLink, AlertTriangle, CheckCircle2, Clock, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { AlertTriangle, ExternalLink } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+const TIER_LABELS: Record<string, string> = {
+  solo: 'Solo',
+  practice: 'Practice',
+  clinic: 'Clinic',
+  enterprise: 'Enterprise',
+  unknown: 'No Plan',
+};
+
+const TIER_COLORS: Record<string, string> = {
+  solo: 'bg-[#00bceb]/10 text-[#00bceb] border-[#00bceb]/30',
+  practice: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  clinic: 'bg-violet-50 text-violet-700 border-violet-200',
+  enterprise: 'bg-amber-50 text-amber-700 border-amber-200',
+  unknown: 'bg-zinc-100 text-zinc-500 border-zinc-200',
+};
+
+const STATUS_ICON: Record<string, React.ReactNode> = {
+  active: <CheckCircle2 className="h-4 w-4 text-emerald-500" />,
+  trialing: <Clock className="h-4 w-4 text-[#00bceb]" />,
+  canceled: <AlertTriangle className="h-4 w-4 text-red-500" />,
+  past_due: <AlertTriangle className="h-4 w-4 text-amber-500" />,
+};
 
 export default async function ManageSubscriptionPage() {
   const supabase = createClient();
@@ -16,7 +37,10 @@ export default async function ManageSubscriptionPage() {
     return redirect('/signin');
   }
 
-  const subscription = await getSubscription(supabase, user.id);
+  const [subscription, planTier] = await Promise.all([
+    getSubscription(supabase, user.id),
+    getUserPlanTier(),
+  ]);
 
   async function openBillingPortal() {
     'use server';
@@ -24,89 +48,138 @@ export default async function ManageSubscriptionPage() {
     redirect(url);
   }
 
+  const tierLabel = TIER_LABELS[planTier] ?? 'Unknown';
+  const tierColor = TIER_COLORS[planTier] ?? TIER_COLORS.unknown;
+  const status = subscription?.status ?? null;
+  const statusIcon = status ? (STATUS_ICON[status] ?? null) : null;
+  const renewalDate = subscription?.current_period_end
+    ? new Date(subscription.current_period_end).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : null;
+
   return (
-    <div className="flex min-h-screen w-full flex-col gap-6 max-w-5xl mx-auto page-transition-premium">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Manage Subscription</h1>
-        <p className="text-zinc-600 text-base">
-          Billing is handled securely through Stripe. You can update payment details or cancel your plan anytime.
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-light text-[#0e274e] tracking-tight">Subscription</h1>
+        <p className="text-sm text-zinc-500 font-light mt-1">
+          Billing is handled securely through Stripe.
         </p>
       </div>
 
-      <Card className="border-zinc-200 card-premium-enter stagger-item">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-zinc-900">Your current plan</CardTitle>
-          <CardDescription className="text-zinc-600">A snapshot of your active billing state.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {subscription ? (
+      {/* Current Plan Card */}
+      <div className="border border-zinc-200 bg-white">
+        <div className="px-6 py-4 border-b border-zinc-100">
+          <p className="text-xs font-medium text-zinc-400 uppercase tracking-widest">Current Plan</p>
+        </div>
+
+        {subscription ? (
+          <div className="px-6 py-6 space-y-5">
+            {/* Tier badge + status */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span
+                  className={`inline-flex items-center px-3 py-1 text-sm font-light border tracking-wide ${tierColor}`}
+                >
+                  {tierLabel}
+                </span>
+                {status && (
+                  <span className="flex items-center gap-1.5 text-sm font-light text-zinc-500 capitalize">
+                    {statusIcon}
+                    {status.replace('_', ' ')}
+                  </span>
+                )}
+              </div>
+              {planTier !== 'unknown' && planTier !== 'enterprise' && (
+                <Link
+                  href="/select-plan"
+                  className="text-xs text-[#00bceb] hover:underline font-light flex items-center gap-1"
+                >
+                  Upgrade <ArrowRight className="h-3 w-3" />
+                </Link>
+              )}
+            </div>
+
+            {/* Details grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="rounded-lg border border-zinc-200 bg-white p-4">
-                <div className="text-xs font-medium text-zinc-600">Plan</div>
-                <div className="mt-1 text-base font-semibold text-zinc-900">
-                  {subscription?.prices?.products?.name || 'N/A'}
-                </div>
+              <div className="bg-zinc-50 px-4 py-3">
+                <p className="text-xs text-zinc-400 font-light mb-1">Billing period</p>
+                <p className="text-sm text-[#0e274e] font-light">Monthly</p>
               </div>
-              <div className="rounded-lg border border-zinc-200 bg-white p-4">
-                <div className="text-xs font-medium text-zinc-600">Status</div>
-                <div className="mt-1 text-base font-semibold text-zinc-900 capitalize">
-                  {subscription?.status || 'N/A'}
+              {renewalDate && (
+                <div className="bg-zinc-50 px-4 py-3">
+                  <p className="text-xs text-zinc-400 font-light mb-1">
+                    {status === 'canceled' ? 'Access until' : 'Next renewal'}
+                  </p>
+                  <p className="text-sm text-[#0e274e] font-light">{renewalDate}</p>
                 </div>
-              </div>
+              )}
             </div>
-          ) : (
-            <Alert className="bg-yellow-50 border-yellow-200">
-              <AlertTriangle className="h-4 w-4" />
+          </div>
+        ) : (
+          <div className="px-6 py-6">
+            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 px-4 py-3">
+              <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
               <div>
-                <AlertTitle>No active subscription</AlertTitle>
-                <AlertDescription>
-                  This account does not currently have an active subscription. If you need access, choose a plan first.
-                </AlertDescription>
+                <p className="text-sm text-amber-800 font-light">No active subscription</p>
+                <p className="text-xs text-amber-600 font-light mt-0.5">
+                  Export, certificates, and Practice features are locked until you activate a plan.
+                </p>
               </div>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card className="border-zinc-200 card-premium-enter stagger-item">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold text-zinc-900">Cancel subscription</CardTitle>
-          <CardDescription className="text-zinc-600">
-            Cancellation happens in Stripe and is recorded on your billing account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Alert className="bg-zinc-50 border-zinc-200">
-            <AlertTriangle className="h-4 w-4" />
-            <div>
-              <AlertTitle>Audit note</AlertTitle>
-              <AlertDescription>
-                Subscription status affects access only. Your organization’s compliance records remain in your database.
-              </AlertDescription>
             </div>
-          </Alert>
-
-          <form action={openBillingPortal} className="space-y-3">
-            <Button
-              type="submit"
-              className="w-full bg-[#00bceb] text-white hover:bg-[#00bceb]/90 rounded-none font-bold"
-            >
-              <ExternalLink className="mr-2 h-4 w-4" />
-              Open Stripe Billing Portal
-            </Button>
-          </form>
-
-          <div className="flex items-center justify-between">
-            <Link href="/dashboard/account" className="text-sm text-zinc-600 hover:text-zinc-900">
-              Back to Account
-            </Link>
-            <Link href="/dashboard" className="text-sm text-zinc-600 hover:text-zinc-900">
-              Back to Dashboard
+            <Link href="/select-plan" className="mt-4 inline-flex">
+              <button className="bg-[#00bceb] hover:bg-[#00a8d4] text-white text-sm font-light px-5 py-2 flex items-center gap-2 transition-colors">
+                Choose a plan
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </Link>
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
+
+      {/* Billing portal */}
+      {subscription && (
+        <div className="border border-zinc-200 bg-white">
+          <div className="px-6 py-4 border-b border-zinc-100">
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-widest">Billing</p>
+          </div>
+          <div className="px-6 py-6 space-y-4">
+            <p className="text-sm text-zinc-500 font-light">
+              Update payment details, download invoices, or cancel your subscription through the
+              Stripe billing portal.
+            </p>
+            <div className="bg-zinc-50 border border-zinc-200 px-4 py-3 flex items-start gap-3">
+              <AlertTriangle className="h-4 w-4 text-zinc-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-zinc-500 font-light">
+                Cancellation affects access only. Your organization&apos;s compliance records remain
+                in your account.
+              </p>
+            </div>
+            <form action={openBillingPortal}>
+              <button
+                type="submit"
+                className="bg-[#0e274e] hover:bg-[#0e274e]/90 text-white text-sm font-light px-5 py-2 flex items-center gap-2 transition-colors"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open Billing Portal
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Nav */}
+      <div className="flex items-center justify-between text-sm font-light">
+        <Link href="/dashboard/account" className="text-zinc-400 hover:text-zinc-600 transition-colors">
+          ← Back to Account
+        </Link>
+        <Link href="/dashboard" className="text-zinc-400 hover:text-zinc-600 transition-colors">
+          Dashboard →
+        </Link>
+      </div>
     </div>
   );
 }
-

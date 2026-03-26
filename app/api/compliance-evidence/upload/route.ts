@@ -12,6 +12,29 @@ import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 import { Database } from '@/types/db';
 
+async function extractTextFromFile(buffer: Buffer, mimeType: string): Promise<string> {
+  try {
+    if (mimeType === 'application/pdf') {
+      // Use require inside function to avoid Next.js test-file initialization issue
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const pdfParse = require('pdf-parse/lib/pdf-parse');
+      const data = await pdfParse(buffer);
+      return (data.text || '').substring(0, 100000);
+    }
+    if (
+      mimeType === 'text/plain' ||
+      mimeType === 'text/csv' ||
+      mimeType === 'application/json' ||
+      mimeType === 'text/html'
+    ) {
+      return buffer.toString('utf-8').substring(0, 100000);
+    }
+  } catch (e) {
+    console.warn('Text extraction failed:', e);
+  }
+  return '';
+}
+
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: NextRequest) {
@@ -108,12 +131,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Extract text for full-text search (non-blocking; failures are silent)
+    const extracted_text = await extractTextFromFile(buffer, file.type);
+
     return NextResponse.json({
       success: true,
       file_url: uploadData.path,
       file_name: file.name,
       file_type: file.type,
       file_size: file.size,
+      extracted_text,
     });
 
   } catch (error: any) {

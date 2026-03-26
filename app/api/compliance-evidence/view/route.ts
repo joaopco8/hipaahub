@@ -200,6 +200,7 @@ export async function GET(request: NextRequest) {
         .from('evidence_access_logs')
         .insert({
           user_id: user.id,
+          user_name: user.email || user.id,
           organization_id: String((organization as any).id),
           evidence_id: evidenceId,
           evidence_title: decodeURIComponent(evidenceTitle),

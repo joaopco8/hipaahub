@@ -18,8 +18,8 @@ ALTER TABLE risk_assessments
   ADD COLUMN IF NOT EXISTS expires_at timestamp with time zone;
 
 UPDATE risk_assessments
-SET expires_at = updated_at + interval '12 months'
-WHERE expires_at IS NULL AND updated_at IS NOT NULL;
+SET expires_at = "updatedAt" + interval '12 months'
+WHERE expires_at IS NULL AND "updatedAt" IS NOT NULL;
 
 COMMENT ON COLUMN risk_assessment_history.gap_report IS 'Full gap report snapshot (GapReport JSON) at time of assessment';
 COMMENT ON COLUMN onboarding_risk_assessments.expires_at IS 'Assessment expiration: completed_at + 12 months';
