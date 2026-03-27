@@ -72,8 +72,14 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (user) {
-      // Check if user has phone number - if not, redirect to complete profile
-      const { data: userData } = await supabase
+      // Check if user has phone number using service role to bypass RLS
+      const { createClient: createAdmin } = await import('@supabase/supabase-js');
+      const adminClient = createAdmin(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+      );
+      const { data: userData } = await adminClient
         .from('users')
         .select('phone_number')
         .eq('id', user.id)

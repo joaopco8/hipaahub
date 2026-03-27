@@ -23,50 +23,27 @@ function CompleteProfilePageContent() {
   const redirectParam = searchParams.get('redirect') || '';
   const priceId = searchParams.get('priceId') || '';
 
-  const doRedirect = async (supabase: ReturnType<typeof createClient>, userId: string) => {
-    if (priceId) {
-      router.push(`/checkout?priceId=${priceId}`);
-      return;
-    }
-    if (redirectParam === 'checkout') {
-      router.push('/checkout');
-      return;
-    }
-    const { getSubscription, getOrganization, getComplianceCommitment } = await import('@/utils/supabase/queries');
-    const [subscription, organization, commitment] = await Promise.all([
-      getSubscription(supabase, userId),
-      getOrganization(supabase, userId),
-      getComplianceCommitment(supabase, userId)
-    ]);
-    if (organization && commitment) {
-      router.push('/dashboard');
-    } else if (subscription) {
-      router.push('/onboarding/expectation');
-    } else {
-      router.push('/select-plan');
-    }
+  const doRedirect = () => {
+    if (priceId) { router.push(`/checkout?priceId=${priceId}`); return; }
+    if (redirectParam === 'checkout') { router.push('/checkout'); return; }
+    router.push('/dashboard');
   };
 
   // On mount: if user already has a phone number, skip the form and redirect
   useEffect(() => {
     const checkAndRedirect = async () => {
       try {
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          router.push('/signin');
-          return;
-        }
-        const { data: userData } = await supabase
-          .from('users')
-          .select('phone_number')
-          .eq('id', user.id)
-          .single();
-
-        if (userData?.phone_number) {
-          // Already has phone number — go straight to the right destination
-          await doRedirect(supabase, user.id);
-          return;
+        const res = await fetch('/api/profile/phone');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.hasPhone) {
+            doRedirect();
+            return;
+          }
+          if (data.unauthenticated) {
+            router.push('/signin');
+            return;
+          }
         }
       } catch (err) {
         console.error('Profile check error:', err);
@@ -103,16 +80,7 @@ function CompleteProfilePageContent() {
       }
 
       toast.success('Phone number saved successfully');
-
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push('/signin');
-        return;
-      }
-
-      await doRedirect(supabase, user.id);
+      doRedirect();
     } catch (error) {
       console.error('Error completing profile:', error);
       toast.error('An error occurred. Please try again.');
