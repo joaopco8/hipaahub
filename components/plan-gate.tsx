@@ -44,13 +44,15 @@ export function PlanGate({
   if (hasAccess) return <>{children}</>;
 
   return (
-    <div className="relative flex w-full flex-col gap-6">
-      {/* Blurred preview */}
-      <div className="pointer-events-none select-none opacity-30 blur-sm">{children}</div>
+    <>
+      {/* Blurred, non-interactive preview of the locked content */}
+      <div className="pointer-events-none select-none blur-sm opacity-30 w-full">
+        {children}
+      </div>
 
-      {/* Lock overlay */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="mx-4 w-full max-w-md bg-white border border-gray-200 shadow-xl p-8 text-center">
+      {/* Full-screen fixed overlay — blocks all interaction */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+        <div className="mx-4 w-full max-w-md bg-white border border-gray-200 shadow-2xl p-8 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#0e274e]/10">
             <Lock className="h-7 w-7 text-[#0e274e]" />
           </div>
@@ -86,6 +88,6 @@ export function PlanGate({
           </p>
         </div>
       </div>
-    </div>
+    </>
   );
 }

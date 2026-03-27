@@ -190,7 +190,7 @@ export default function EmployeeInvitesSection({
               </p>
               <Button
                 onClick={() => setIsModalOpen(true)}
-                className="rounded-none bg-[#1ad07a] text-[#0c0b1d] hover:bg-[#1ad07a]/90 font-medium h-9"
+                className="rounded-none bg-[#0e274e] text-white hover:bg-[#0e274e]/90 font-medium h-9"
               >
                 <UserPlus className="mr-2 h-4 w-4" />
                 Add First Employee
