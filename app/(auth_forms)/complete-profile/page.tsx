@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import { savePhoneNumber } from '@/app/actions/profile';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -33,47 +34,34 @@ function CompleteProfilePageContent() {
     setIsSubmitting(true);
 
     try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const result = await savePhoneNumber(phoneNumber);
 
-      if (!user) {
-        toast.error('You must be signed in to complete your profile');
-        router.push('/signin');
-        return;
-      }
-
-      // Update user phone number
-      const { error } = await supabase
-        .from('users')
-        .update({ phone_number: phoneNumber.trim() })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Error updating phone number:', error);
+      if (result.error) {
+        console.error('Error saving phone number:', result.error);
         toast.error('Failed to save phone number. Please try again.');
         return;
       }
 
-      // Also update in auth metadata
-      await supabase.auth.updateUser({
-        data: { phone_number: phoneNumber.trim() }
-      });
-
       toast.success('Phone number saved successfully');
 
       // Redirect based on priceId / redirect parameter or default flow
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push('/signin');
+        return;
+      }
+
       if (priceId) {
-        // User already selected a plan before signing in → go straight to checkout
         router.push(`/checkout?priceId=${priceId}`);
       } else if (redirectParam === 'checkout') {
         router.push('/checkout');
       } else {
-        // Check subscription status and redirect accordingly
         const { getSubscription } = await import('@/utils/supabase/queries');
         const subscription = await getSubscription(supabase, user.id);
-        
+
         if (subscription) {
-          // Check onboarding status
           const { getOrganization, getComplianceCommitment } = await import('@/utils/supabase/queries');
           const [organization, commitment] = await Promise.all([
             getOrganization(supabase, user.id),
@@ -86,7 +74,6 @@ function CompleteProfilePageContent() {
             router.push('/onboarding/expectation');
           }
         } else {
-          // No plan selected → show plan selection screen
           router.push('/select-plan');
         }
       }
