@@ -3,10 +3,9 @@
 // Force dynamic rendering to prevent build-time prerendering errors with useSearchParams
 export const dynamic = 'force-dynamic';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { savePhoneNumber } from '@/app/actions/profile';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,12 +19,68 @@ function CompleteProfilePageContent() {
   const searchParams = useSearchParams();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const redirectParam = searchParams.get('redirect') || '';
   const priceId = searchParams.get('priceId') || '';
 
+  const doRedirect = async (supabase: ReturnType<typeof createClient>, userId: string) => {
+    if (priceId) {
+      router.push(`/checkout?priceId=${priceId}`);
+      return;
+    }
+    if (redirectParam === 'checkout') {
+      router.push('/checkout');
+      return;
+    }
+    const { getSubscription, getOrganization, getComplianceCommitment } = await import('@/utils/supabase/queries');
+    const [subscription, organization, commitment] = await Promise.all([
+      getSubscription(supabase, userId),
+      getOrganization(supabase, userId),
+      getComplianceCommitment(supabase, userId)
+    ]);
+    if (organization && commitment) {
+      router.push('/dashboard');
+    } else if (subscription) {
+      router.push('/onboarding/expectation');
+    } else {
+      router.push('/select-plan');
+    }
+  };
+
+  // On mount: if user already has a phone number, skip the form and redirect
+  useEffect(() => {
+    const checkAndRedirect = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          router.push('/signin');
+          return;
+        }
+        const { data: userData } = await supabase
+          .from('users')
+          .select('phone_number')
+          .eq('id', user.id)
+          .single();
+
+        if (userData?.phone_number) {
+          // Already has phone number — go straight to the right destination
+          await doRedirect(supabase, user.id);
+          return;
+        }
+      } catch (err) {
+        console.error('Profile check error:', err);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+    checkAndRedirect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!phoneNumber.trim()) {
       toast.error('Please enter your phone number');
       return;
@@ -34,17 +89,21 @@ function CompleteProfilePageContent() {
     setIsSubmitting(true);
 
     try {
-      const result = await savePhoneNumber(phoneNumber);
+      const res = await fetch('/api/profile/phone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phoneNumber })
+      });
 
-      if (result.error) {
-        console.error('Error saving phone number:', result.error);
-        toast.error('Failed to save phone number. Please try again.');
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        toast.error(data.error || 'Failed to save phone number. Please try again.');
         return;
       }
 
       toast.success('Phone number saved successfully');
 
-      // Redirect based on priceId / redirect parameter or default flow
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -53,30 +112,7 @@ function CompleteProfilePageContent() {
         return;
       }
 
-      if (priceId) {
-        router.push(`/checkout?priceId=${priceId}`);
-      } else if (redirectParam === 'checkout') {
-        router.push('/checkout');
-      } else {
-        const { getSubscription } = await import('@/utils/supabase/queries');
-        const subscription = await getSubscription(supabase, user.id);
-
-        if (subscription) {
-          const { getOrganization, getComplianceCommitment } = await import('@/utils/supabase/queries');
-          const [organization, commitment] = await Promise.all([
-            getOrganization(supabase, user.id),
-            getComplianceCommitment(supabase, user.id)
-          ]);
-
-          if (organization && commitment) {
-            router.push('/dashboard');
-          } else {
-            router.push('/onboarding/expectation');
-          }
-        } else {
-          router.push('/select-plan');
-        }
-      }
+      await doRedirect(supabase, user.id);
     } catch (error) {
       console.error('Error completing profile:', error);
       toast.error('An error occurred. Please try again.');
@@ -84,6 +120,14 @@ function CompleteProfilePageContent() {
       setIsSubmitting(false);
     }
   };
+
+  if (isChecking) {
+    return (
+      <div className="flex min-h-[100dvh] bg-[#f3f5f9] items-center justify-center">
+        <div className="w-6 h-6 border-2 border-[#0e274e]/30 border-t-[#0e274e] rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-[100dvh] bg-[#f3f5f9]">
@@ -123,10 +167,7 @@ function CompleteProfilePageContent() {
           </div>
 
           {/* Form */}
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6 mt-8"
-          >
+          <form onSubmit={handleSubmit} className="space-y-6 mt-8">
             <div className="space-y-2">
               <Label htmlFor="phone_number" className="text-gray-700 font-thin text-sm">
                 Phone Number <span className="text-red-500">*</span>
@@ -147,8 +188,8 @@ function CompleteProfilePageContent() {
               </p>
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full h-12 bg-cisco-blue text-white font-thin hover:bg-cisco-navy transition-all rounded-none text-sm shadow-md shadow-cisco-blue/10"
               disabled={isSubmitting || !phoneNumber.trim()}
             >
@@ -190,11 +231,13 @@ function CompleteProfilePageContent() {
 
 export default function CompleteProfilePage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-[100dvh] bg-[#f3f5f9] items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-[100dvh] bg-[#f3f5f9] items-center justify-center">
+          <div className="w-6 h-6 border-2 border-[#0e274e]/30 border-t-[#0e274e] rounded-full animate-spin" />
+        </div>
+      }
+    >
       <CompleteProfilePageContent />
     </Suspense>
   );
