@@ -92,7 +92,7 @@ export default function SidebarLayout({
   return (
     <div className="flex h-screen w-full bg-[#f3f5f9] overflow-hidden">
       {/* Desktop Sidebar */}
-      <aside className="hidden w-64 flex-col bg-[#0175a2] text-white sm:flex h-full shrink-0 shadow-xl z-20">
+      <aside className="hidden w-64 flex-col bg-[#0175a2] text-white sm:flex h-full shrink-0 shadow-xl z-[60]">
         <SidebarContent />
       </aside>
 
