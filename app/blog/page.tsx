@@ -1,7 +1,22 @@
+import type { Metadata } from 'next';
 import { blog } from '@/utils/source';
 import { BlogCard } from '@/components/blog/blog-card';
 
 export const revalidate = 3600; // Revalidate every hour
+
+export const metadata: Metadata = {
+  title: 'HIPAA Compliance Resources for Private Practices',
+  description: 'Practical HIPAA compliance guides for therapists and small clinics. Risk assessments, audits, policies, and more.',
+  openGraph: {
+    title: 'HIPAA Compliance Resources for Private Practices',
+    description: 'Practical HIPAA compliance guides for therapists and small clinics. Risk assessments, audits, policies, and more.',
+    url: 'https://hipaahubhealth.com/blog',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://hipaahubhealth.com/blog',
+  },
+};
 
 export default function Page(): React.ReactElement {
   const posts = [...blog.getPages()].sort(
@@ -27,10 +42,10 @@ export default function Page(): React.ReactElement {
       {/* Header */}
       <div className="mb-12">
         <h1 className="text-4xl md:text-5xl font-extralight text-[#0c0b1d] mb-4">
-          HIPAA Hub Blog
+          HIPAA Compliance Resources for Private Practices
         </h1>
         <p className="text-lg text-zinc-600 font-extralight">
-          Practical, audit-ready HIPAA guidance for clinic owners.
+          Practical HIPAA compliance guides for therapists and small clinics. Risk assessments, audits, policies, and more.
         </p>
       </div>
 

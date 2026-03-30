@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, Clock } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, ChevronRight } from 'lucide-react';
 import { blog } from '@/utils/source';
-import { createMetadata } from '@/utils/metadata';
 import { Button } from '@/components/ui/button';
 import { BlogCoverImage } from '@/components/blog/blog-cover-image';
 import Image from 'next/image';
@@ -34,8 +33,47 @@ export default function Page({
     year: 'numeric'
   });
 
+  const slug = params.slug;
+  const canonicalUrl = `https://hipaahubhealth.com/blog/${slug}`;
+  const dateISO = date.toISOString();
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: page.data.title,
+    description: page.data.description ?? 'Practical HIPAA compliance guidance for therapists and small clinics.',
+    author: {
+      '@type': 'Organization',
+      name: 'HIPAA Hub',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'HIPAA Hub',
+      url: 'https://hipaahubhealth.com',
+    },
+    datePublished: dateISO,
+    dateModified: dateISO,
+    url: canonicalUrl,
+  };
+
+  const relatedArticles = ((page.data as any).relatedArticles as Array<{ slug: string; title: string }> | undefined) ?? [];
+
   return (
     <article className="w-full max-w-5xl mx-auto text-[#0c0b1d]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      {/* Breadcrumb */}
+      <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-sm text-zinc-500 font-extralight">
+        <Link href="/" className="hover:text-[#1ad07a] transition-colors">Home</Link>
+        <ChevronRight className="h-3.5 w-3.5" />
+        <Link href="/blog" className="hover:text-[#1ad07a] transition-colors">Blog</Link>
+        <ChevronRight className="h-3.5 w-3.5" />
+        <span className="text-[#0c0b1d] line-clamp-1">{page.data.title}</span>
+      </nav>
+
       {/* Back Button */}
       <div className="mb-8">
         <Link href="/blog" prefetch={true}>
@@ -129,6 +167,30 @@ export default function Page({
           </div>
         </div>
       </div>
+
+      {/* Related Articles */}
+      {relatedArticles.length > 0 && (
+        <div className="mt-16 pt-12 border-t border-zinc-200">
+          <h2 className="text-2xl font-extralight text-[#0c0b1d] mb-6">Related Articles</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {relatedArticles.map((related) => (
+              <Link
+                key={related.slug}
+                href={`/blog/${related.slug}`}
+                className="group block bg-[#f3f5f9] rounded-2xl p-6 border border-zinc-200 hover:shadow-md transition-all duration-200"
+              >
+                <p className="font-extralight text-[#0c0b1d] group-hover:text-[#1ad07a] transition-colors leading-snug">
+                  {related.title}
+                </p>
+                <div className="flex items-center gap-1.5 mt-3 text-sm text-[#1ad07a] font-extralight">
+                  <span>Read article</span>
+                  <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </article>
   );
 }
@@ -138,11 +200,25 @@ export function generateMetadata({ params }: { params: Param }): Metadata {
 
   if (!page) notFound();
 
-  return createMetadata({
+  const slug = params.slug;
+  const canonicalUrl = `https://hipaahubhealth.com/blog/${slug}`;
+  const date = new Date(page.data.date ?? page.file.name);
+
+  return {
     title: page.data.title,
-    description:
-      page.data.description ?? 'Practical, audit-ready HIPAA guidance for clinic owners.'
-  });
+    description: page.data.description ?? 'Practical, audit-ready HIPAA guidance for clinic owners.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: page.data.title,
+      description: page.data.description ?? 'Practical, audit-ready HIPAA guidance for clinic owners.',
+      url: canonicalUrl,
+      type: 'article',
+      publishedTime: date.toISOString(),
+      authors: ['HIPAA Hub Compliance Team'],
+    },
+  };
 }
 
 export async function generateStaticParams(): Promise<Param[]> {

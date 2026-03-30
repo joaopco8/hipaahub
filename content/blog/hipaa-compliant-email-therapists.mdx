@@ -1,0 +1,90 @@
+---
+title: "HIPAA Compliant Email for Therapists: What a BAA Alone Does Not Protect You From"
+description: "What makes email HIPAA compliant for therapy practices, which providers to use, and what a BAA alone does not protect you from."
+author: "HIPAA Hub Compliance Team"
+date: "2026-03-08"
+category: "Technology"
+readTime: "7 min read"
+excerpt: "The question therapists ask most often about email and HIPAA is whether signing a Business Associate Agreement with Google or Microsoft makes their email HIPAA compliant."
+relatedArticles:
+  - slug: "business-associate-agreements-therapy-practice"
+    title: "Business Associate Agreements for Therapy Practices: Who Needs One and What to Look For"
+  - slug: "hipaa-compliance-checklist-private-practice-therapists"
+    title: "The HIPAA Compliance Checklist Every Private Practice Therapist Needs in 2026"
+---
+
+The question therapists ask most often about email and HIPAA is whether signing a Business Associate Agreement with Google or Microsoft makes their email HIPAA compliant. The answer is that a BAA is necessary but not sufficient. What the BAA actually covers, where the gaps are, and what you still need to do after signing one is what this article explains.
+
+## What HIPAA Actually Says About Email
+
+HIPAA does not prohibit therapists from using email to communicate with patients. It does not require you to use a secure patient portal for every interaction. What HIPAA requires is that you implement reasonable safeguards to protect PHI during transmission and that you document what those safeguards are.
+
+The practical question is not whether you can use email but what you can send through it and how it needs to be configured to meet the Security Rule's requirements.
+
+## What a BAA With Google or Microsoft Actually Covers
+
+When you sign a Business Associate Agreement with Google Workspace or Microsoft 365, you are establishing that the provider will implement appropriate safeguards for PHI that passes through their infrastructure. The BAA creates a contractual obligation on the vendor's side and establishes liability if they mishandle your patients' information.
+
+What the BAA covers: PHI stored in Gmail or Outlook inboxes, PHI transmitted through the provider's servers, and the security of the provider's platform infrastructure.
+
+What the BAA does not cover: what happens after the email leaves their servers and arrives in the recipient's inbox. Standard email is not encrypted end-to-end. The moment your email reaches the recipient's email provider, it is outside the scope of your BAA.
+
+## The Encryption Problem With Standard Email
+
+HIPAA's Security Rule requires covered entities to implement a mechanism to encrypt and decrypt ePHI whenever deemed appropriate. For email, the key requirement is transmission security, which requires technical security measures to guard against unauthorized access to ePHI being transmitted over electronic networks.
+
+Standard SMTP email is transmitted using TLS encryption between servers when both servers support it, which most modern email providers do. This means the email is encrypted in transit between servers. However, once it arrives in the recipient's inbox, it is stored unencrypted. If the recipient's email account is compromised, so is the PHI in your messages.
+
+This is why many compliance advisors recommend treating standard email as inadequate for transmitting clinical PHI (diagnoses, session notes, treatment plans) and reserving it for administrative communication.
+
+## What You Can Send via Standard Email
+
+The minimum necessary standard applies to email just as it applies to every other form of PHI disclosure. Before sending any patient information via email, consider whether the recipient needs the specific information you are sending.
+
+For a therapy practice, reasonable use of standard business email with a BAA includes appointment reminders containing only the patient name and appointment time, billing communications that reference invoices without detailed clinical information, general administrative correspondence, and responses to patient-initiated email communications where the patient has been informed of the risks.
+
+The patient's right to communicate by email is important here. If a patient requests to communicate with you via their personal Gmail account, HIPAA allows you to accommodate that request even knowing that their email is not HIPAA-compliant. You should document that the patient made this request and was informed of the potential risks.
+
+## When to Use a Secure Messaging Solution
+
+For transmitting actual clinical content including diagnoses, session notes, assessment results, or detailed treatment information, a secure messaging system is the appropriate tool. Several options are purpose-built for healthcare.
+
+Patient portals integrated with your EHR are often the simplest solution. Most modern EHR systems include a HIPAA-compliant messaging portal. Using this for clinical communication keeps everything within a single compliant system.
+
+Spruce Health offers a HIPAA-compliant messaging platform with a BAA that handles both internal team communication and patient-facing messages. Messages are encrypted in transit and at rest.
+
+OhMD is designed specifically for patient communication, with HIPAA-compliant text messaging and secure messaging options.
+
+The key distinction: these platforms use end-to-end encryption and require patients to access messages through a secure channel, unlike standard email which delivers to whatever inbox the patient uses.
+
+## Setting Up Google Workspace or Microsoft 365 for HIPAA
+
+If you choose to use Google Workspace or Microsoft 365 for practice email, the setup steps beyond signing the BAA include several important configurations.
+
+For Google Workspace: enable 2-step verification for all accounts, configure session length controls, enable Google Vault for email retention and legal hold if needed, review sharing settings to prevent PHI from being shared outside your organization automatically, and document your configuration in your Security Policy.
+
+For Microsoft 365: enable multi-factor authentication, configure Microsoft Purview (formerly Compliance Center) for data loss prevention policies, enable audit logging, and document your configuration in your Security Policy.
+
+Critically, the configuration you put in place needs to be documented. Your Security Policy should describe how your email system is configured and what controls are in place. A BAA with no documented configuration is weaker than a BAA paired with evidence that you configured the system appropriately.
+
+## The Broader Email Compliance Picture
+
+Email is one piece of a larger compliance infrastructure. Having HIPAA-compliant email while missing a Risk Assessment, unsigned BAAs with other vendors, or no written policies leaves you significantly exposed despite your email being properly configured.
+
+OCR investigations rarely start with email. They typically start with a complaint, a breach report, or a random audit. What they find when they start investigating is the state of your overall compliance program, which email is one component of.
+
+The [HIPAA Hub Risk Assessment](https://hipaahubhealth.com) includes an evaluation of your email and communication systems as part of a complete compliance review.
+
+## A Practical Summary for Solo Therapists
+
+Sign a BAA with your email provider if you use Google Workspace or Microsoft 365. Document the BAA in your vendor records. Configure your email system with appropriate security settings and document those settings in your Security Policy.
+
+Use your EHR's secure messaging portal or a purpose-built secure messaging app for clinical communications containing diagnoses, notes, or detailed treatment information. Use standard business email for administrative communication and appointment reminders. If a patient requests email communication, document that request and inform them of the risks.
+
+None of this is as complicated as it sounds once you have a system for tracking it. The harder part for most practices is keeping the documentation organized and current.
+
+---
+
+**Get your email compliance in order.** HIPAA Hub helps private practice therapists track their BAAs, document their security configurations, and maintain organized compliance records in one place. [Start your free 14-day trial](https://hipaahubhealth.com/signup) at hipaahubhealth.com.
+
+*Disclaimer: This article provides general educational information about HIPAA requirements and does not constitute legal advice.*
