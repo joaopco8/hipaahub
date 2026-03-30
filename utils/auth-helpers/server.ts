@@ -164,15 +164,9 @@ export async function signInWithPassword(formData: FormData) {
     if (organization && commitment) {
       // Onboarding complete → always send to dashboard
       redirectPath = getStatusRedirect('/dashboard', 'Success!', 'You are now signed in.');
-    } else if (subscription) {
-      // Has subscription but onboarding incomplete → resume onboarding
-      redirectPath = getStatusRedirect('/onboarding/expectation', 'Success!', 'You are now signed in.');
-    } else if (priceId) {
-      // No subscription, but user already selected a plan → go straight to checkout
-      redirectPath = `/checkout?priceId=${priceId}`;
     } else {
-      // No subscription, no plan selected → show plan selection screen
-      redirectPath = '/select-plan';
+      // Onboarding incomplete → resume onboarding (trial starts on completion, no Stripe required)
+      redirectPath = getStatusRedirect('/onboarding/expectation', 'Success!', 'You are now signed in.');
     }
   } else {
     redirectPath = getErrorRedirect(
@@ -247,16 +241,8 @@ export async function signUp(formData: FormData) {
       console.log('signUp: user:', data.user?.id, '| subscription:', subscription ? 'YES' : 'NO');
     }
 
-    if (subscription) {
-      // User already has an active subscription → go to onboarding (or dashboard if complete)
-      redirectPath = '/onboarding/expectation';
-    } else if (priceId) {
-      // No subscription, but user already selected a plan → go straight to checkout
-      redirectPath = `/checkout?priceId=${priceId}`;
-    } else {
-      // No subscription, no plan selected → show plan selection screen
-      redirectPath = '/select-plan';
-    }
+    // Always start onboarding — trial is granted on onboarding completion (no Stripe required)
+    redirectPath = '/onboarding/expectation';
   } else if (
     data.user &&
     data.user.identities &&

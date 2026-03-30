@@ -79,7 +79,7 @@ export function requiredPlanFor(feature: SectionFeature): 'practice' | 'clinic' 
   return SECTION_PLAN_REQUIREMENTS[feature];
 }
 
-/** Convert raw Supabase subscription status → SubscriptionStatus */
+/** Convert raw Stripe subscription status → SubscriptionStatus */
 export function toSubscriptionStatus(
   raw: string | null | undefined
 ): SubscriptionStatus {
@@ -88,7 +88,34 @@ export function toSubscriptionStatus(
   return 'expired';
 }
 
-/** Compute trial days remaining from trial_end ISO string. */
+/**
+ * Resolve subscription status from the organizations table fields.
+ * This is the primary status source for the new org-based trial system.
+ * Falls back to Stripe subscription status when org fields are absent.
+ */
+export function resolveSubscriptionStatus(org: {
+  subscription_status?: string | null;
+  trial_ends_at?: string | null;
+} | null, stripeRaw?: string | null): SubscriptionStatus {
+  // Org table has explicit status — trust it, except validate trial hasn't silently expired
+  if (org?.subscription_status) {
+    const s = org.subscription_status;
+    if (s === 'active') return 'active';
+    if (s === 'cancelled') return 'expired';
+    if (s === 'expired') return 'expired';
+    if (s === 'trial') {
+      // Double-check trial hasn't expired (cron might not have run yet)
+      if (org.trial_ends_at && new Date(org.trial_ends_at) < new Date()) {
+        return 'expired';
+      }
+      return 'trial';
+    }
+  }
+  // No org status yet — fall back to Stripe
+  return toSubscriptionStatus(stripeRaw);
+}
+
+/** Compute trial days remaining from an ISO date string. */
 export function getTrialDaysRemaining(trialEnd: string | null): number | null {
   if (!trialEnd) return null;
   const ms = new Date(trialEnd).getTime() - Date.now();

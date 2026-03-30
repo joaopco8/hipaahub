@@ -945,6 +945,85 @@ export async function saveComplianceCommitment() {
     throw new Error(`Failed to save compliance commitment: ${error.message || 'Unknown error'}`);
   }
 
+  // ── Start 14-day trial on the organization ───────────────────────────────
+  const now = new Date();
+  const trialEndsAt = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+  // @ts-ignore — new columns added via migration, types not yet regenerated
+  await (supabase.from('organizations') as any)
+    .update({
+      subscription_status: 'trial',
+      trial_started_at: now.toISOString(),
+      trial_ends_at: trialEndsAt.toISOString(),
+    })
+    .eq('user_id', user.id);
+
+  // Log subscription event (best-effort)
+  try {
+    // @ts-ignore — new table added via migration
+    await (supabase.from('subscription_events') as any).insert({
+      org_id: organization.id,
+      event_type: 'trial_started',
+      from_status: null,
+      to_status: 'trial',
+    });
+  } catch { /* non-critical */ }
+
+  // ── Send Email 1: trial started ──────────────────────────────────────────
+  try {
+    const { data: userData } = await supabase.auth.admin
+      ? (await supabase.auth.getUser())
+      : { data: { user: null } };
+    const authUser = userData?.user ?? { email: null, user_metadata: {} };
+    const userEmail = authUser.email;
+    const firstName = (authUser.user_metadata as any)?.full_name?.split(' ')[0] ?? 'there';
+
+    if (userEmail) {
+      const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hipaahubhealth.com';
+      const FROM = process.env.RESEND_FROM_EMAIL ?? 'noreply@hipaahubhealth.com';
+      const apiKey = process.env.RESEND_API_KEY;
+      if (apiKey) {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            from: FROM,
+            to: userEmail,
+            subject: 'Your HIPAA Hub trial starts now',
+            html: `
+              <div style="font-family:sans-serif;max-width:560px;margin:auto;color:#0e274e">
+                <div style="background:#0e274e;padding:16px 24px">
+                  <p style="color:#fff;margin:0;font-size:13px;font-weight:300">HIPAA Hub</p>
+                </div>
+                <div style="padding:32px 24px">
+                  <h2 style="font-weight:300;font-size:22px;margin:0 0 16px">Hi ${firstName}, your 14-day trial is active.</h2>
+                  <p style="color:#555;font-size:14px;line-height:1.6;font-weight:300">Here is what to do first:</p>
+                  <ol style="color:#555;font-size:13px;line-height:1.8;font-weight:300;padding-left:20px">
+                    <li><strong style="font-weight:400">Complete your Risk Assessment</strong> (45 minutes)<br>
+                      This shows you exactly where your practice stands.<br>
+                      <a href="${SITE_URL}/dashboard/risk-assessment" style="color:#00bceb">Go to Risk Assessment →</a></li>
+                    <li style="margin-top:12px"><strong style="font-weight:400">Activate your 9 HIPAA policies</strong><br>
+                      Pre-written and ready for your review.<br>
+                      <a href="${SITE_URL}/dashboard/policies" style="color:#00bceb">Go to Policies →</a></li>
+                    <li style="margin-top:12px"><strong style="font-weight:400">Upload your existing compliance documents</strong><br>
+                      Keep everything in one place before an audit.<br>
+                      <a href="${SITE_URL}/dashboard/evidence" style="color:#00bceb">Go to Evidence Center →</a></li>
+                  </ol>
+                  <p style="color:#888;font-size:12px;font-weight:300;margin-top:24px;border-top:1px solid #eee;padding-top:16px">
+                    Your trial gives you full access to everything on your plan.
+                    Exporting and downloading requires an active subscription.
+                  </p>
+                </div>
+                <div style="background:#f3f5f9;padding:16px 24px">
+                  <p style="color:#999;font-size:11px;font-weight:300;margin:0">HIPAA Hub · hipaahubhealth.com · Reply to this email with questions</p>
+                </div>
+              </div>`,
+          }),
+        });
+      }
+    }
+  } catch { /* email failure is non-critical */ }
+
   revalidatePath('/dashboard');
   return commitment;
 }

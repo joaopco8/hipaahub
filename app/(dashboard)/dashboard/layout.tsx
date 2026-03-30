@@ -7,7 +7,8 @@ import { SavingBarGlobal } from '@/components/saving-bar-global';
 import { CrispChat } from '@/components/support/crisp-chat';
 import { SubscriptionProvider } from '@/contexts/subscription-context';
 import { getUserPlanTier } from '@/lib/plan-gating';
-import { toSubscriptionStatus, getTrialDaysRemaining } from '@/lib/plans';
+import { resolveSubscriptionStatus, getTrialDaysRemaining } from '@/lib/plans';
+import { ExpiredTrialWall } from '@/components/expired-trial-wall';
 import {
   getCachedUser,
   getCachedUserDetails,
@@ -67,12 +68,23 @@ export default async function DashboardLayout({
     }
   }
 
-  // Compute subscription state for gating context
-  const subscriptionStatus = toSubscriptionStatus(subscription?.status);
+  // Resolve subscription status: org table is primary, Stripe is fallback
+  const orgAny = organization as any;
+  const subscriptionStatus = resolveSubscriptionStatus(
+    orgAny
+      ? { subscription_status: orgAny.subscription_status, trial_ends_at: orgAny.trial_ends_at }
+      : null,
+    subscription?.status
+  );
   const isLocked = subscriptionStatus !== 'active';
   const isTrialing = subscriptionStatus === 'trial';
+  const isExpired = subscriptionStatus === 'expired';
+
+  // Prefer org trial_ends_at, fall back to Stripe trial_end
+  const trialEndSource: string | null =
+    orgAny?.trial_ends_at ?? subscription?.trial_end ?? null;
   const trialDaysRemaining = isTrialing
-    ? getTrialDaysRemaining(subscription?.trial_end ?? null)
+    ? getTrialDaysRemaining(trialEndSource)
     : null;
 
   return (
@@ -85,18 +97,26 @@ export default async function DashboardLayout({
       <SubscriptionProvider
         value={{ isLocked, planTier, subscriptionStatus, trialDaysRemaining }}
       >
-        <SidebarProvider>
-          <SidebarLayout
-            userDetails={userDetails}
-            organization={organization}
-            navConfig={navConfig as NavItem[]}
+        {isExpired ? (
+          <ExpiredTrialWall
+            userEmail={user.email ?? ''}
+            userName={userDetails?.full_name ?? user.email ?? ''}
             planTier={planTier}
-            isTrialing={isTrialing}
-            trialDaysRemaining={trialDaysRemaining}
-          >
-            {children}
-          </SidebarLayout>
-        </SidebarProvider>
+          />
+        ) : (
+          <SidebarProvider>
+            <SidebarLayout
+              userDetails={userDetails}
+              organization={organization}
+              navConfig={navConfig as NavItem[]}
+              planTier={planTier}
+              isTrialing={isTrialing}
+              trialDaysRemaining={trialDaysRemaining}
+            >
+              {children}
+            </SidebarLayout>
+          </SidebarProvider>
+        )}
       </SubscriptionProvider>
     </SavingStateProvider>
   );

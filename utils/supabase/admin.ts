@@ -809,6 +809,107 @@ const manageSubscriptionStatusChange = async (
   }
 };
 
+/**
+ * Called after a Stripe subscription becomes active.
+ * Updates organizations.subscription_status → 'active' and sends Email 5.
+ */
+async function activateOrgSubscription(
+  userId: string,
+  planTier: 'solo' | 'practice' | 'clinic' | 'enterprise'
+) {
+  const key = getServiceRoleKey();
+  if (!key) return; // non-critical path
+  const adminSupabase = getAdminSupabaseClient(key);
+
+  const now = new Date().toISOString();
+
+  // Get org
+  // @ts-ignore — new columns added via migration
+  const { data: org } = await (adminSupabase.from('organizations') as any)
+    .select('id, subscription_status')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (!org) return;
+
+  const wasOnTrial = org.subscription_status === 'trial' || org.subscription_status === 'expired';
+
+  // @ts-ignore — new columns added via migration
+  await (adminSupabase.from('organizations') as any)
+    .update({
+      subscription_status: 'active',
+      plan_tier: planTier,
+      subscribed_at: now,
+    })
+    .eq('user_id', userId);
+
+  // Log event
+  // @ts-ignore — new table added via migration
+  await (adminSupabase.from('subscription_events') as any).insert({
+    org_id: org.id,
+    event_type: wasOnTrial ? 'trial_converted' : 'reactivated',
+    from_status: org.subscription_status,
+    to_status: 'active',
+    to_plan: planTier,
+  });
+
+  // Send Email 5: subscription confirmed
+  try {
+    const { data: userData } = await adminSupabase.auth.admin.getUserById(userId);
+    const userEmail = userData?.user?.email;
+    const firstName = userData?.user?.user_metadata?.full_name?.split(' ')[0] ?? 'there';
+    const planName = planTier.charAt(0).toUpperCase() + planTier.slice(1);
+
+    if (userEmail) {
+      const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://hipaahubhealth.com';
+      const FROM = process.env.RESEND_FROM_EMAIL ?? 'noreply@hipaahubhealth.com';
+      const apiKey = process.env.RESEND_API_KEY;
+      if (apiKey) {
+        const isPracticePlus = planTier === 'practice' || planTier === 'clinic';
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            from: FROM,
+            to: userEmail,
+            subject: 'You are subscribed. All features are now unlocked.',
+            html: `
+              <div style="font-family:sans-serif;max-width:560px;margin:auto;color:#0e274e">
+                <div style="background:#0e274e;padding:16px 24px">
+                  <p style="color:#fff;margin:0;font-size:13px;font-weight:300">HIPAA Hub</p>
+                </div>
+                <div style="padding:32px 24px">
+                  <h2 style="font-weight:300;font-size:22px;margin:0 0 16px">Hi ${firstName}, your ${planName} subscription is active.</h2>
+                  <p style="color:#555;font-size:14px;line-height:1.6;font-weight:300">Everything is unlocked:</p>
+                  <ul style="color:#555;font-size:13px;line-height:1.8;font-weight:300;padding-left:20px">
+                    <li>Export your Audit Package anytime</li>
+                    <li>Download policy PDFs</li>
+                    <li>Activate your policies with electronic signature</li>
+                    ${isPracticePlus ? '<li>Add your team to the training tracker</li><li>Register your vendors in BAA tracker</li>' : ''}
+                  </ul>
+                  <p style="color:#555;font-size:14px;line-height:1.6;font-weight:300;margin-top:16px">Your next steps:</p>
+                  <ol style="color:#555;font-size:13px;line-height:1.8;font-weight:300;padding-left:20px">
+                    <li>Activate your policies (click Activate on each policy)</li>
+                    <li>Export your first Audit Package to verify everything is ready</li>
+                  </ol>
+                  <p style="margin:28px 0 0">
+                    <a href="${SITE_URL}/dashboard"
+                       style="background:#00bceb;color:#fff;padding:12px 28px;text-decoration:none;font-size:13px;font-weight:300;display:inline-block">
+                      Go to your dashboard →
+                    </a>
+                  </p>
+                </div>
+                <div style="background:#f3f5f9;padding:16px 24px">
+                  <p style="color:#999;font-size:11px;font-weight:300;margin:0">HIPAA Hub · hipaahubhealth.com · Reply to this email with any questions</p>
+                </div>
+              </div>`,
+          }),
+        });
+      }
+    }
+  } catch { /* email failure is non-critical */ }
+}
+
 export {
   upsertProductRecord,
   upsertPriceRecord,
@@ -816,5 +917,6 @@ export {
   deletePriceRecord,
   createOrRetrieveCustomer,
   manageSubscriptionStatusChange,
+  activateOrgSubscription,
   syncStripeProducts
 };

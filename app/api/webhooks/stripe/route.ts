@@ -11,9 +11,30 @@ const getAdminFunctions = () => {
     upsertPriceRecord: module.upsertPriceRecord,
     manageSubscriptionStatusChange: module.manageSubscriptionStatusChange,
     deleteProductRecord: module.deleteProductRecord,
-    deletePriceRecord: module.deletePriceRecord
+    deletePriceRecord: module.deletePriceRecord,
+    activateOrgSubscription: module.activateOrgSubscription,
   }));
 };
+
+// Map Stripe price ID → plan tier
+function getPlanTierFromPriceId(priceId: string): 'solo' | 'practice' | 'clinic' | 'enterprise' {
+  const soloIds = [
+    process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID,
+    'price_1TEHcrFjJxHsNvNGmvH3pQur',
+  ].filter(Boolean);
+  const practiceIds = [
+    process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID,
+    'price_1TEHd6FjJxHsNvNGahdVbS6N',
+  ].filter(Boolean);
+  const clinicIds = [
+    process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID,
+    'price_1TEHdcFjJxHsNvNGzViIgMp8',
+  ].filter(Boolean);
+  if (soloIds.includes(priceId)) return 'solo';
+  if (practiceIds.includes(priceId)) return 'practice';
+  if (clinicIds.includes(priceId)) return 'clinic';
+  return 'enterprise';
+}
 
 const relevantEvents = new Set([
   'product.created',
@@ -73,7 +94,8 @@ export async function POST(req: Request) {
       upsertPriceRecord,
       manageSubscriptionStatusChange,
       deleteProductRecord,
-      deletePriceRecord
+      deletePriceRecord,
+      activateOrgSubscription,
     } = await getAdminFunctions();
     
     try {
@@ -117,7 +139,7 @@ export async function POST(req: Request) {
           const checkoutSession = event.data.object as Stripe.Checkout.Session;
           console.log('Checkout session customer:', checkoutSession.customer);
           console.log('Checkout session mode:', checkoutSession.mode);
-          
+
           if (checkoutSession.mode === 'subscription') {
             const subscriptionId = checkoutSession.subscription;
             if (subscriptionId && checkoutSession.customer) {
@@ -127,6 +149,32 @@ export async function POST(req: Request) {
                 checkoutSession.customer as string,
                 true
               );
+
+              // Activate org subscription and send Email 5
+              try {
+                const stripeAdminSub = await stripe.subscriptions.retrieve(subscriptionId as string);
+                const priceId = stripeAdminSub.items.data[0]?.price?.id;
+                const planTier = priceId ? getPlanTierFromPriceId(priceId) : 'solo';
+
+                // Look up user from customers table
+                const { createClient: createAdminClient } = await import('@supabase/supabase-js');
+                const adminSupa = createAdminClient(
+                  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+                  { auth: { autoRefreshToken: false, persistSession: false } }
+                );
+                const { data: customerRow } = await adminSupa
+                  .from('customers')
+                  .select('id')
+                  .eq('stripe_customer_id', checkoutSession.customer as string)
+                  .single();
+                if (customerRow?.id) {
+                  await activateOrgSubscription(customerRow.id, planTier);
+                }
+              } catch (activateErr) {
+                console.error('activateOrgSubscription error:', activateErr);
+              }
+
               console.log('✅ Subscription created/updated successfully');
             } else {
               console.error('❌ Missing subscription ID or customer ID in checkout session');

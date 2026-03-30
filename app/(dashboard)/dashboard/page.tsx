@@ -1,5 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
+import { SubscribedToast } from '@/components/subscribed-toast';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -561,6 +563,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8 font-sans max-w-[1600px] mx-auto px-4 md:px-8">
+      {/* One-time toast when returning from Stripe checkout */}
+      <Suspense fallback={null}><SubscribedToast /></Suspense>
       {/* ── 1. Header Contextual ───────────────────────────────────────────── */}
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl md:text-3xl font-thin text-[#0e274e] leading-tight mb-2">
