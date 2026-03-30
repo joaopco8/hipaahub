@@ -16,7 +16,7 @@ ALTER TABLE organizations
 -- Subscription events log
 CREATE TABLE IF NOT EXISTS subscription_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  org_id UUID NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
+  org_id TEXT NOT NULL REFERENCES organizations(id) ON DELETE CASCADE,
   event_type VARCHAR(50) NOT NULL,
   from_status VARCHAR(20),
   to_status VARCHAR(20),
