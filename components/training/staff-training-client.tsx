@@ -517,7 +517,11 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
             <BarChart3 className="mr-1.5 h-3.5 w-3.5" />
             Assign Training
           </Button>
-          <Button size="sm" onClick={() => setAddOpen(true)} className="bg-[#00bceb] text-white hover:bg-[#00a8d4] rounded-none text-xs h-8">
+          <Button
+            size="sm"
+            onClick={() => { if (isLocked) { setShowUpgradeModal(true); return; } setAddOpen(true); }}
+            className="bg-[#00bceb] text-white hover:bg-[#00a8d4] rounded-none text-xs h-8"
+          >
             <UserPlus className="mr-1.5 h-3.5 w-3.5" />
             Add Employee
           </Button>

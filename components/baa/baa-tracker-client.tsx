@@ -322,7 +322,7 @@ export default function BAATrackerClient({ initialVendors, initialStats, isLocke
           </Button>
           <Button
             size="sm"
-            onClick={() => { setEditVendor(null); setVendorModalOpen(true); }}
+            onClick={() => { if (isLocked) { setShowUpgradeModal(true); return; } setEditVendor(null); setVendorModalOpen(true); }}
             className="bg-[#00bceb] text-white hover:bg-[#00a8d4] rounded-none text-xs h-8"
           >
             <Plus className="mr-1.5 h-3.5 w-3.5" />
