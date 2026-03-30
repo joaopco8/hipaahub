@@ -67,6 +67,10 @@ const HipaaHubLandingPage: React.FC = () => {
   };
 
   const navigateTo = (newView: AppView, post?: any) => {
+    if (newView === 'blog') {
+      router.push('/blog');
+      return;
+    }
     if (post) setSelectedPost(post);
     setView(newView);
     window.scrollTo(0, 0);
