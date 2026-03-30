@@ -28,6 +28,9 @@ yarn-error.log*
 # local env files
 .env
 .env.local
+
+# Claude Code
+.claude/
 .env.development.local
 .env.test.local
 .env.production.local

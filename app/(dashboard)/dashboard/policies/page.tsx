@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, FileText, Download, Eye, AlertCircle, RefreshCw, Clock, AlertTriangle, History } from 'lucide-react';
+import { CheckCircle2, FileText, Download, Eye, AlertCircle, RefreshCw, Clock, AlertTriangle, History, Pencil } from 'lucide-react';
 import { AdditionalDocumentsSection } from '@/components/policies/additional-documents-section';
 import { PoliciesNavigation } from '@/components/policies/policies-navigation';
 import { getPolicyGenerationStatus } from '@/app/actions/policy-documents';
@@ -107,6 +107,7 @@ export default async function PoliciesPage() {
   });
 
   const completedCount = policies.filter((p) => p.isGenerated).length;
+  const activatedCount = policies.filter((p) => p.policyStatus === 'active').length;
   const totalCount = policies.length;
 
   return (
@@ -125,30 +126,33 @@ export default async function PoliciesPage() {
       {/* Status Summary Card */}
       <Card className="border-0 shadow-sm bg-white rounded-none">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-full border-2 border-[#00bceb] flex items-center justify-center">
                 <FileText className="h-6 w-6 text-[#00bceb]" />
               </div>
               <div>
-                <p className="text-sm text-[#565656] font-light">Policies Generated</p>
+                <p className="text-sm text-[#565656] font-light">Policies Activated</p>
                 <p className="text-2xl font-light text-[#0e274e]">
-                  {completedCount}{' '}
+                  {activatedCount}{' '}
                   <span className="text-lg text-[#565656]">/ {totalCount} Policies</span>
                 </p>
               </div>
             </div>
             {/* Progress bar */}
-            <div className="hidden sm:block w-40">
+            <div className="w-full sm:w-48">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-[#565656]">
-                  {Math.round((completedCount / totalCount) * 100)}% complete
+                  {activatedCount} of {totalCount} activated
+                </span>
+                <span className="text-xs text-[#565656]">
+                  {Math.round((activatedCount / totalCount) * 100)}%
                 </span>
               </div>
               <div className="h-2 bg-[#f3f5f9] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#00bceb] rounded-full transition-all"
-                  style={{ width: `${Math.round((completedCount / totalCount) * 100)}%` }}
+                  className="h-full bg-[#71bc48] rounded-full transition-all"
+                  style={{ width: `${Math.round((activatedCount / totalCount) * 100)}%` }}
                 />
               </div>
             </div>
@@ -250,6 +254,17 @@ export default async function PoliciesPage() {
                 )}
 
                 <div className="flex gap-2 flex-wrap">
+                  {/* Edit button — always available, primary CTA */}
+                  <Link href={`/dashboard/policies/${policy.id}/edit`}>
+                    <Button
+                      size="sm"
+                      className="h-8 rounded-none bg-[#00bceb] text-white hover:bg-[#00a0c9] font-light"
+                    >
+                      <Pencil className="mr-2 h-3.5 w-3.5" />
+                      {policy.isGenerated ? 'Edit' : 'Open Editor'}
+                    </Button>
+                  </Link>
+
                   {policy.isGenerated ? (
                     <>
                       <Link href={`/dashboard/policies/${policy.id}/preview`}>
@@ -260,17 +275,6 @@ export default async function PoliciesPage() {
                         >
                           <Eye className="mr-2 h-3.5 w-3.5" />
                           View
-                        </Button>
-                      </Link>
-
-                      <Link href={`/dashboard/policies/${policy.id}/preview`}>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 rounded-none border-gray-200 text-[#565656] hover:text-[#0e274e]"
-                        >
-                          <RefreshCw className="mr-2 h-3.5 w-3.5" />
-                          Regenerate
                         </Button>
                       </Link>
 
@@ -290,16 +294,7 @@ export default async function PoliciesPage() {
                         currentStatus={policy.policyStatus}
                       />
                     </>
-                  ) : (
-                    <Link href={`/dashboard/policies/${policy.id}/preview`} className="flex-1">
-                      <Button
-                        size="sm"
-                        className="w-full bg-[#00bceb] text-white hover:bg-[#00a0c9] rounded-none h-8 font-light"
-                      >
-                        Generate Document
-                      </Button>
-                    </Link>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </CardContent>
