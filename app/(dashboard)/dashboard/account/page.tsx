@@ -21,7 +21,16 @@ import { redirect } from 'next/navigation';
 import { LogOutButton } from './logout-button';
 import { requestPasswordReset } from './password-reset-action';
 import { DeleteAccountForm } from './delete-account-form';
+import { getUserPlanTier } from '@/lib/plan-gating';
 import { Phone, Key, Trash2 } from 'lucide-react';
+
+const TIER_LABELS: Record<string, string> = {
+  solo: 'Solo',
+  practice: 'Practice',
+  clinic: 'Clinic',
+  enterprise: 'Enterprise',
+  unknown: 'No Plan',
+};
 
 export default async function AccountPage() {
   const supabase = createClient();
@@ -34,8 +43,12 @@ export default async function AccountPage() {
     return redirect('/signin');
   }
 
-  const subscription = await getSubscription(supabase, user.id);
+  const [subscription, planTier] = await Promise.all([
+    getSubscription(supabase, user.id),
+    getUserPlanTier(),
+  ]);
   const isSubscribed = subscription?.status === 'active' || subscription?.status === 'trialing';
+  const tierLabel = TIER_LABELS[planTier] ?? 'Unknown';
 
   // Get phone number from multiple sources (user_metadata, users table, or auth.phone)
   // Phone is required, so we check all possible locations
@@ -180,7 +193,7 @@ export default async function AccountPage() {
               <div className="space-y-1">
                 <Label className="text-sm text-zinc-600">Plan</Label>
                 <div className="text-base font-semibold text-zinc-900">
-                  {subscription?.prices?.products?.name || 'N/A'}
+                  {planTier !== 'unknown' ? `HIPAA Hub ${tierLabel}` : (subscription?.prices?.products?.name || 'N/A')}
                 </div>
               </div>
               <div className="space-y-1">
