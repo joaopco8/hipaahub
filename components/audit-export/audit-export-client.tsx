@@ -25,6 +25,7 @@ import {
   Clock,
   AlertTriangle,
   Package,
+  Lock,
   Archive,
   Loader2,
   XCircle,

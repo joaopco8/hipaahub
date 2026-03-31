@@ -390,7 +390,7 @@ function EmployeeRow({
                         </Button>
                       )}
                       {a.status === 'completed' && (
-                        <ActionGate isLocked={isLocked} documentType="training certificate">
+                        <ActionGate isLocked={isLocked ?? false} documentType="training certificate">
                           <Button
                             size="sm"
                             variant="ghost"
