@@ -32,6 +32,13 @@ const TIER_LABELS: Record<string, string> = {
   unknown: 'No Plan',
 };
 
+const TIER_PRICES: Record<string, string> = {
+  solo: '$79 / month',
+  practice: '$197 / month',
+  clinic: '$397 / month',
+  enterprise: 'Custom',
+};
+
 export default async function AccountPage() {
   const supabase = createClient();
   const [user, userDetails] = await Promise.all([
@@ -217,9 +224,7 @@ export default async function AccountPage() {
               <div className="space-y-1">
                 <Label className="text-sm text-zinc-600">Amount</Label>
                 <div className="text-base font-semibold text-zinc-900">
-                  {subscription?.prices?.unit_amount
-                    ? `$${(subscription.prices.unit_amount / 100).toFixed(2)} / ${subscription.prices.interval}`
-                    : 'N/A'}
+                  {TIER_PRICES[planTier] ?? 'N/A'}
                 </div>
               </div>
             </div>
