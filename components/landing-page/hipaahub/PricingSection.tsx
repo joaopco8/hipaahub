@@ -144,7 +144,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
         </button>
         {price !== 'Custom' && (
           <p className="mt-2.5 text-center text-[11px] text-gray-400 font-thin">
-            14-day trial &middot; Cancel anytime &middot; BAA included
+            Cancel anytime &middot; BAA included
           </p>
         )}
       </div>
@@ -175,7 +175,7 @@ const PricingSection: React.FC<{ onDemoClick?: () => void }> = () => {
               tagline="1–5 staff. Full HIPAA coverage, no compliance team required."
               price="$79"
               annualNote="or $67/mo billed annually"
-              cta="Start free trial"
+              cta="Get started"
               priceId={SOLO_PRICE_ID}
               features={[
                 "9 customizable HIPAA policy templates",
@@ -197,7 +197,7 @@ const PricingSection: React.FC<{ onDemoClick?: () => void }> = () => {
               price="$197"
               annualNote="or $167/mo billed annually (save $360/yr)"
               isFeatured
-              cta="Start free trial"
+              cta="Get started"
               priceId={PRACTICE_PRICE_ID}
               featuresLabel="Everything in Solo, plus"
               features={[
@@ -218,7 +218,7 @@ const PricingSection: React.FC<{ onDemoClick?: () => void }> = () => {
               tagline="Multiple providers. Board-level accountability."
               price="$397"
               annualNote="or $330/mo billed annually (save $804/yr)"
-              cta="Start free trial"
+              cta="Get started"
               priceId={CLINIC_PRICE_ID}
               featuresLabel="Everything in Practice, plus"
               features={[
