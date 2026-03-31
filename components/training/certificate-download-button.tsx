@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Award, Loader2 } from 'lucide-react';
-import { UpgradeModal } from '@/components/ui/upgrade-modal';
+import { ActionGate } from '@/components/action-gate';
 
 interface CertificateDownloadButtonProps {
   recordId: string;
@@ -13,13 +13,8 @@ interface CertificateDownloadButtonProps {
 
 export function CertificateDownloadButton({ recordId, employeeName, isLocked = false }: CertificateDownloadButtonProps) {
   const [loading, setLoading] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const handleDownload = async () => {
-    if (isLocked) {
-      setShowUpgradeModal(true);
-      return;
-    }
     setLoading(true);
     try {
       const res = await fetch(`/api/training/certificate?id=${encodeURIComponent(recordId)}`);
@@ -42,7 +37,7 @@ export function CertificateDownloadButton({ recordId, employeeName, isLocked = f
   };
 
   return (
-    <>
+    <ActionGate isLocked={isLocked} documentType="training certificate">
       <Button
         variant="outline"
         size="sm"
@@ -57,11 +52,6 @@ export function CertificateDownloadButton({ recordId, employeeName, isLocked = f
         )}
         Certificate
       </Button>
-      <UpgradeModal
-        open={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        featureName="Training certificates"
-      />
-    </>
+    </ActionGate>
   );
 }

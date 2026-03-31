@@ -26,7 +26,7 @@ import {
   type TrainingModule, type TrainingOverviewStats,
 } from '@/app/actions/staff-training';
 import { toast } from 'sonner';
-import { UpgradeModal } from '@/components/ui/upgrade-modal';
+import { ActionGate } from '@/components/action-gate';
 
 interface Props {
   initialEmployees: EmployeeWithAssignments[];
@@ -280,13 +280,11 @@ function EmployeeRow({
   onDeactivate,
   onComplete,
   isLocked,
-  onLockedDownload,
 }: {
   emp: EmployeeWithAssignments;
   onDeactivate: (id: string) => void;
   onComplete: (assignmentId: string) => void;
   isLocked?: boolean;
-  onLockedDownload?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -298,7 +296,6 @@ function EmployeeRow({
     'not_started';
 
   const handleDownloadCert = async (assignmentId: string, name: string) => {
-    if (isLocked) { onLockedDownload?.(); return; }
     const res = await fetch(`/api/training/staff-certificate?id=${assignmentId}`);
     if (!res.ok) { toast.error('Certificate not available'); return; }
     const blob = await res.blob();
@@ -393,15 +390,17 @@ function EmployeeRow({
                         </Button>
                       )}
                       {a.status === 'completed' && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0 rounded-none text-gray-400 hover:text-[#00bceb]"
-                          title="Download certificate"
-                          onClick={() => handleDownloadCert(a.id, `${emp.first_name} ${emp.last_name}`)}
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                        </Button>
+                        <ActionGate isLocked={isLocked} documentType="training certificate">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 w-7 p-0 rounded-none text-gray-400 hover:text-[#00bceb]"
+                            title="Download certificate"
+                            onClick={() => handleDownloadCert(a.id, `${emp.first_name} ${emp.last_name}`)}
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                          </Button>
+                        </ActionGate>
                       )}
                     </div>
                   </div>
@@ -422,7 +421,6 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
   const [stats, setStats] = useState(initialStats);
   const [modules] = useState(initialModules);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const [filterRole, setFilterRole] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -485,7 +483,6 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
   });
 
   const handleDownloadReport = async () => {
-    if (isLocked) { setShowUpgradeModal(true); return; }
     const res = await fetch('/api/training/audit-report');
     if (!res.ok) { toast.error('Failed to generate report'); return; }
     const blob = await res.blob();
@@ -505,10 +502,12 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
           </h3>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={handleDownloadReport} className="rounded-none text-xs font-light h-8">
-            <FileText className="mr-1.5 h-3.5 w-3.5" />
-            Audit Report
-          </Button>
+          <ActionGate isLocked={isLocked} documentType="training audit report">
+            <Button size="sm" variant="outline" onClick={handleDownloadReport} className="rounded-none text-xs font-light h-8">
+              <FileText className="mr-1.5 h-3.5 w-3.5" />
+              Audit Report
+            </Button>
+          </ActionGate>
           <Button size="sm" variant="outline" onClick={() => setCsvOpen(true)} className="rounded-none text-xs font-light h-8">
             <Upload className="mr-1.5 h-3.5 w-3.5" />
             Import CSV
@@ -517,14 +516,16 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
             <BarChart3 className="mr-1.5 h-3.5 w-3.5" />
             Assign Training
           </Button>
-          <Button
-            size="sm"
-            onClick={() => { if (isLocked) { setShowUpgradeModal(true); return; } setAddOpen(true); }}
-            className="bg-[#00bceb] text-white hover:bg-[#00a8d4] rounded-none text-xs h-8"
-          >
-            <UserPlus className="mr-1.5 h-3.5 w-3.5" />
-            Add Employee
-          </Button>
+          <ActionGate isLocked={isLocked} documentType="employee">
+            <Button
+              size="sm"
+              onClick={() => setAddOpen(true)}
+              className="bg-[#00bceb] text-white hover:bg-[#00a8d4] rounded-none text-xs h-8"
+            >
+              <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+              Add Employee
+            </Button>
+          </ActionGate>
           <Button size="sm" variant="ghost" onClick={refresh} disabled={isRefreshing} className="h-8 w-8 p-0 rounded-none text-gray-400">
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
@@ -635,7 +636,6 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
                     onDeactivate={handleDeactivate}
                     onComplete={handleComplete}
                     isLocked={isLocked}
-                    onLockedDownload={() => setShowUpgradeModal(true)}
                   />
                 ))}
               </tbody>
@@ -648,11 +648,6 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
       <AddEmployeeModal open={addOpen} onClose={() => setAddOpen(false)} onSuccess={refresh} />
       <AssignModal open={assignOpen} onClose={() => setAssignOpen(false)} employees={employees} modules={modules} onSuccess={refresh} />
       <CSVImportModal open={csvOpen} onClose={() => setCsvOpen(false)} onSuccess={refresh} />
-      <UpgradeModal
-        open={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        featureName="Staff training exports"
-      />
     </div>
   );
 }

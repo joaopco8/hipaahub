@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
-import { UpgradeModal } from '@/components/ui/upgrade-modal';
+import { ActionGate } from '@/components/action-gate';
 
 interface Props {
   isLocked?: boolean;
@@ -11,13 +11,8 @@ interface Props {
 
 export function RiskAssessmentExportButton({ isLocked = false }: Props) {
   const [loading, setLoading] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   const handleExport = async () => {
-    if (isLocked) {
-      setShowUpgradeModal(true);
-      return;
-    }
     setLoading(true);
     try {
       const res = await fetch('/api/risk-assessment/export-pdf');
@@ -38,7 +33,7 @@ export function RiskAssessmentExportButton({ isLocked = false }: Props) {
   };
 
   return (
-    <>
+    <ActionGate isLocked={isLocked} documentType="Risk Assessment PDF">
       <Button
         variant="outline"
         size="sm"
@@ -53,11 +48,6 @@ export function RiskAssessmentExportButton({ isLocked = false }: Props) {
         )}
         Export PDF
       </Button>
-      <UpgradeModal
-        open={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        featureName="Risk Assessment PDF"
-      />
-    </>
+    </ActionGate>
   );
 }

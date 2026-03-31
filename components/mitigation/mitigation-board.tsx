@@ -20,6 +20,8 @@ import {
   MessageSquare, Calendar, User, ArrowRight, Trash2, RefreshCw, Edit, XCircle,
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { ActionGate } from '@/components/action-gate';
+import { useSubscription } from '@/contexts/subscription-context';
 import { format, formatDistanceToNow } from 'date-fns';
 import {
   createMitigationItem, updateMitigationItem, deleteMitigationItem,
@@ -403,6 +405,7 @@ function KanbanCard({ item, onClick }: { item: MitigationItem; onClick: () => vo
 // ─── Main Board ───────────────────────────────────────────────────────────────
 
 export default function MitigationBoard({ initialItems, mitigationStats }: Props) {
+  const { isLocked } = useSubscription();
   const [items, setItems] = useState(initialItems);
   const [stats, setStats] = useState(mitigationStats);
   const [newItemOpen, setNewItemOpen] = useState(false);
@@ -471,10 +474,12 @@ export default function MitigationBoard({ initialItems, mitigationStats }: Props
           <Button size="sm" variant="ghost" onClick={refresh} disabled={isRefreshing} className="h-8 w-8 p-0 rounded-none text-gray-400">
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
-          <Button size="sm" onClick={() => setNewItemOpen(true)} className="bg-[#00bceb] text-white hover:bg-[#00a8d4] rounded-none text-xs h-8">
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            New Item
-          </Button>
+          <ActionGate isLocked={isLocked} documentType="mitigation item">
+            <Button size="sm" onClick={() => setNewItemOpen(true)} className="bg-[#00bceb] text-white hover:bg-[#00a8d4] rounded-none text-xs h-8">
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              New Item
+            </Button>
+          </ActionGate>
         </div>
       </div>
 

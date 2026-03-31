@@ -19,7 +19,7 @@ import {
   Building2, Plus, Edit, Trash2, Upload, FileText, AlertTriangle,
   CheckCircle2, Clock, AlertCircle, RefreshCw, Filter, Download,
 } from 'lucide-react';
-import { UpgradeModal } from '@/components/ui/upgrade-modal';
+import { ActionGate } from '@/components/action-gate';
 import { format } from 'date-fns';
 import {
   createVendor, updateVendor, deleteVendor, upsertBAA,
@@ -253,8 +253,6 @@ export default function BAATrackerClient({ initialVendors, initialStats, isLocke
   const [stats, setStats] = useState(initialStats);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-
   const [vendorModalOpen, setVendorModalOpen] = useState(false);
   const [editVendor, setEditVendor] = useState<VendorWithBAA | null>(null);
   const [baaVendor, setBaaVendor] = useState<VendorWithBAA | null>(null);
@@ -290,7 +288,6 @@ export default function BAATrackerClient({ initialVendors, initialStats, isLocke
   };
 
   const handleDownloadReport = async () => {
-    if (isLocked) { setShowUpgradeModal(true); return; }
     const res = await fetch('/api/baa/audit-report');
     if (!res.ok) { toast.error('Failed to generate report'); return; }
     const blob = await res.blob();
@@ -316,18 +313,22 @@ export default function BAATrackerClient({ initialVendors, initialStats, isLocke
           <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider">BAA Tracker</h3>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={handleDownloadReport} className="rounded-none text-xs font-light h-8">
-            <FileText className="mr-1.5 h-3.5 w-3.5" />
-            BAA Audit Report
-          </Button>
-          <Button
-            size="sm"
-            onClick={() => { if (isLocked) { setShowUpgradeModal(true); return; } setEditVendor(null); setVendorModalOpen(true); }}
-            className="bg-[#00bceb] text-white hover:bg-[#00a8d4] rounded-none text-xs h-8"
-          >
-            <Plus className="mr-1.5 h-3.5 w-3.5" />
-            Add Vendor
-          </Button>
+          <ActionGate isLocked={isLocked} documentType="BAA Audit Report">
+            <Button size="sm" variant="outline" onClick={handleDownloadReport} className="rounded-none text-xs font-light h-8">
+              <FileText className="mr-1.5 h-3.5 w-3.5" />
+              BAA Audit Report
+            </Button>
+          </ActionGate>
+          <ActionGate isLocked={isLocked} documentType="vendor">
+            <Button
+              size="sm"
+              onClick={() => { setEditVendor(null); setVendorModalOpen(true); }}
+              className="bg-[#00bceb] text-white hover:bg-[#00a8d4] rounded-none text-xs h-8"
+            >
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Add Vendor
+            </Button>
+          </ActionGate>
           <Button size="sm" variant="ghost" onClick={refresh} disabled={isRefreshing} className="h-8 w-8 p-0 rounded-none text-gray-400">
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
@@ -525,11 +526,6 @@ export default function BAATrackerClient({ initialVendors, initialStats, isLocke
           onSuccess={refresh}
         />
       )}
-      <UpgradeModal
-        open={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        featureName="BAA Audit Report"
-      />
     </div>
   );
 }

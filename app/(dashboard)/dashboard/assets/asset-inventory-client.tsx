@@ -9,12 +9,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   Plus, Monitor, Cloud, Laptop, Server, Wifi, Edit, Trash2,
   AlertTriangle, CheckCircle2, Shield, Package
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { ActionGate } from '@/components/action-gate';
+import { useSubscription } from '@/contexts/subscription-context';
 
 interface Asset {
   id: string;
@@ -86,6 +88,7 @@ interface Props {
 
 export function AssetInventoryClient({ initialAssets, organizationId }: Props) {
   const router = useRouter();
+  const { isLocked } = useSubscription();
   const [assets, setAssets] = useState(initialAssets);
   const [isOpen, setIsOpen] = useState(false);
   const [editing, setEditing] = useState<Asset | null>(null);
@@ -190,17 +193,18 @@ export function AssetInventoryClient({ initialAssets, organizationId }: Props) {
           ))}
         </div>
 
+        <ActionGate isLocked={isLocked} documentType="asset record">
+          <Button
+            onClick={openNew}
+            className="bg-[#00bceb] text-white hover:bg-[#00a0c9] rounded-none"
+            size="sm"
+          >
+            <Plus className="h-4 w-4 mr-1.5" />
+            Add Asset
+          </Button>
+        </ActionGate>
+
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button
-              onClick={openNew}
-              className="bg-[#00bceb] text-white hover:bg-[#00a0c9] rounded-none"
-              size="sm"
-            >
-              <Plus className="h-4 w-4 mr-1.5" />
-              Add Asset
-            </Button>
-          </DialogTrigger>
 
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white rounded-none">
             <DialogHeader>

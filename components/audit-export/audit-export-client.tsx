@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogDescription
 } from '@/components/ui/dialog';
-import { UpgradeModal } from '@/components/ui/upgrade-modal';
+import { ActionGate } from '@/components/action-gate';
 import {
   Download,
   FolderOpen,
@@ -25,7 +25,6 @@ import {
   Clock,
   AlertTriangle,
   Package,
-  Lock,
   Archive,
   Loader2,
   XCircle,
@@ -68,8 +67,6 @@ export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExpor
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [downloadFilename, setDownloadFilename] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-
   // Date range
   const today = new Date().toISOString().split('T')[0];
   const oneYearAgo = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -206,11 +203,6 @@ export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExpor
   }
 
   async function handleExport() {
-    if (isLocked) {
-      setShowUpgradeModal(true);
-      return;
-    }
-
     setShowModal(true);
     setModalState('generating');
     setProgress(0);
@@ -295,15 +287,6 @@ export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExpor
       <div className="mb-4">
         <div className="flex items-center gap-3 mb-2">
           <h2 className="text-3xl font-light text-[#0c0b1d]">Export Audit Package</h2>
-          {isLocked && (
-            <Badge
-              variant="outline"
-              className="text-[11px] font-light px-2 py-0.5 rounded-none bg-[#0e274e]/5 text-[#0e274e] border-[#0e274e]/20 flex items-center gap-1"
-            >
-              <Lock className="h-3 w-3" />
-              Paid Plan Required
-            </Badge>
-          )}
         </div>
         <p className="text-sm text-[#565656] font-light leading-relaxed max-w-3xl">
           Generate a structured, audit-ready ZIP archive with all your HIPAA compliance documentation.
@@ -589,35 +572,17 @@ export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExpor
           </div>
 
           {/* Export button */}
-          <Button
-            onClick={handleExport}
-            className={`rounded-none font-light h-11 w-full flex items-center justify-center gap-2 transition-all ${
-              isLocked
-                ? 'bg-gray-200 text-gray-500 hover:bg-gray-200 cursor-not-allowed'
-                : 'bg-[#0c0b1d] text-white hover:bg-[#0c0b1d]/90'
-            }`}
-          >
-            {isLocked ? (
-              <>
-                <Lock className="h-4 w-4" />
-                Upgrade to Export
-              </>
-            ) : (
-              <>
-                <Download className="h-4 w-4" />
-                Export Audit Package
-              </>
-            )}
-          </Button>
+          <ActionGate isLocked={isLocked} documentType="Audit Package">
+            <Button
+              onClick={handleExport}
+              className="rounded-none font-light h-11 w-full flex items-center justify-center gap-2 transition-all bg-[#0c0b1d] text-white hover:bg-[#0c0b1d]/90"
+            >
+              <Download className="h-4 w-4" />
+              Export Audit Package
+            </Button>
+          </ActionGate>
         </div>
       </div>
-
-      {/* ─── UPGRADE MODAL ───────────────────────────────────────────────── */}
-      <UpgradeModal
-        open={showUpgradeModal}
-        onClose={() => setShowUpgradeModal(false)}
-        featureName="Audit Package Export"
-      />
 
       {/* ─── GENERATION MODAL ────────────────────────────────────────────── */}
       <Dialog open={showModal} onOpenChange={(open) => { if (!open) handleCloseModal(); }}>

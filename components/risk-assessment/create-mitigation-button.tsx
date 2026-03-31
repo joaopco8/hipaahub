@@ -6,6 +6,8 @@ import { Shield, CheckCircle2 } from 'lucide-react';
 import { autoCreateFromRiskGaps, type MitigationPriority } from '@/app/actions/mitigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { ActionGate } from '@/components/action-gate';
+import { useSubscription } from '@/contexts/subscription-context';
 
 interface Gap {
   title: string;
@@ -20,6 +22,7 @@ interface Props {
 export function CreateMitigationButton({ gaps }: Props) {
   const [pending, startTransition] = useTransition();
   const [created, setCreated] = useState(0);
+  const { isLocked } = useSubscription();
 
   const eligibleGaps = gaps.filter(
     (g) => g.priority === 'critical' || g.priority === 'high' || g.priority === 'medium'
@@ -59,16 +62,18 @@ export function CreateMitigationButton({ gaps }: Props) {
   }
 
   return (
-    <Button
-      onClick={handleCreate}
-      disabled={pending}
-      size="sm"
-      className="rounded-none bg-[#0e274e] text-white hover:bg-[#0e274e]/90 text-xs h-8"
-    >
-      <Shield className="h-3.5 w-3.5 mr-1.5" />
-      {pending
-        ? 'Creating…'
-        : `Create ${eligibleGaps.length} mitigation task${eligibleGaps.length !== 1 ? 's' : ''} from gaps`}
-    </Button>
+    <ActionGate isLocked={isLocked} documentType="mitigation items">
+      <Button
+        onClick={handleCreate}
+        disabled={pending}
+        size="sm"
+        className="rounded-none bg-[#0e274e] text-white hover:bg-[#0e274e]/90 text-xs h-8"
+      >
+        <Shield className="h-3.5 w-3.5 mr-1.5" />
+        {pending
+          ? 'Creating…'
+          : `Create ${eligibleGaps.length} mitigation task${eligibleGaps.length !== 1 ? 's' : ''} from gaps`}
+      </Button>
+    </ActionGate>
   );
 }
