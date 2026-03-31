@@ -23,6 +23,22 @@ import { requestPasswordReset } from '@/app/(dashboard)/dashboard/account/passwo
 import { DeleteAccountForm } from '@/app/(dashboard)/dashboard/account/delete-account-form';
 import { Phone, Key, Trash2, UserCircle, CreditCard, Shield, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { getUserPlanTier } from '@/lib/plan-gating';
+
+const TIER_LABELS: Record<string, string> = {
+  solo: 'Solo',
+  practice: 'Practice',
+  clinic: 'Clinic',
+  enterprise: 'Enterprise',
+  unknown: 'No Plan',
+};
+
+const TIER_PRICES: Record<string, string> = {
+  solo: '$79 / month',
+  practice: '$197 / month',
+  clinic: '$397 / month',
+  enterprise: 'Custom',
+};
 
 export default async function ProfilePage() {
   const supabase = createClient();
@@ -35,7 +51,10 @@ export default async function ProfilePage() {
     return redirect('/signin');
   }
 
-  const subscription = await getSubscription(supabase, user.id);
+  const [subscription, planTier] = await Promise.all([
+    getSubscription(supabase, user.id),
+    getUserPlanTier(),
+  ]);
   const isSubscribed = subscription?.status === 'active' || subscription?.status === 'trialing';
 
   // Get phone number from multiple sources
@@ -159,7 +178,7 @@ export default async function ProfilePage() {
               <div className="space-y-1">
                 <Label className="text-sm text-[#565656] font-light">Plan</Label>
                 <div className="text-base font-semibold text-[#0e274e]">
-                  {subscription?.prices?.products?.name || 'N/A'}
+                  {planTier !== 'unknown' ? `HIPAA Hub ${TIER_LABELS[planTier]}` : 'N/A'}
                 </div>
               </div>
               <div className="space-y-1">
@@ -183,9 +202,7 @@ export default async function ProfilePage() {
               <div className="space-y-1">
                 <Label className="text-sm text-[#565656] font-light">Amount</Label>
                 <div className="text-base font-semibold text-[#0e274e]">
-                  {subscription?.prices?.unit_amount
-                    ? `$${(subscription.prices.unit_amount / 100).toFixed(2)} / ${subscription.prices.interval}`
-                    : 'N/A'}
+                  {TIER_PRICES[planTier] ?? 'N/A'}
                 </div>
               </div>
             </div>
