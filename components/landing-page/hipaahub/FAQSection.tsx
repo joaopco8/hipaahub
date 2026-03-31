@@ -38,7 +38,7 @@ const FAQSection: React.FC = () => {
       answer: "For most small practices, yes. HIPAA Hub gives you the same policies, assessments, and documentation a consultant would produce, at a fraction of the cost. If you face an active OCR investigation, we recommend pairing our platform with legal counsel."
     },
     {
-      question: "My EHR is HIPAA compliant — do I still need this?",
+      question: "My EHR is HIPAA compliant. Do I still need this?",
       answer: "Yes. Your EHR being HIPAA compliant means the vendor has secured their platform. It does not mean your organization is HIPAA compliant.\n\nAs a covered entity, you are independently responsible for: maintaining written HIPAA policies, conducting annual risk assessments, training your staff, managing Business Associate Agreements with every vendor (including your EHR), and having a documented breach response plan.\n\nNone of those obligations are fulfilled by your EHR. HIPAA Hub covers exactly what your EHR doesn't."
     },
     {
