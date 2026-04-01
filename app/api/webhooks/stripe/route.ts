@@ -197,7 +197,7 @@ export async function POST(req: Request) {
           if (invoice.subscription && invoice.customer) {
             const subscriptionId = invoice.subscription as string;
             const customerId = invoice.customer as string;
-            
+
             console.log('Processing subscription from invoice:', subscriptionId, 'for customer:', customerId);
             await manageSubscriptionStatusChange(
               subscriptionId,
@@ -205,6 +205,33 @@ export async function POST(req: Request) {
               invoice.billing_reason === 'subscription_create' || invoice.billing_reason === 'subscription_cycle'
             );
             console.log('✅ Subscription synced from invoice payment');
+
+            // Also activate org subscription to keep organizations table in sync.
+            // This handles cases where checkout.session.completed failed or the
+            // user converted from trial — manageSubscriptionStatusChange only
+            // updates the subscriptions table, not organizations.
+            try {
+              const { createClient: createAdminClient } = await import('@supabase/supabase-js');
+              const adminSupa = createAdminClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.SUPABASE_SERVICE_ROLE_KEY!,
+                { auth: { autoRefreshToken: false, persistSession: false } }
+              );
+              const { data: customerRow } = await adminSupa
+                .from('customers')
+                .select('id')
+                .eq('stripe_customer_id', customerId)
+                .single();
+              if (customerRow?.id) {
+                const stripeSub = await stripe.subscriptions.retrieve(subscriptionId);
+                const priceId = stripeSub.items.data[0]?.price?.id;
+                const planTier = priceId ? getPlanTierFromPriceId(priceId) : 'solo';
+                await activateOrgSubscription(customerRow.id, planTier);
+                console.log('✅ Org subscription activated from invoice payment');
+              }
+            } catch (activateErr) {
+              console.error('⚠️ activateOrgSubscription from invoice error (non-fatal):', activateErr);
+            }
           } else {
             console.log('⚠️  Invoice does not have subscription or customer ID');
           }

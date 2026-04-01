@@ -104,6 +104,8 @@ export function resolveSubscriptionStatus(org: {
     if (s === 'cancelled') return 'expired';
     if (s === 'expired') return 'expired';
     if (s === 'trial') {
+      // If Stripe already shows 'active', the trial converted to a paid plan — trust Stripe
+      if (stripeRaw === 'active') return 'active';
       // Double-check trial hasn't expired (cron might not have run yet)
       if (org.trial_ends_at && new Date(org.trial_ends_at) < new Date()) {
         return 'expired';
