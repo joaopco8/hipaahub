@@ -422,7 +422,7 @@ export function PolicyEditorClient({
     editorProps: {
       attributes: {
         class:
-          'min-h-[60vh] focus:outline-none prose prose-sm max-w-none text-[#0e274e] text-sm leading-relaxed [&_h1]:text-2xl [&_h1]:font-light [&_h1]:text-[#0e274e] [&_h1]:mb-4 [&_h2]:text-lg [&_h2]:font-light [&_h2]:text-[#0e274e] [&_h2]:mt-6 [&_h2]:mb-2 [&_h3]:text-base [&_h3]:font-normal [&_h3]:text-[#0e274e] [&_h3]:mt-4 [&_h3]:mb-1 [&_p]:text-gray-700 [&_p]:mb-3 [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:mb-1',
+          'min-h-[60vh] focus:outline-none prose prose-slate max-w-none text-[#0e274e] text-sm leading-relaxed [&_h1]:text-2xl [&_h1]:font-semibold [&_h1]:text-[#0e274e] [&_h1]:mb-4 [&_h1]:mt-0 [&_h1]:border-b [&_h1]:border-gray-200 [&_h1]:pb-3 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-[#0e274e] [&_h2]:mt-7 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-medium [&_h3]:text-[#0e274e] [&_h3]:mt-5 [&_h3]:mb-2 [&_p]:text-gray-700 [&_p]:mb-3 [&_p]:leading-relaxed [&_ul]:pl-6 [&_ul]:mb-3 [&_ol]:pl-6 [&_ol]:mb-3 [&_li]:mb-1.5 [&_li]:text-gray-700 [&_strong]:text-[#0e274e] [&_strong]:font-semibold [&_a]:text-[#00bceb] [&_hr]:border-gray-200 [&_hr]:my-4',
       },
     },
     onUpdate: ({ editor }) => {

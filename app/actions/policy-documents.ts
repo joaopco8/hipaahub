@@ -433,14 +433,9 @@ export async function markPolicyAsGenerated(
       });
   }
 
-  // Save version snapshot if content was provided
-  if (contentSnapshot) {
-    try {
-      await savePolicyVersion(policyNumericId, policyName, contentSnapshot, 'draft');
-    } catch {
-      // Non-blocking — generation already succeeded
-    }
-  }
+  // NOTE: We intentionally do NOT save the plain-text document content to policy_versions.
+  // policy_versions is only for HTML editor content saved via saveEditorDraft.
+  // Mixing plain-text view snapshots would corrupt the editor on next open.
 
   revalidatePath('/dashboard/policies');
 }

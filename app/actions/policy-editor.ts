@@ -23,20 +23,24 @@ export async function getLatestEditorContent(
     .single();
   if (!organization) return null;
 
-  const { data } = await (supabase as any)
+  // Fetch the last 10 versions and find the latest one with HTML editor content.
+  // Plain-text snapshots from the view/PDF page are skipped — they look disorganized in TipTap.
+  const { data: versions } = await (supabase as any)
     .from('policy_versions')
     .select('content_snapshot, version_number')
     .eq('organization_id', organization.id)
     .eq('policy_id', policyId)
     .order('version_number', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(10);
 
-  if (!data?.content_snapshot) return null;
+  const htmlVersion = (versions as Array<{ content_snapshot: string; version_number: number }> | null)
+    ?.find((v) => v.content_snapshot?.trimStart().startsWith('<'));
+
+  if (!htmlVersion?.content_snapshot) return null;
 
   return {
-    content: data.content_snapshot,
-    versionNumber: data.version_number,
+    content: htmlVersion.content_snapshot,
+    versionNumber: htmlVersion.version_number,
   };
 }
 
