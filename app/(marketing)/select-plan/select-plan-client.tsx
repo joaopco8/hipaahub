@@ -17,13 +17,13 @@ interface Plan {
 }
 
 const SOLO_PRICE_ID =
-  (process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID || 'price_1TEHcrFjJxHsNvNGmvH3pQur').trim();
+  (process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID || 'price_1TEHcrFjJxHsNvNGmvH3pQur').replace(/\s+/g, '');
 const PRACTICE_PRICE_ID =
-  (process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID || 'price_1TEHd6FjJxHsNvNGahdVbS6N').trim();
+  (process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID || 'price_1TEHd6FjJxHsNvNGahdVbS6N').replace(/\s+/g, '');
 const CLINIC_PRICE_ID =
-  (process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8').trim();
+  (process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8').replace(/\s+/g, '');
 const ENTERPRISE_PRICE_ID =
-  (process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8').trim();
+  (process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8').replace(/\s+/g, '');
 
 const plans: Plan[] = [
   {

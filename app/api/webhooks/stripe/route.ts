@@ -19,15 +19,15 @@ const getAdminFunctions = () => {
 // Map Stripe price ID → plan tier
 function getPlanTierFromPriceId(priceId: string): 'solo' | 'practice' | 'clinic' | 'enterprise' {
   const soloIds = [
-    process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID,
+    process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID?.replace(/\s+/g, ''),
     'price_1TEHcrFjJxHsNvNGmvH3pQur',
   ].filter(Boolean);
   const practiceIds = [
-    process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID,
+    process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID?.replace(/\s+/g, ''),
     'price_1TEHd6FjJxHsNvNGahdVbS6N',
   ].filter(Boolean);
   const clinicIds = [
-    process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID,
+    process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID?.replace(/\s+/g, ''),
     'price_1TEHdcFjJxHsNvNGzViIgMp8',
   ].filter(Boolean);
   if (soloIds.includes(priceId)) return 'solo';

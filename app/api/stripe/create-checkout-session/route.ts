@@ -5,7 +5,8 @@ import { getUser } from '@/utils/supabase/queries';
 
 export async function POST(request: NextRequest) {
   try {
-    const { priceId } = await request.json();
+    const body = await request.json();
+    const priceId: string | undefined = body.priceId?.replace(/\s+/g, '') || undefined;
     if (!priceId) {
       return NextResponse.json({ error: 'priceId is required' }, { status: 400 });
     }

@@ -58,7 +58,7 @@ export type CheckoutResult =
  */
 export async function initiateCheckout(priceId?: string): Promise<CheckoutResult> {
   // Trim whitespace/newlines that can sneak in from env vars
-  priceId = priceId?.trim() || undefined;
+  priceId = priceId?.replace(/\s+/g, '') || undefined;
   const supabase = createClient();
   
   // Wait a moment for OAuth session to be fully established
