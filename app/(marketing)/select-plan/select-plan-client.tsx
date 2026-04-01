@@ -17,13 +17,13 @@ interface Plan {
 }
 
 const SOLO_PRICE_ID =
-  process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID || 'price_1TEHcrFjJxHsNvNGmvH3pQur';
+  (process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID || 'price_1TEHcrFjJxHsNvNGmvH3pQur').trim();
 const PRACTICE_PRICE_ID =
-  process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID || 'price_1TEHd6FjJxHsNvNGahdVbS6N';
+  (process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID || 'price_1TEHd6FjJxHsNvNGahdVbS6N').trim();
 const CLINIC_PRICE_ID =
-  process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8';
+  (process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8').trim();
 const ENTERPRISE_PRICE_ID =
-  process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8';
+  (process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID || 'price_1TEHdcFjJxHsNvNGzViIgMp8').trim();
 
 const plans: Plan[] = [
   {

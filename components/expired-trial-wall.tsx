@@ -21,7 +21,7 @@ const PLANS: Plan[] = [
     name: 'Solo',
     price: '$69/mo',
     description: '1-5 staff. Full HIPAA coverage.',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID ?? 'price_1TEHcrFjJxHsNvNGmvH3pQur',
+    priceId: (process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID ?? 'price_1TEHcrFjJxHsNvNGmvH3pQur').trim(),
     features: [
       'All 9 HIPAA policy templates',
       'Security Risk Assessment',
@@ -34,7 +34,7 @@ const PLANS: Plan[] = [
     name: 'Practice',
     price: '$197/mo',
     description: '2-15 staff. Includes training and BAA tracking.',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID ?? 'price_1TEHd6FjJxHsNvNGahdVbS6N',
+    priceId: (process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID ?? 'price_1TEHd6FjJxHsNvNGahdVbS6N').trim(),
     features: [
       'Everything in Solo',
       'Staff training tracker',
@@ -47,7 +47,7 @@ const PLANS: Plan[] = [
     name: 'Clinic',
     price: '$397/mo',
     description: '15-50 staff. Multi-location and board reporting.',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID ?? 'price_1TEHdcFjJxHsNvNGzViIgMp8',
+    priceId: (process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID ?? 'price_1TEHdcFjJxHsNvNGzViIgMp8').trim(),
     features: [
       'Everything in Practice',
       'Multi-location support',

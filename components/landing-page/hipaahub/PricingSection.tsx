@@ -6,9 +6,9 @@ import { initiateCheckout } from '@/app/actions/checkout';
 import { getStripe } from '@/utils/stripe/client';
 import ContactSalesModal from './ContactSalesModal';
 
-const SOLO_PRICE_ID     = process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID     || 'price_1TEHcrFjJxHsNvNGmvH3pQur';
-const PRACTICE_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID || 'price_1TEHd6FjJxHsNvNGahdVbS6N';
-const CLINIC_PRICE_ID   = process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID   || 'price_1TEHdcFjJxHsNvNGzViIgMp8';
+const SOLO_PRICE_ID     = (process.env.NEXT_PUBLIC_STRIPE_SOLO_PRICE_ID     || 'price_1TEHcrFjJxHsNvNGmvH3pQur').trim();
+const PRACTICE_PRICE_ID = (process.env.NEXT_PUBLIC_STRIPE_PRACTICE_PRICE_ID || 'price_1TEHd6FjJxHsNvNGahdVbS6N').trim();
+const CLINIC_PRICE_ID   = (process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID   || 'price_1TEHdcFjJxHsNvNGzViIgMp8').trim();
 
 interface PricingCardProps {
   title: string;

@@ -57,6 +57,8 @@ export type CheckoutResult =
  * 3. If user has no subscription → create Stripe checkout and return sessionId
  */
 export async function initiateCheckout(priceId?: string): Promise<CheckoutResult> {
+  // Trim whitespace/newlines that can sneak in from env vars
+  priceId = priceId?.trim() || undefined;
   const supabase = createClient();
   
   // Wait a moment for OAuth session to be fully established
