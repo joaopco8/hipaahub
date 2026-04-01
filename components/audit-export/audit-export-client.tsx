@@ -520,7 +520,7 @@ export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExpor
               )}
               <div>
                 <p className="text-xs text-[#565656] font-light mb-1">Export Date</p>
-                <p className="text-sm text-[#0c0b1d] font-light">
+                <p className="text-sm text-[#0c0b1d] font-light" suppressHydrationWarning>
                   {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               </div>

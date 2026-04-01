@@ -844,7 +844,7 @@ export default function RiskScorePage() {
                 data-tier={riskTier}
                 className="border-b border-gray-200 bg-white px-5 py-5 md:px-6 md:py-6"
               >
-                <p className="mb-3 text-[11px] text-gray-500">
+                <p className="mb-3 text-[11px] text-gray-500" suppressHydrationWarning>
                   HIPAA Hub · Risk Assessment ·{" "}
                   {new Date().toLocaleDateString(undefined, {
                     year: "numeric",

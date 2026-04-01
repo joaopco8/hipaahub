@@ -52,15 +52,15 @@ export const allTrainingQuestions: TrainingQuestion[] = [
   {
     id: 'PHI-04',
     category: 'Understanding PHI & Privacy',
-    question: 'Can you discuss a patient\'s medical information with family members who call the clinic?',
+    question: 'A patient\'s adult child calls and asks for the patient\'s test results. The patient is conscious and has not provided written authorization. What should you do?',
     options: [
-      'Yes, family members have the right to know',
-      'Only if the patient has authorized it in writing',
-      'Yes, but only with immediate family',
-      'No, never discuss patient information over the phone'
+      'Share the results — family members have the right to know',
+      'Share only general health status, not specific results',
+      'Decline to share any PHI until you have the patient\'s explicit authorization',
+      'Ask the adult child to come in person, then share freely'
     ],
-    correctAnswer: 1,
-    explanation: 'You can only discuss a patient\'s information with authorized individuals. The patient must provide written authorization. Even family members cannot access PHI without explicit patient consent.'
+    correctAnswer: 2,
+    explanation: 'Under HIPAA, even immediate family members cannot receive PHI without the patient\'s explicit authorization. The patient must designate who may receive their health information, typically in writing. Without that authorization, you must politely decline to share any PHI — regardless of the caller\'s relationship to the patient.'
   },
   {
     id: 'PHI-05',
@@ -92,15 +92,15 @@ export const allTrainingQuestions: TrainingQuestion[] = [
   {
     id: 'PASSWORD-02',
     category: 'Password & Access Security',
-    question: 'How often should you change your password?',
+    question: 'Under current NIST guidelines, when should you change your password?',
     options: [
-      'Never, if it\'s strong enough',
-      'Every 6 months',
-      'Every 90 days',
-      'Only when your manager tells you to'
+      'Every 30 days regardless of circumstances',
+      'Only when there is evidence of compromise, or when prompted by your organization\'s policy',
+      'Every week to stay safe',
+      'Never — strong passwords never need to be changed'
     ],
-    correctAnswer: 2,
-    explanation: 'Industry best practices recommend changing passwords every 90 days. This reduces the risk if your password is compromised. Your organization\'s policy should specify the exact frequency.'
+    correctAnswer: 1,
+    explanation: 'NIST SP 800-63B (the current standard) recommends changing passwords when there is evidence of compromise or when required by your organization\'s policy — NOT on a fixed arbitrary schedule. Forced periodic changes without cause can actually reduce security by leading to predictable patterns. Always follow your organization\'s specific policy.'
   },
   {
     id: 'PASSWORD-03',
@@ -316,15 +316,15 @@ export const allTrainingQuestions: TrainingQuestion[] = [
   {
     id: 'INCIDENT-04',
     category: 'Incident Response & Breach Reporting',
-    question: 'What is a breach under HIPAA?',
+    question: 'Under HIPAA\'s Breach Notification Rule, if a breach affects 500 or more patients in a state, what must the covered entity do?',
     options: [
-      'Any unauthorized access to PHI',
-      'Only unauthorized access that results in harm to the patient',
-      'Unauthorized access, acquisition, use, or disclosure of PHI that compromises security or privacy',
-      'Only breaches that affect more than 100 patients'
+      'Notify affected patients within 1 year and optionally notify HHS',
+      'Notify affected patients, HHS, and prominent local media within 60 days of discovery',
+      'Notify only HHS — patients do not need to be informed',
+      'Only notify if the breach was intentional'
     ],
-    correctAnswer: 2,
-    explanation: 'A breach is any unauthorized access, acquisition, use, or disclosure of PHI that compromises the security or privacy of the information. This includes accidental disclosures. All breaches must be reported, regardless of the number of patients affected.'
+    correctAnswer: 1,
+    explanation: 'For breaches affecting 500 or more individuals in a state or jurisdiction, the covered entity must: (1) notify affected individuals without unreasonable delay and within 60 days; (2) notify HHS simultaneously; and (3) notify prominent media outlets in the affected area. For breaches under 500, media notification is not required but HHS must still be notified annually.'
   },
   {
     id: 'INCIDENT-05',
@@ -607,28 +607,28 @@ export const allTrainingQuestions: TrainingQuestion[] = [
   {
     id: 'VISITOR-01',
     category: 'Visitor & Contractor Management',
-    question: 'A contractor needs to work on the clinic\'s computer system. What should you do?',
+    question: 'An IT contractor arrives to upgrade your EHR server. They say they don\'t need a signed BAA because they "won\'t look at patient data." What is the correct response?',
     options: [
-      'Give them full access to all systems',
-      'Ensure they have a signed Business Associate Agreement (BAA) and limited access only to what they need',
-      'Let them access the system without supervision',
-      'Assume they\'re trustworthy and don\'t worry about it'
+      'Allow access — if they don\'t intentionally view PHI, no BAA is needed',
+      'Require a signed BAA regardless — incidental access to PHI is still covered under HIPAA',
+      'Let them work but have a staff member watch them at all times instead',
+      'Ask them to sign a general NDA instead of a BAA'
     ],
     correctAnswer: 1,
-    explanation: 'All contractors who may access PHI must have a signed Business Associate Agreement (BAA). They should be given limited access only to what they need for their job. Supervision and access controls are essential.'
+    explanation: 'A BAA is required for any Business Associate who could potentially access, process, or transmit PHI — even if access is incidental. Simply "not looking" at PHI does not eliminate the requirement. Server maintenance provides physical or logical access to systems containing PHI, which legally requires a signed BAA before work begins.'
   },
   {
     id: 'VISITOR-02',
     category: 'Visitor & Contractor Management',
-    question: 'What is a Business Associate Agreement (BAA)?',
+    question: 'Your organization\'s BAA with a cloud storage vendor expires next week. The vendor says they need two more weeks to process the renewal. What should you do?',
     options: [
-      'A contract between the organization and a vendor',
-      'A legal agreement that requires vendors to protect PHI and comply with HIPAA',
-      'An agreement that allows vendors to share PHI with others',
-      'A contract that\'s optional for most vendors'
+      'Continue using the vendor — the lapse is only temporary',
+      'Stop storing or transmitting PHI through that vendor until the BAA is renewed',
+      'Ask the vendor to sign the renewal retroactively',
+      'Switch to a verbal agreement temporarily'
     ],
     correctAnswer: 1,
-    explanation: 'A BAA is a legal agreement between a covered entity and a vendor that requires the vendor to protect PHI and comply with HIPAA. Any vendor that may access PHI must have a signed BAA.'
+    explanation: 'Operating without a valid BAA — even briefly — is a HIPAA violation. Any PHI stored or transmitted through a vendor without a current BAA creates legal exposure. You must suspend PHI-related use of that vendor\'s services until the BAA is fully executed. Plan BAA renewals well in advance to avoid gaps.'
   },
   // Third-Party & Vendor Management (2 questions)
   {
@@ -647,15 +647,15 @@ export const allTrainingQuestions: TrainingQuestion[] = [
   {
     id: 'VENDOR-02',
     category: 'Third-Party & Vendor Management',
-    question: 'A vendor informs you of a security breach affecting their system. What should you do?',
+    question: 'Your cloud EHR vendor notifies you of a breach that exposed PHI for 600 of your patients. They tell you they "handle all notifications." What is your organization\'s obligation?',
     options: [
-      'Keep it quiet and hope it doesn\'t affect your patients',
-      'Report it immediately to your Privacy Officer and IT department',
-      'Wait to see if any patients are affected',
-      'Contact the vendor\'s customer service'
+      'None — the breach is the vendor\'s problem since it happened on their system',
+      'Wait for the vendor to confirm patient impact before taking any action',
+      'Independently notify affected patients, HHS, and prominent local media within 60 days — the covered entity (you) bears primary liability',
+      'Only notify HHS if the vendor fails to do so within 90 days'
     ],
-    correctAnswer: 1,
-    explanation: 'Any vendor breach affecting PHI must be reported immediately to your Privacy Officer and IT department. They will determine if your patients\' information was affected and what notification steps are needed.'
+    correctAnswer: 2,
+    explanation: 'Under HIPAA, the covered entity — your organization — bears primary breach notification responsibility, even when the breach occurs at a Business Associate. Your vendor\'s BAA may require them to notify you, but you are still obligated to notify affected individuals, HHS, and (for 500+ patients in a state) prominent local media — all within 60 days of discovery. Never delegate this legal duty entirely to a vendor.'
   },
   // General Compliance (5 questions)
   {
@@ -713,15 +713,15 @@ export const allTrainingQuestions: TrainingQuestion[] = [
   {
     id: 'COMPLIANCE-05',
     category: 'General Compliance',
-    question: 'Can your organization be fined for HIPAA violations?',
+    question: 'A covered entity is found to have willfully neglected HIPAA rules and failed to correct the issue. Which fine tier applies, and what is the maximum annual penalty?',
     options: [
-      'No, HIPAA violations don\'t result in fines',
-      'Yes, fines can range from $100 to $50,000 per violation',
-      'Yes, but only for the first violation',
-      'Only if the violation involves more than 1,000 patients'
+      'Tier 1 — up to $25,000 per year (unknowing violation)',
+      'Tier 2 — up to $100,000 per year (reasonable cause)',
+      'Tier 3 — up to $250,000 per year (willful neglect, corrected)',
+      'Tier 4 — up to $1.9 million per year (willful neglect, not corrected)'
     ],
-    correctAnswer: 1,
-    explanation: 'Yes, organizations can be fined for HIPAA violations. Fines can range from $100 to $50,000 per violation. Repeated violations or willful neglect result in higher fines. Criminal charges are also possible.'
+    correctAnswer: 3,
+    explanation: 'HIPAA fines are tiered by culpability. Tier 4 (willful neglect not corrected) carries the highest penalty — a minimum of $50,000 per violation and an annual ceiling of $1.9 million (inflation-adjusted). Criminal penalties are also possible for intentional violations, including imprisonment. Even Tier 1 (unknowing) carries up to $25,000 per year — so no violation is without consequence.'
   },
   // Social Engineering & Manipulation (5 questions)
   {

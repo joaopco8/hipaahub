@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { getUser } from '@/utils/supabase/queries';
 import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
 
 // ─── Types ───────────────────────────────────────────────────
 
@@ -337,6 +338,13 @@ export async function markAssignmentComplete(assignmentId: string): Promise<void
 
   const now = new Date();
 
+  // Capture IP from request headers
+  const headersList = headers();
+  const completionIp =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    headersList.get('x-real-ip') ||
+    null;
+
   // Fetch module to know expiration_months
   const { data: assignment } = await (supabase as any)
     .from('training_assignments')
@@ -354,6 +362,7 @@ export async function markAssignmentComplete(assignmentId: string): Promise<void
       status: 'completed',
       completed_at: now.toISOString(),
       expires_at: expiresAt,
+      completion_ip: completionIp,
     })
     .eq('id', assignmentId)
     .eq('org_id', orgId);
