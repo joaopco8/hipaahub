@@ -419,6 +419,7 @@ export function PolicyEditorClient({
       }),
     ],
     content: initialContent,
+    editable: !isLocked,
     editorProps: {
       attributes: {
         class:
@@ -742,7 +743,7 @@ export function PolicyEditorClient({
   return (
     <>
       {/* ── Toolbar ─────────────────────────────────────────────────────────── */}
-      <div className="sticky top-0 z-30 flex items-center gap-1 border-b border-gray-200 bg-white px-3 py-1.5 shadow-sm -mx-4 sm:-mx-8 mb-4 px-4 sm:px-8">
+      <div className={`sticky top-0 z-30 flex items-center gap-1 border-b border-gray-200 bg-white px-3 py-1.5 shadow-sm -mx-4 sm:-mx-8 mb-4 px-4 sm:px-8${isLocked ? ' pointer-events-none opacity-40' : ''}`}>
         {/* Left — text formatting */}
         <div className="flex items-center gap-0.5 border-r border-gray-200 pr-2 mr-1">
           <ToolbarBtn
@@ -904,8 +905,55 @@ export function PolicyEditorClient({
       <div className="flex w-full gap-0 items-start">
         {/* ── Editor area ───────────────────────────────────────────────────── */}
         <div className="flex-1 min-w-0 bg-white border border-gray-200 shadow-sm">
-          <div className="max-w-4xl mx-auto px-8 py-8 pb-24">
-            <EditorContent editor={editor} />
+          <div className="max-w-4xl mx-auto px-8 py-8 pb-24 relative">
+            {/* When locked: show editor but blur bottom 60% with upgrade CTA */}
+            {isLocked ? (
+              <div className="relative">
+                <div
+                  className="pointer-events-none select-none"
+                  style={{ WebkitUserSelect: 'none', MozUserSelect: 'none', userSelect: 'none' } as React.CSSProperties}
+                  onCopy={(e) => e.preventDefault()}
+                >
+                  <EditorContent editor={editor} />
+                </div>
+                {/* Gradient fade starting at 40% */}
+                <div
+                  className="absolute inset-x-0 pointer-events-none"
+                  style={{ top: '38%', bottom: 0, background: 'linear-gradient(to bottom, transparent 0%, white 30%)' }}
+                />
+                {/* Blur overlay over bottom 60% */}
+                <div
+                  className="absolute inset-x-0 pointer-events-none"
+                  style={{ top: '45%', bottom: 0, backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' } as React.CSSProperties}
+                  aria-hidden="true"
+                />
+                {/* Upgrade CTA */}
+                <div className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-end pb-12" style={{ top: '50%' }}>
+                  <div className="bg-white border border-gray-200 shadow-xl px-8 py-6 max-w-sm w-full text-center">
+                    <div className="w-10 h-10 bg-[#0e274e]/5 flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-5 h-5 text-[#0e274e]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm font-light text-[#0e274e] mb-1">
+                      This policy is <span className="font-normal">18–25 pages</span> long.
+                    </p>
+                    <p className="text-xs text-gray-500 font-light mb-4">
+                      Subscribe to edit, activate, and download all 9 HIPAA policies.
+                    </p>
+                    <a
+                      href="/select-plan"
+                      className="block w-full bg-[#00bceb] text-white text-sm font-light py-2.5 hover:bg-[#0e274e] transition-colors text-center"
+                    >
+                      Unlock Full Access
+                    </a>
+                    <p className="text-[11px] text-gray-400 font-light mt-2">Cancel anytime · BAA included</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <EditorContent editor={editor} />
+            )}
           </div>
         </div>
 

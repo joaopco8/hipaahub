@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
-import { getUser } from '@/utils/supabase/queries';
+import { getUser, getSubscription } from '@/utils/supabase/queries';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { AdditionalDocumentsSection } from '@/components/policies/additional-doc
 import { PoliciesNavigation } from '@/components/policies/policies-navigation';
 import { getPolicyGenerationStatus } from '@/app/actions/policy-documents';
 import { PolicyStatusActions } from '@/components/policies/policy-status-actions';
+import { PolicyEditButton } from '@/components/policies/policy-edit-button';
 
 export default async function PoliciesPage() {
   const supabase = createClient();
@@ -19,8 +20,12 @@ export default async function PoliciesPage() {
     return redirect('/signin');
   }
 
-  // Fetch generation status from DB
-  const generationStatusMap = await getPolicyGenerationStatus();
+  // Fetch generation status and subscription from DB
+  const [generationStatusMap, subscription] = await Promise.all([
+    getPolicyGenerationStatus(),
+    getSubscription(supabase, user.id),
+  ]);
+  const isLocked = !subscription || subscription.status === 'trialing';
 
   // HIPAA Required Documents — only these 9 can be generated
   const policiesBase = [
@@ -254,16 +259,12 @@ export default async function PoliciesPage() {
                 )}
 
                 <div className="flex gap-2 flex-wrap">
-                  {/* Edit button — always available, primary CTA */}
-                  <Link href={`/dashboard/policies/${policy.id}/edit`}>
-                    <Button
-                      size="sm"
-                      className="h-8 rounded-none bg-[#00bceb] text-white hover:bg-[#00a0c9] font-light"
-                    >
-                      <Pencil className="mr-2 h-3.5 w-3.5" />
-                      {policy.isGenerated ? 'Edit' : 'Open Editor'}
-                    </Button>
-                  </Link>
+                  {/* Edit button — shows upgrade modal on trial */}
+                  <PolicyEditButton
+                    policyId={policy.id}
+                    isGenerated={policy.isGenerated}
+                    isLocked={isLocked}
+                  />
 
                   {policy.isGenerated ? (
                     <>
