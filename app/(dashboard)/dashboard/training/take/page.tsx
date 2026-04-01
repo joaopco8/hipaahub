@@ -712,8 +712,7 @@ export default function TakeTrainingPage() {
           const errorData = await response.json();
           errorMessage = errorData.error || errorMessage;
         } catch {
-          const errorText = await response.text();
-          errorMessage = errorText || errorMessage;
+          // body not JSON or already consumed — use default message
         }
         throw new Error(errorMessage);
       }
