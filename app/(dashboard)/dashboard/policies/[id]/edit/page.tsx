@@ -4,8 +4,32 @@ import { redirect } from 'next/navigation';
 import { getLatestEditorContent } from '@/app/actions/policy-editor';
 import { getPolicyGenerationStatus } from '@/app/actions/policy-documents';
 import { getOrganizationData } from '@/app/actions/organization';
-import { POLICY_EDITOR_TEMPLATES, POLICY_NAMES, fillPolicyTemplate } from '@/lib/policy-editor-templates';
+import { POLICY_NAMES } from '@/lib/policy-editor-templates';
 import { PolicyEditorClient } from '@/components/policies/policy-editor-client';
+import { processDocumentTemplate } from '@/lib/document-generator';
+import { policyTextToEditorHtml } from '@/lib/policy-text-to-editor-html';
+import { HIPAA_SECURITY_PRIVACY_MASTER_POLICY_TEMPLATE } from '@/lib/document-templates/hipaa-security-privacy-master-policy';
+import { SECURITY_RISK_ANALYSIS_POLICY_TEMPLATE } from '@/lib/document-templates/security-risk-analysis-policy';
+import { RISK_MANAGEMENT_PLAN_POLICY_TEMPLATE } from '@/lib/document-templates/risk-management-plan-policy';
+import { ACCESS_CONTROL_POLICY_TEMPLATE } from '@/lib/document-templates/access-control-policy';
+import { WORKFORCE_TRAINING_POLICY_TEMPLATE } from '@/lib/document-templates/workforce-training-policy';
+import { SANCTION_POLICY_TEMPLATE } from '@/lib/document-templates/sanction-policy';
+import { INCIDENT_RESPONSE_BREACH_NOTIFICATION_POLICY_TEMPLATE } from '@/lib/document-templates/incident-response-breach-notification-policy';
+import { BUSINESS_ASSOCIATE_MANAGEMENT_POLICY_TEMPLATE } from '@/lib/document-templates/business-associate-management-policy';
+import { AUDIT_LOGS_DOCUMENTATION_RETENTION_POLICY_TEMPLATE } from '@/lib/document-templates/audit-logs-documentation-retention-policy';
+
+/** Maps policyId → real document template (same as view/preview page). */
+const REAL_TEMPLATES: Record<number, string> = {
+  1: HIPAA_SECURITY_PRIVACY_MASTER_POLICY_TEMPLATE,
+  2: SECURITY_RISK_ANALYSIS_POLICY_TEMPLATE,
+  3: RISK_MANAGEMENT_PLAN_POLICY_TEMPLATE,
+  4: ACCESS_CONTROL_POLICY_TEMPLATE,
+  5: WORKFORCE_TRAINING_POLICY_TEMPLATE,
+  6: SANCTION_POLICY_TEMPLATE,
+  7: INCIDENT_RESPONSE_BREACH_NOTIFICATION_POLICY_TEMPLATE,
+  8: BUSINESS_ASSOCIATE_MANAGEMENT_POLICY_TEMPLATE,
+  9: AUDIT_LOGS_DOCUMENTATION_RETENTION_POLICY_TEMPLATE,
+};
 
 export default async function PolicyEditPage({
   params,
@@ -37,14 +61,23 @@ export default async function PolicyEditPage({
   const isLocked = !subscription || subscription.status === 'trialing';
   const genStatus = generationStatusMap.get(policyId);
 
-  // Load content: saved version OR fill fresh template
+  // Load content:
+  // 1. Previously saved editor HTML (from a prior edit session)
+  // 2. Fresh render of the REAL policy template (same as what View shows)
   let initialContent: string;
   if (savedContent?.content) {
     initialContent = savedContent.content;
   } else {
-    const template = POLICY_EDITOR_TEMPLATES[policyId];
-    const { html } = fillPolicyTemplate(template, organization);
-    initialContent = html;
+    const rawTemplate = REAL_TEMPLATES[policyId];
+    if (rawTemplate) {
+      // Process the template with org data (fills {{placeholders}})
+      const processedText = processDocumentTemplate(rawTemplate, organization as any);
+      // Convert plain-text format to TipTap-compatible HTML
+      initialContent = policyTextToEditorHtml(processedText);
+    } else {
+      // Fallback: empty document with just the title
+      initialContent = `<h1>${policyName}</h1><p>Start editing your policy here.</p>`;
+    }
   }
 
   return (
