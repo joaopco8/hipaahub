@@ -83,19 +83,15 @@ export default function PricingRounded({
       );
     }
 
-    try {
-      const stripe = await getStripe();
-      if (stripe) {
-        await stripe.redirectToCheckout({ sessionId });
-      } else if (sessionUrl) {
-        // Fallback: use session URL if Stripe.js fails
-        window.location.href = sessionUrl;
-      }
-    } catch (stripeError: any) {
-      console.error('Stripe.js error, using session URL:', stripeError);
-      // Fallback: use session URL if Stripe.js throws error
-      if (sessionUrl) {
-        window.location.href = sessionUrl;
+    // Always prefer sessionUrl — stripe.redirectToCheckout is deprecated and unreliable
+    if (sessionUrl) {
+      window.location.href = sessionUrl;
+    } else if (sessionId) {
+      try {
+        const stripe = await getStripe();
+        if (stripe) await stripe.redirectToCheckout({ sessionId });
+      } catch (stripeError: any) {
+        console.error('Stripe.js error:', stripeError);
       }
     }
 
@@ -225,7 +221,7 @@ export default function PricingRounded({
                     <div className="flex flex-col mt-4 font-extralight">
                       <span className="text-zinc-400 text-sm font-extralight">From</span>
                       <div className="flex items-baseline mt-1 font-extralight">
-                        <span className="text-5xl font-extralight">
+                        <span className="text-5xl font-extralight" suppressHydrationWarning>
                           {priceString}
                         </span>
                         <span className="ml-1 text-zinc-400 font-extralight">

@@ -51,15 +51,16 @@ const PricingCard: React.FC<PricingCardProps> = ({
         localStorage.setItem('hipaa_pending_price_id', priceId);
         window.location.href = result.path;
       } else if (result.type === 'checkout') {
-        try {
-          const stripe = await getStripe();
-          if (stripe && result.sessionId) {
-            await stripe.redirectToCheckout({ sessionId: result.sessionId });
-          } else if (result.sessionUrl) {
-            window.location.href = result.sessionUrl;
+        // Always prefer sessionUrl — stripe.redirectToCheckout is deprecated and unreliable
+        if (result.sessionUrl) {
+          window.location.href = result.sessionUrl;
+        } else if (result.sessionId) {
+          try {
+            const stripe = await getStripe();
+            if (stripe) await stripe.redirectToCheckout({ sessionId: result.sessionId });
+          } catch {
+            setErrorMsg('Something went wrong. Please try again.');
           }
-        } catch {
-          if (result.sessionUrl) window.location.href = result.sessionUrl;
         }
       } else if (result.type === 'error') {
         setErrorMsg(result.message || 'Something went wrong. Please try again.');

@@ -22,26 +22,14 @@ export default function PricingSection() {
         console.log('PricingSection: Redirecting to:', result.path);
         window.location.href = result.path;
       } else if (result.type === 'checkout') {
-        console.log('PricingSection: Proceeding to Stripe checkout');
-        try {
-          const stripe = await getStripe();
-          if (stripe) {
-            await stripe.redirectToCheckout({ sessionId: result.sessionId });
-          } else {
-            // Fallback: use session URL if Stripe.js fails
-            if (result.sessionUrl) {
-              window.location.href = result.sessionUrl;
-            } else {
-              console.error('Stripe failed to load and no session URL available');
-              window.location.href = '/signup?redirect=checkout';
-            }
-          }
-        } catch (stripeError: any) {
-          console.error('Stripe.js error, using session URL:', stripeError);
-          // Fallback: use session URL if Stripe.js throws error
-          if (result.sessionUrl) {
-            window.location.href = result.sessionUrl;
-          } else {
+        // Always prefer sessionUrl — stripe.redirectToCheckout is deprecated and unreliable
+        if (result.sessionUrl) {
+          window.location.href = result.sessionUrl;
+        } else if (result.sessionId) {
+          try {
+            const stripe = await getStripe();
+            if (stripe) await stripe.redirectToCheckout({ sessionId: result.sessionId });
+          } catch {
             window.location.href = '/signup?redirect=checkout';
           }
         }
