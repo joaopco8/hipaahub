@@ -258,7 +258,7 @@ export default async function DocumentPreviewPage({
       </div>
 
       {/* Document Viewer */}
-      <DocumentViewer content={processedContent} title={document.name} />
+      <DocumentViewer content={processedContent} title={document.name} isLocked={isLocked} />
     </div>
   );
 }
