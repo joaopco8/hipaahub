@@ -13,6 +13,8 @@ import { AuthStatusHandler } from '@/components/auth-status-handler';
 import { OAuthErrorHandler } from '../oauth-error-handler';
 import { CiscoStyleLogo } from '@/components/auth/cisco-style-logo';
 import { Eye, EyeOff } from 'lucide-react';
+import { signInWithOAuth } from '@/utils/auth-helpers/client';
+import { GoogleLogo } from '@/components/google-logo';
 
 function SignUpContent() {
   const router = useRouter();
@@ -37,6 +39,13 @@ function SignUpContent() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
     await handleRequest(e, signUp, router);
+    setIsSubmitting(false);
+  };
+
+  const handleGoogleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    await signInWithOAuth(e);
     setIsSubmitting(false);
   };
 
@@ -229,6 +238,46 @@ function SignUpContent() {
             {isSubmitting ? 'Registering...' : 'Register'}
           </button>
         </form>
+
+        {/* Google Sign Up */}
+        <div className="mt-5">
+          <div className="relative flex items-center mb-5">
+            <div className="flex-1 border-t border-gray-200" />
+            <span className="px-3 text-xs text-gray-400 font-thin">or</span>
+            <div className="flex-1 border-t border-gray-200" />
+          </div>
+          <form onSubmit={handleGoogleSignUp}>
+            {(searchParams.get('redirect') === 'checkout' || priceId) && (
+              <input type="hidden" name="redirect" value="checkout" />
+            )}
+            {priceId && <input type="hidden" name="priceId" value={priceId} />}
+            <input type="hidden" name="provider" value="google" />
+            <button
+              type="submit"
+              className="w-full h-11 border border-gray-300 bg-white text-gray-700 font-thin rounded-md flex items-center justify-center gap-2"
+              style={{
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'none',
+                transform: 'none',
+                boxShadow: 'none'
+              }}
+              disabled={isSubmitting}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.backgroundColor = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'none';
+                e.currentTarget.style.boxShadow = 'none';
+                e.currentTarget.style.backgroundColor = 'white';
+              }}
+            >
+              <GoogleLogo className="w-5 h-5" />
+              <span>Continue with Google</span>
+            </button>
+          </form>
+        </div>
 
         {/* Sign In Link */}
         <div className="mt-8 text-center text-sm">
