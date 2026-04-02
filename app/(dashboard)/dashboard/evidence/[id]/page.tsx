@@ -89,14 +89,24 @@ export default async function EvidenceDetailPage({
         </div>
 
         {/* Download / view actions (client component for signed URL) */}
-        {item.file_url && (
+        {item.external_link ? (
+          <a
+            href={item.external_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 h-9 px-4 text-xs font-light border border-[#00bceb] text-[#00bceb] hover:bg-[#00bceb]/5 rounded-none transition-colors"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            Open Link
+          </a>
+        ) : item.file_url ? (
           <EvidenceDetailActions
             evidenceId={item.id}
             fileUrl={item.file_url}
             fileName={item.file_name || item.title}
             evidenceTitle={item.title}
           />
-        )}
+        ) : null}
       </div>
 
       {/* Metadata */}
@@ -147,6 +157,23 @@ export default async function EvidenceDetailPage({
                   <span className="text-gray-400 shrink-0">{formatFileSize(item.file_size)}</span>
                 )}
               </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {item.external_link && (
+          <Card className="border-0 shadow-sm rounded-none bg-white">
+            <CardContent className="p-4 space-y-1">
+              <p className="text-[11px] text-gray-400 font-light uppercase tracking-wide">External Link</p>
+              <a
+                href={item.external_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[#00bceb] font-light flex items-center gap-1.5 truncate hover:underline"
+              >
+                <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{item.external_link}</span>
+              </a>
             </CardContent>
           </Card>
         )}

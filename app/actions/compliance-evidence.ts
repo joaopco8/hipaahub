@@ -97,6 +97,8 @@ export interface ComplianceEvidence {
   tags?: string[];
   notes?: string;
   external_reference?: string;
+  external_link?: string;
+  capture_type?: 'document_upload' | 'external_link' | 'attestation' | 'system_generated' | 'screenshot';
   created_at: string;
   updated_at: string;
   deleted_at?: string;

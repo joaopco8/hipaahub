@@ -5,15 +5,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/utils/cn';
-import { 
-  FileText, 
-  Image as ImageIcon, 
-  FileCode, 
-  Link as LinkIcon, 
+import {
+  FileText,
+  Image as ImageIcon,
+  FileCode,
+  Link as LinkIcon,
   CheckCircle2,
   Upload,
-  Eye, 
-  Download 
+  Eye,
+  Download,
+  ExternalLink
 } from 'lucide-react';
 import { 
   getEvidenceFieldsByCategory,
@@ -190,7 +191,17 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                                 </p>
                               </div>
                               <div className="flex items-center gap-1 shrink-0">
-                                {ev.file_url && (
+                                {ev.external_link ? (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 w-7 p-0 hover:bg-gray-200 rounded-none"
+                                    onClick={() => window.open(ev.external_link!, '_blank')}
+                                    title="Open Link"
+                                  >
+                                    <ExternalLink className="h-3.5 w-3.5 text-indigo-500" />
+                                  </Button>
+                                ) : ev.file_url ? (
                                   <>
                                     <Button
                                       variant="ghost"
@@ -208,14 +219,14 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                                           const response = await fetch(
                                             `/api/compliance-evidence/view?${viewParams.toString()}`
                                           );
-                                          
+
                                           if (!response.ok) {
                                             const errorData = await response.json();
                                             console.error('Failed to get view URL:', errorData);
                                             alert('Failed to open document. Please try downloading it instead.');
                                             return;
                                           }
-                                          
+
                                           const data = await response.json();
                                           if (data.view_url) {
                                             window.open(data.view_url, '_blank');
@@ -241,14 +252,14 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                                           const response = await fetch(
                                             `/api/compliance-evidence/download?file_url=${encodeURIComponent(ev.file_url || '')}&bucket=${encodeURIComponent(bucket)}`
                                           );
-                                          
+
                                           if (!response.ok) {
                                             const errorData = await response.json();
                                             console.error('Failed to get download URL:', errorData);
                                             alert('Failed to download document.');
                                             return;
                                           }
-                                          
+
                                           const data = await response.json();
                                           if (data.download_url) {
                                             window.open(data.download_url, '_blank');
@@ -265,7 +276,7 @@ export function EvidenceFieldsGrid({ existingEvidence = [], evidenceByFieldId = 
                                       <Download className="h-3.5 w-3.5 text-gray-500" />
                                     </Button>
                                   </>
-                                )}
+                                ) : null}
                               </div>
                             </div>
                           ))}
