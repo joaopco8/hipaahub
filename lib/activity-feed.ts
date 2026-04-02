@@ -49,8 +49,8 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
   ] = await Promise.allSettled([
     (supabase as any)
       .from('generated_policy_documents')
-      .select('id, policy_name, policy_status, last_generated_at, created_at')
-      .eq('user_id', user.id)
+      .select('policy_id, policy_name, policy_status, last_generated_at, created_at')
+      .eq('organization_id', orgId)
       .order('last_generated_at', { ascending: false })
       .limit(20),
 
@@ -71,7 +71,7 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
 
     (supabase as any)
       .from('incident_logs')
-      .select('id, incident_type, status, date_discovered, created_at')
+      .select('id, incident_title, status, date_discovered, created_at')
       .eq('organization_id', orgId)
       .order('created_at', { ascending: false })
       .limit(10),
@@ -90,11 +90,11 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
       .order('created_at', { ascending: false })
       .limit(10),
 
-    supabase
-      .from('risk_assessments')
-      .select('id, updated_at, created_at')
+    (supabase as any)
+      .from('risk_assessment_history')
+      .select('id, assessed_at, risk_level')
       .eq('user_id', user.id)
-      .order('updated_at', { ascending: false })
+      .order('assessed_at', { ascending: false })
       .limit(5),
 
     (supabase as any)
@@ -111,7 +111,7 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
       const date = p.last_generated_at || p.created_at;
       if (!date) continue;
       events.push({
-        id: `policy-${p.id}`,
+        id: `policy-${p.policy_id}`,
         type: p.policy_status === 'active' ? 'policy_activated' : 'policy_draft',
         title: p.policy_status === 'active' ? 'Policy activated' : 'Policy updated',
         description: p.policy_name,
@@ -160,7 +160,7 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
         id: `incident-${inc.id}`,
         type: inc.status === 'closed' ? 'incident_closed' : 'incident_opened',
         title: inc.status === 'closed' ? 'Incident closed' : 'Incident logged',
-        description: inc.incident_type || 'Security incident',
+        description: inc.incident_title || 'Security incident',
         date: new Date(date),
         link: '/dashboard/breach-notifications/incidents',
       });
@@ -200,7 +200,7 @@ export async function getRecentActivity(limit = 10): Promise<ActivityEvent[]> {
   // Risk Assessment
   if (riskResult.status === 'fulfilled' && riskResult.value.data) {
     for (const r of riskResult.value.data) {
-      const date = r.updated_at || r.created_at;
+      const date = r.assessed_at;
       if (!date) continue;
       events.push({
         id: `risk-${r.id}`,

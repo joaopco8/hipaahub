@@ -420,21 +420,14 @@ export default function BreachNotificationsPage() {
 
   if (!organization) {
     return (
-      <div className="flex min-h-screen w-full flex-col gap-6 p-6">
+      <div className="flex w-full flex-col gap-6">
+        <div className="mb-2">
+          <h2 className="text-2xl font-light text-[#0e274e]">Breach Notifications</h2>
+        </div>
+        <BreachNavigation />
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="font-light">Organization data not found. Please complete your profile.</AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  if (validationError) {
-    return (
-      <div className="flex min-h-screen w-full flex-col gap-6 p-6">
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription className="font-light">{validationError}</AlertDescription>
         </Alert>
       </div>
     );
@@ -452,6 +445,14 @@ export default function BreachNotificationsPage() {
 
       {/* Navigation Tabs */}
       <BreachNavigation />
+
+      {/* Validation warning (non-blocking) */}
+      {validationError && (
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="font-light text-xs">{validationError}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Page Header */}
       <div className="mb-2">
