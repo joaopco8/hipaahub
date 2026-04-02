@@ -88,7 +88,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
     <html lang="en" suppressHydrationWarning className="dark">
       <body
         className={cn(
-          'min-h-screen bg-background antialiased flex flex-col',
+          'min-h-screen bg-background antialiased flex flex-col overflow-x-hidden',
           geologica.variable,
           crimsonText.variable
         )}

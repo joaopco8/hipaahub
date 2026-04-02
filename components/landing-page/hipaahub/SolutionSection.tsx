@@ -10,7 +10,7 @@ const CircularProgress: React.FC<{ percentage: number; label: string; valueDispl
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-[250px] h-[250px] flex items-center justify-center mb-10">
+      <div className="relative w-[140px] h-[140px] md:w-[250px] md:h-[250px] flex items-center justify-center mb-6 md:mb-10">
         <svg className="w-full h-full -rotate-90 block" viewBox="0 0 128 128">
           <circle
             cx="64"
@@ -33,7 +33,7 @@ const CircularProgress: React.FC<{ percentage: number; label: string; valueDispl
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-6xl font-thin text-slate-800">{valueDisplay || `${percentage}%`}</span>
+          <span className="text-3xl md:text-6xl font-thin text-slate-800">{valueDisplay || `${percentage}%`}</span>
         </div>
       </div>
       <p className="text-center text-base text-gray-500 max-w-[320px] leading-relaxed font-thin">{label}</p>
@@ -45,9 +45,9 @@ const CircularProgress: React.FC<{ percentage: number; label: string; valueDispl
 const SolidCircleStat: React.FC<{ value: string; label: string; source?: string }> = ({ value, label, source }) => {
   return (
     <div className="flex flex-col items-center">
-      <div className="w-[250px] h-[250px] flex items-center justify-center mb-10">
-        <div className="w-[234px] h-[234px] rounded-full bg-cisco-green flex items-center justify-center text-white shadow-sm overflow-hidden group">
-          <span className="text-6xl font-thin">{value}</span>
+      <div className="w-[140px] h-[140px] md:w-[250px] md:h-[250px] flex items-center justify-center mb-6 md:mb-10">
+        <div className="w-[130px] h-[130px] md:w-[234px] md:h-[234px] rounded-full bg-cisco-green flex items-center justify-center text-white shadow-sm overflow-hidden group">
+          <span className="text-3xl md:text-6xl font-thin">{value}</span>
         </div>
       </div>
       <p className="text-center text-base text-gray-500 max-w-[320px] leading-relaxed font-thin">{label}</p>
@@ -85,7 +85,7 @@ const SolutionSection: React.FC = () => {
         </div>
 
         {/* Stats Grid - All circles now standardized to the same visual scale */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-16 xl:gap-10 border-t border-gray-50 pt-20">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-8 xl:gap-10 border-t border-gray-50 pt-20">
           <CircularProgress
             percentage={33}
             valueDisplay="1 in 3"
