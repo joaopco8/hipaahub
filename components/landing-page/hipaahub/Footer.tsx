@@ -21,7 +21,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigateLegal }) => {
   return (
     <footer className="bg-white pt-24 pb-12 border-t border-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-12">
-        <div className="mb-16 border-b border-gray-200 border-[0.5px] pb-12">
+        <div className="mb-16 pb-12">
           <h2 className="text-3xl font-thin text-cisco-navy mb-4">
             HIPAA Hub Compliance Platform
           </h2>

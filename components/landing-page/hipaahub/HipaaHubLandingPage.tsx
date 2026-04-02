@@ -126,7 +126,7 @@ const HipaaHubLandingPage: React.FC = () => {
             <SolutionSection />
             <StatsSection onAssessmentClick={handleAssessmentClick} />
             <HowItWorksSteps />
-            <WhatsIncluded onDemoClick={handleWatchDemoClick} />
+            <WhatsIncluded onDemoClick={handleWatchDemoClick} onAssessmentClick={handleAssessmentClick} />
             <HowItWorks onGetStarted={handleAssessmentClick} />
             <BuiltForYourPractice />
             <WhyPracticesChoose />

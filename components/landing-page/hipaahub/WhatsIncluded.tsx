@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronRight, CheckCircle2, Shield, Zap, FileText, Users, Search, Archive, Activity } from 'lucide-react';
 
-const WhatsIncluded: React.FC<{ onDemoClick?: () => void }> = ({ onDemoClick }) => {
+const WhatsIncluded: React.FC<{ onDemoClick?: () => void; onAssessmentClick?: () => void }> = ({ onDemoClick, onAssessmentClick }) => {
   const policies = [
     "Privacy Policy", "Security Policy", "Breach Notification Policy",
     "Access Control Policy", "Audit & Accountability Policy", "Encryption Policy",
@@ -79,8 +79,14 @@ const WhatsIncluded: React.FC<{ onDemoClick?: () => void }> = ({ onDemoClick }) 
           </div>
         </div>
 
-        <div className="mt-20 pt-10 border-t border-white/10 flex flex-col md:flex-row items-center justify-center gap-10">
-           <button 
+        <div className="mt-20 pt-10 border-t border-white/10 flex flex-col md:flex-row items-center justify-center gap-6">
+           <button
+             onClick={onAssessmentClick}
+             className="bg-cisco-green text-white px-10 py-5 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all"
+           >
+             Start free, no credit card
+           </button>
+           <button
              onClick={onDemoClick}
              className="bg-cisco-blue text-white px-10 py-5 text-sm font-thin hover:bg-white hover:text-cisco-navy transition-all"
            >
