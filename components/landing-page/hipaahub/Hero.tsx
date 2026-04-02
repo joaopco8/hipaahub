@@ -3,12 +3,17 @@ import React from 'react';
 const Hero: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void }> = ({ onAssessmentClick, onDemoClick }) => {
   return (
     <section className="relative min-h-[600px] md:min-h-[700px] w-full bg-cisco-navy overflow-hidden flex items-center py-20 md:py-0">
-      {/* Background image */}
+      {/* Background image — desktop / mobile */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <img 
-          src="/images/hero-background.png" 
-          alt="" 
-          className="w-full h-full object-cover"
+        <img
+          src="/images/header-desktop.jpg"
+          alt=""
+          className="hidden md:block w-full h-full object-cover"
+        />
+        <img
+          src="/images/header-mobile.jpg"
+          alt=""
+          className="md:hidden w-full h-full object-cover object-center"
         />
       </div>
       {/* Background visual elements overlay */}
