@@ -6,140 +6,90 @@ import { redirect } from 'next/navigation';
 
 export async function deleteAccount(formData: FormData) {
   const supabase = createClient();
-  
-  // Get current user
+
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   if (!user) {
-    return getErrorRedirect(
-      '/dashboard/account',
-      'Authentication required',
-      'You must be logged in to delete your account.'
+    redirect(
+      getErrorRedirect(
+        '/dashboard/account',
+        'Authentication required',
+        'You must be logged in to delete your account.'
+      )
     );
   }
 
-  // Check if user is authenticated via OAuth (Google, etc.)
-  // OAuth users don't have passwords, so we check identities or app_metadata
-  const hasOAuthIdentity = user.identities?.some((identity: any) => 
-    identity.provider && identity.provider !== 'email'
+  // Validate DELETE confirmation word
+  const deleteWord = String(formData.get('deleteWord')).trim();
+  if (deleteWord !== 'DELETE') {
+    return { error: 'You must type DELETE (in uppercase) to confirm account deletion.' };
+  }
+
+  const hasOAuthIdentity = user!.identities?.some(
+    (identity: any) => identity.provider && identity.provider !== 'email'
   );
-  const isOAuthUser = user.app_metadata?.provider === 'google' || hasOAuthIdentity || false;
+  const isOAuthUser =
+    user!.app_metadata?.provider === 'google' || hasOAuthIdentity || false;
 
   if (isOAuthUser) {
-    // For OAuth users, we use email confirmation instead of password
-    const confirmationEmail = String(formData.get('confirmationEmail')).trim();
-    const confirmationEmail2 = String(formData.get('confirmationEmail2')).trim();
-    
-    // Validate emails are provided
-    if (!confirmationEmail || !confirmationEmail2) {
-      return getErrorRedirect(
-        '/dashboard/account',
-        'Email confirmation required',
-        'Please enter your email address in both fields to confirm account deletion.'
-      );
-    }
+    // For Google users: verify they re-authenticated recently (within last 10 minutes)
+    const lastSignIn = user!.last_sign_in_at ? new Date(user!.last_sign_in_at) : null;
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
 
-    // Validate emails match
-    if (confirmationEmail !== confirmationEmail2) {
-      return getErrorRedirect(
-        '/dashboard/account',
-        'Emails do not match',
-        'The email addresses you entered do not match. Please try again.'
-      );
-    }
-
-    // Validate email matches user's email
-    if (confirmationEmail.toLowerCase() !== user.email?.toLowerCase()) {
-      return getErrorRedirect(
-        '/dashboard/account',
-        'Invalid email',
-        'The email address you entered does not match your account email. Please enter your account email address.'
-      );
+    if (!lastSignIn || lastSignIn < tenMinutesAgo) {
+      return {
+        error:
+          'Google verification expired. Please click "Verify with Google" again.',
+      };
     }
   } else {
-    // For email/password users, validate password
-    const password1 = String(formData.get('password1')).trim();
-    const password2 = String(formData.get('password2')).trim();
-    
-    // Validate passwords are provided
-    if (!password1 || !password2) {
-      return getErrorRedirect(
-        '/dashboard/account',
-        'Passwords required',
-        'Please enter your password in both fields to confirm account deletion.'
-      );
+    // For password users: verify the password is correct
+    const password = String(formData.get('password')).trim();
+
+    if (!password) {
+      return { error: 'Password is required to delete your account.' };
     }
 
-    // Validate passwords match
-    if (password1 !== password2) {
-      return getErrorRedirect(
-        '/dashboard/account',
-        'Passwords do not match',
-        'The passwords you entered do not match. Please try again.'
-      );
-    }
-
-    // Verify password by attempting to sign in
     const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: user.email!,
-      password: password1
+      email: user!.email!,
+      password,
     });
 
     if (signInError) {
-      return getErrorRedirect(
-        '/dashboard/account',
-        'Invalid password',
-        'The password you entered is incorrect. Please try again.'
-      );
+      return { error: 'The password you entered is incorrect. Please try again.' };
     }
   }
 
-  // Confirmation successful, proceed with account deletion
+  // All checks passed — delete user data respecting FK constraints
   try {
-    // Delete user data in order to respect foreign key constraints
-    // 1. Delete action items
-    await supabase.from('action_items').delete().eq('user_id', user.id);
-    
-    // 2. Delete risk assessments
-    await supabase.from('risk_assessments').delete().eq('user_id', user.id);
-    // Note: onboarding_risk_assessments will be deleted automatically via CASCADE when user is deleted
-    
-    // 3. Delete staff members
-    await supabase.from('staff_members').delete().eq('user_id', user.id);
-    
-    // 4. Delete compliance commitments
-    await supabase.from('compliance_commitments').delete().eq('user_id', user.id);
-    
-    // 5. Delete organizations (this may have cascading deletes)
-    await supabase.from('organizations').delete().eq('user_id', user.id);
-    
-    // 6. Delete subscriptions (if any)
-    await supabase.from('subscriptions').delete().eq('user_id', user.id);
-    
-    // 7. Delete customers (Stripe)
-    await supabase.from('customers').delete().eq('id', user.id);
-    
-    // 8. Delete user from users table
-    await supabase.from('users').delete().eq('id', user.id);
+    await supabase.from('action_items').delete().eq('user_id', user!.id);
+    await supabase.from('risk_assessments').delete().eq('user_id', user!.id);
+    // onboarding_risk_assessments deleted via CASCADE
+    await supabase.from('staff_members').delete().eq('user_id', user!.id);
+    await supabase.from('compliance_commitments').delete().eq('user_id', user!.id);
+    await supabase.from('organizations').delete().eq('user_id', user!.id);
+    await supabase.from('subscriptions').delete().eq('user_id', user!.id);
+    await supabase.from('customers').delete().eq('id', user!.id);
+    await supabase.from('users').delete().eq('id', user!.id);
 
-    // 9. Sign out the user
     await supabase.auth.signOut();
+  } catch (error: any) {
+    // Re-throw Next.js redirect errors
+    if (error?.digest?.startsWith('NEXT_REDIRECT')) throw error;
 
-    // Redirect to sign in with success message
-    return redirect(
-      getStatusRedirect(
-        '/signin',
-        'Account deleted',
-        'Your account has been successfully deleted. We\'re sorry to see you go.',
-        true
-      )
-    );
-  } catch (error) {
     console.error('Error deleting account:', error);
-    return getErrorRedirect(
-      '/dashboard/account',
-      'Deletion failed',
-      'An error occurred while deleting your account. Please try again or contact support.'
-    );
+    return {
+      error:
+        'An error occurred while deleting your account. Please try again or contact support.',
+    };
   }
+
+  redirect(
+    getStatusRedirect(
+      '/signin',
+      'Account deleted',
+      "Your account has been successfully deleted. We're sorry to see you go.",
+      true
+    )
+  );
 }
