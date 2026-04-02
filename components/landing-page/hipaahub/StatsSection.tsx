@@ -22,7 +22,7 @@ const StatsSection: React.FC<{ onAssessmentClick?: () => void }> = ({ onAssessme
                 onClick={onAssessmentClick}
                 className="bg-cisco-blue text-white px-10 py-5 text-xs font-thin hover:bg-cisco-navy transition-all"
               >
-                Start Free. Get Your Risk Score
+                Start free, no credit card
               </button>
             </div>
           </div>

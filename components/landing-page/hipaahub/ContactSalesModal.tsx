@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Mail, User, Phone, Building, Users, ArrowRight, ChevronDown } from 'lucide-react';
+import { X, Mail, User, Phone, Building, Users, ArrowRight, ChevronDown, MessageSquare } from 'lucide-react';
 
 interface ContactSalesModalProps {
   isOpen: boolean;
@@ -14,7 +14,8 @@ const ContactSalesModal: React.FC<ContactSalesModalProps> = ({ isOpen, onClose }
     email: '',
     phone: '',
     organization: '',
-    staffSize: ''
+    staffSize: '',
+    needs: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -39,6 +40,7 @@ const ContactSalesModal: React.FC<ContactSalesModalProps> = ({ isOpen, onClose }
           phone: formData.phone,
           organization: formData.organization,
           staffSize: formData.staffSize,
+          needs: formData.needs,
           source: 'contact_sales'
         }),
       });
@@ -52,7 +54,7 @@ const ContactSalesModal: React.FC<ContactSalesModalProps> = ({ isOpen, onClose }
       setTimeout(() => {
         onClose();
         setIsSuccess(false);
-        setFormData({ name: '', email: '', phone: '', organization: '', staffSize: '' });
+        setFormData({ name: '', email: '', phone: '', organization: '', staffSize: '', needs: '' });
       }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
@@ -61,7 +63,7 @@ const ContactSalesModal: React.FC<ContactSalesModalProps> = ({ isOpen, onClose }
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -89,16 +91,16 @@ const ContactSalesModal: React.FC<ContactSalesModalProps> = ({ isOpen, onClose }
             </div>
             <h3 className="text-2xl font-thin text-cisco-navy mb-4">Thank You!</h3>
             <p className="text-gray-600 font-thin">
-              Our sales team will contact you shortly to discuss your needs.
+              We&rsquo;ll reach out shortly to better understand your needs and find the best solution for your organization.
             </p>
           </div>
         ) : (
           <>
             {/* Header */}
             <div className="bg-cisco-navy p-8 text-white">
-              <h2 className="text-3xl font-thin mb-2">Contact Sales</h2>
+              <h2 className="text-3xl font-thin mb-2">Custom Plan</h2>
               <p className="text-gray-300 text-sm font-thin">
-                Get in touch with our team to discuss enterprise pricing and custom solutions.
+                Leave your details and we&rsquo;ll reach out to better understand your organization&rsquo;s needs and build the right plan for you.
               </p>
             </div>
 
@@ -216,6 +218,25 @@ const ContactSalesModal: React.FC<ContactSalesModalProps> = ({ isOpen, onClose }
                     <ChevronDown size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   </div>
                 </div>
+
+                {/* Needs Field */}
+                <div>
+                  <label htmlFor="needs" className="block text-sm font-thin text-cisco-navy mb-2">
+                    What are your main compliance needs?
+                  </label>
+                  <div className="relative">
+                    <MessageSquare size={18} className="absolute left-4 top-3.5 text-gray-400" />
+                    <textarea
+                      id="needs"
+                      name="needs"
+                      value={formData.needs}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full pl-12 pr-4 py-3 border border-gray-200 focus:border-cisco-blue focus:outline-none font-thin text-cisco-navy bg-white placeholder:text-gray-400 resize-none"
+                      placeholder="Tell us about your organization, compliance challenges, or any specific requirements..."
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Submit Button */}
@@ -229,7 +250,7 @@ const ContactSalesModal: React.FC<ContactSalesModalProps> = ({ isOpen, onClose }
                     'Submitting...'
                   ) : (
                     <>
-                      Submit Request
+                      Send Request
                       <ArrowRight size={18} />
                     </>
                   )}

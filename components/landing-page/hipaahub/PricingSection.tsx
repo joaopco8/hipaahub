@@ -255,9 +255,14 @@ const PricingSection: React.FC<{ onDemoClick?: () => void }> = () => {
             />
           </div>
 
-          <p className="mt-8 text-center text-xs text-gray-400 font-thin">
-            Not sure which plan? Start with Solo &mdash; you can upgrade anytime.
-          </p>
+          <div className="mt-8 flex flex-col items-center gap-2 text-center">
+            <p className="text-xs text-gray-400 font-thin">
+              Not sure which plan? Start with Solo &mdash; you can upgrade anytime.
+            </p>
+            <p className="text-xs text-gray-400 font-thin max-w-xl">
+              <span className="text-gray-500">Solo → Practice:</span> the step up adds staff training tracking with certificates, a real-time compliance dashboard, phone support, and BAA expiration alerts &mdash; worth it once you have 6+ staff or face an upcoming audit.
+            </p>
+          </div>
         </div>
       </section>
 

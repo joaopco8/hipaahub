@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
 
-const CircularProgress: React.FC<{ percentage: number; label: string; valueDisplay?: string }> = ({ percentage, label, valueDisplay }) => {
+const CircularProgress: React.FC<{ percentage: number; label: string; valueDisplay?: string; source?: string }> = ({ percentage, label, valueDisplay, source }) => {
   // Standardized size: 120px container (w-30 = 120px)
   const radius = 56;
   const strokeWidth = 8;
@@ -37,11 +37,12 @@ const CircularProgress: React.FC<{ percentage: number; label: string; valueDispl
         </div>
       </div>
       <p className="text-center text-base text-gray-500 max-w-[320px] leading-relaxed font-thin">{label}</p>
+      {source && <p className="text-center text-[10px] text-gray-300 max-w-[280px] mt-3 font-thin italic">{source}</p>}
     </div>
   );
 };
 
-const SolidCircleStat: React.FC<{ value: string; label: string }> = ({ value, label }) => {
+const SolidCircleStat: React.FC<{ value: string; label: string; source?: string }> = ({ value, label, source }) => {
   return (
     <div className="flex flex-col items-center">
       <div className="w-[250px] h-[250px] flex items-center justify-center mb-10">
@@ -50,6 +51,7 @@ const SolidCircleStat: React.FC<{ value: string; label: string }> = ({ value, la
         </div>
       </div>
       <p className="text-center text-base text-gray-500 max-w-[320px] leading-relaxed font-thin">{label}</p>
+      {source && <p className="text-center text-[10px] text-gray-300 max-w-[280px] mt-3 font-thin italic">{source}</p>}
     </div>
   );
 };
@@ -84,23 +86,27 @@ const SolutionSection: React.FC = () => {
 
         {/* Stats Grid - All circles now standardized to the same visual scale */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-16 xl:gap-10 border-t border-gray-50 pt-20">
-          <CircularProgress 
+          <CircularProgress
             percentage={33}
             valueDisplay="1 in 3"
             label="solo practices audited by OCR had no documented policies on file"
+            source="HHS OCR Phase 2 Audit Program Report, 2017"
           />
-          <CircularProgress 
-            percentage={40} 
+          <CircularProgress
+            percentage={40}
             valueDisplay="40%"
             label="increase in OCR audits (2024-2025)"
+            source="HHS Office for Civil Rights Annual Report to Congress, 2024"
           />
-          <SolidCircleStat 
-            value="$50k" 
-            label="average fine per violation" 
+          <SolidCircleStat
+            value="$50k"
+            label="average fine per violation"
+            source="HHS OCR Resolution Agreements, 2020–2024"
           />
-          <SolidCircleStat 
+          <SolidCircleStat
             value="10 days"
             label="OCR gives you 10 days to respond to an audit request. Most solo practices need 4-8 weeks to find their files."
+            source="HHS OCR Desk Review Protocol"
           />
         </div>
       </div>

@@ -117,7 +117,7 @@ const HowItWorks: React.FC<{ onGetStarted?: () => void }> = ({ onGetStarted }) =
             icon={<CheckCircle2 size={32} strokeWidth={1} />}
             title="Ready to Get Started?"
             description="HIPAA compliance for independent practices, with everything you need to stay organized and audit ready."
-            ctaText="Start Free Trial"
+            ctaText="Start free, no credit card"
             onClick={onGetStarted}
           />
         </div>

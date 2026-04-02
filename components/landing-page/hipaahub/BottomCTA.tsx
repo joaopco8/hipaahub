@@ -25,7 +25,7 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => 
               The OCR does not warn you before an audit.
             </h2>
             <h3 className="text-xl md:text-2xl font-thin text-cisco-blue mb-10">
-              Your practice can be audit-ready in 7 days. Start free today, no credit card.
+              Set up and audit-ready in 1–3 hours. Start free today, no credit card.
             </h3>
             <p className="text-gray-400 text-lg font-thin leading-relaxed mb-12">
               Most therapists spend years hoping they are compliant. HIPAA Hub shows you exactly where you stand, and closes every gap before it becomes a fine.
@@ -36,7 +36,7 @@ const BottomCTA: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => 
                 onClick={handleGetStarted}
                 className="bg-cisco-blue text-white px-12 py-6 text-xs font-thin hover:bg-white hover:text-cisco-navy transition-all shadow-2xl shadow-cisco-blue/20"
               >
-                Get Started
+                Start free, no credit card
               </button>
               <button 
                 onClick={onDemoClick}

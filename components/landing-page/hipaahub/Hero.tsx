@@ -26,7 +26,7 @@ const Hero: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void 
           </div>
           <div className="animate-reveal [animation-delay:400ms] opacity-0">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-thin mb-6 md:mb-8 leading-[1.1]">
-              HIPAA compliant in 7 days.{" "}
+              HIPAA compliant in 1–3 hours.{" "}
               <br className="hidden md:block" />
               Without the $10,000 consultant.
             </h1>
