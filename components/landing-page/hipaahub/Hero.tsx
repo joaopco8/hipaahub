@@ -6,12 +6,12 @@ const Hero: React.FC<{ onAssessmentClick?: () => void; onDemoClick?: () => void 
       {/* Background image — desktop / mobile */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <img
-          src="/images/header-desktop.jpg"
+          src="/images/header-desktop1.jpg"
           alt=""
           className="hidden md:block w-full h-full object-cover"
         />
         <img
-          src="/images/header-mobile.jpg"
+          src="/images/header-mobile2.jpg"
           alt=""
           className="md:hidden w-full h-full object-cover object-center"
         />
