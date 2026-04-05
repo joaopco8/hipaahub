@@ -52,7 +52,7 @@ export default function SidebarLayout({
       </div>
 
       {/* Navigation Items */}
-      <div className="flex-1 overflow-y-auto py-4">
+      <div className="flex-1 overflow-y-auto py-2">
         <Suspense fallback={<div className="px-4 py-4">Loading...</div>}>
           <Sidebar navConfig={navConfig} theme="blue" planTier={planTier} />
         </Suspense>

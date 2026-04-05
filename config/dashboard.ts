@@ -26,6 +26,7 @@ import {
   BookOpen,
   Download,
   Wrench,
+  CalendarDays,
   Package as AssetIcon
 } from 'lucide-react';
 
@@ -67,6 +68,7 @@ export const iconComponents = {
   BookOpen,
   Download,
   Wrench,
+  CalendarDays,
 };
 
 export const navConfig = [
@@ -80,5 +82,8 @@ export const navConfig = [
   { href: '/dashboard/risk-assessment', icon: 'ShieldAlert', label: 'Risk Assessment', group: 'compliance' },
   { href: '/dashboard/breach-notifications', icon: 'Mail', label: 'Breach Notifications', group: 'compliance' },
   { href: '/dashboard/evidence', icon: 'Archive', label: 'Evidence Center', group: 'compliance' },
-  { href: '/dashboard/audit-export', icon: 'Download', label: 'Export Audit', group: 'compliance' }
+  { href: '/dashboard/audit-export', icon: 'Download', label: 'Export Audit', group: 'compliance' },
+  { href: '/dashboard/reports', icon: 'BarChart3', label: 'Board Reports', group: 'compliance', requiresPlan: 'clinic' },
+  { href: '/dashboard/calendar', icon: 'CalendarDays', label: 'Compliance Calendar', group: 'compliance', requiresPlan: 'clinic' },
+  { href: '/dashboard/quarterly-review', icon: 'CheckCircle2', label: 'Quarterly Reviews', group: 'compliance', requiresPlan: 'clinic' },
 ];
