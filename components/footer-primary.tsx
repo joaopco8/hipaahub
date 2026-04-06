@@ -2,7 +2,6 @@
 import { useState } from "react"
 import React from 'react'
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createClient } from '@/utils/supabase/client';
@@ -12,15 +11,6 @@ import { Shield, ArrowRight, Linkedin, Instagram, Mail } from 'lucide-react';
 export default function FooterPrimary() {
   const [email, setEmail] = useState('')
   const supabase = createClient()
-
-  const certificateImages = [
-    '/images/certifica/lh2OZHoa6vWkCIdtwhJgJ4OH8.png',
-    '/images/certifica/qeCP87kIOhUjSnHbsf9ZYKl6nog.avif',
-    '/images/certifica/rDLougW3lvlvBBNVWPnp7qm1AH8.png',
-    '/images/certifica/tBZpvW6AhYhkuyrCFWibAiSpA.png',
-    '/images/certifica/XIpzXmr735QBrMd2zKW6qCBMBaQ.png',
-    '/images/certifica/yLWevTQjUl8ckOOua7U9HRkCY.png',
-  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -109,20 +99,6 @@ export default function FooterPrimary() {
               </Link>
             </div>
             
-            {/* Training certificates - Horizontal */}
-            <div className="space-y-4 pt-6">
-              <p className="text-sm text-white/60 font-light">Training certificates</p>
-              <div className="flex flex-wrap gap-3">
-                {certificateImages.map((src) => (
-                  <div
-                    key={src}
-                    className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden bg-white/5 border border-white/10"
-                  >
-                    <Image src={src} alt="Certificate" fill className="object-cover opacity-80" />
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
 
