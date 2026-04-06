@@ -119,22 +119,22 @@ function ScheduleModal({
   const qConfig = QUARTERS_CONFIG.find(q => q.label === form.quarter);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-      <div className="bg-white w-full max-w-xl border border-gray-200 shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-base font-medium text-[#0e274e]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+      <div className="bg-white w-full max-w-xl shadow-2xl max-h-[90vh] overflow-y-auto rounded-lg overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 bg-[#0e274e]">
+          <h3 className="text-base font-medium text-white">
             {editReview ? 'Edit Review' : 'Schedule Quarterly Review'}
           </h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
-            <X className="h-4 w-4 text-gray-400" />
+          <button onClick={onClose} className="p-1 hover:bg-white/10 rounded transition-colors">
+            <X className="h-4 w-4 text-white/70" />
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-6 space-y-5 bg-white">
           {/* Quarter + Year */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Review Quarter</label>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Review Quarter</label>
               <div className="grid grid-cols-4 gap-1">
                 {['Q1','Q2','Q3','Q4'].map(q => (
                   <button
@@ -143,7 +143,7 @@ function ScheduleModal({
                     className={`py-2 text-xs font-medium border rounded transition-colors
                       ${form.quarter === q
                         ? 'bg-[#0e274e] text-white border-[#0e274e]'
-                        : 'border-gray-200 text-gray-600 hover:border-[#0e274e]'}`}
+                        : 'border-gray-200 text-gray-500 hover:border-[#0e274e]'}`}
                   >
                     {q}
                   </button>
@@ -154,9 +154,9 @@ function ScheduleModal({
               )}
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Year</label>
               <select
-                className="w-full border border-gray-200 px-3 py-2 text-sm rounded bg-white focus:outline-none focus:border-[#00bceb]"
+                className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
                 value={form.year}
                 onChange={e => setForm(f => ({ ...f, year: parseInt(e.target.value) }))}
               >
@@ -168,19 +168,19 @@ function ScheduleModal({
           {/* Date + Time */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Meeting Date</label>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Meeting Date</label>
               <input
                 type="date"
-                className="w-full border border-gray-200 px-3 py-2 text-sm rounded focus:outline-none focus:border-[#00bceb]"
+                className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
                 value={form.meeting_date}
                 onChange={e => setForm(f => ({ ...f, meeting_date: e.target.value }))}
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Time (optional)</label>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Time (optional)</label>
               <input
                 type="time"
-                className="w-full border border-gray-200 px-3 py-2 text-sm rounded focus:outline-none focus:border-[#00bceb]"
+                className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
                 value={form.meeting_time}
                 onChange={e => setForm(f => ({ ...f, meeting_time: e.target.value }))}
               />
@@ -189,9 +189,9 @@ function ScheduleModal({
 
           {/* Location */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Location / Format</label>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Location / Format</label>
             <input
-              className="w-full border border-gray-200 px-3 py-2 text-sm rounded focus:outline-none focus:border-[#00bceb]"
+              className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
               placeholder="e.g. Conference Room A, or Zoom"
               value={form.meeting_location}
               onChange={e => setForm(f => ({ ...f, meeting_location: e.target.value }))}
@@ -200,7 +200,7 @@ function ScheduleModal({
 
           {/* Duration */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Meeting Duration</label>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Meeting Duration</label>
             <div className="flex gap-2">
               {[30, 60, 90].map(d => (
                 <button
@@ -209,7 +209,7 @@ function ScheduleModal({
                   className={`px-3 py-1.5 text-xs border rounded transition-colors
                     ${form.duration_minutes === d
                       ? 'bg-[#0e274e] text-white border-[#0e274e]'
-                      : 'border-gray-200 text-gray-600 hover:border-[#0e274e]'}`}
+                      : 'border-gray-200 text-gray-500 hover:border-[#0e274e]'}`}
                 >
                   {d} min
                 </button>
@@ -219,12 +219,12 @@ function ScheduleModal({
 
           {/* Attendees */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Attendees</label>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Attendees</label>
             <div className="space-y-2">
               {attendees.map((a, i) => (
                 <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
                   <input
-                    className="border border-gray-200 px-2.5 py-1.5 text-xs rounded focus:outline-none focus:border-[#00bceb]"
+                    className="border border-gray-200 px-2.5 py-1.5 text-xs text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
                     placeholder="Name"
                     value={a.name}
                     onChange={e => {
@@ -234,7 +234,7 @@ function ScheduleModal({
                     }}
                   />
                   <input
-                    className="border border-gray-200 px-2.5 py-1.5 text-xs rounded focus:outline-none focus:border-[#00bceb]"
+                    className="border border-gray-200 px-2.5 py-1.5 text-xs text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
                     placeholder="Email (for invite)"
                     value={a.email ?? ''}
                     onChange={e => {
@@ -253,7 +253,7 @@ function ScheduleModal({
               ))}
               <button
                 onClick={() => setAttendees([...attendees, { name: '', email: '', role: '' }])}
-                className="text-xs text-[#00bceb] hover:text-[#0e274e] flex items-center gap-1"
+                className="text-xs text-[#0175a2] hover:text-[#0e274e] flex items-center gap-1 transition-colors"
               >
                 <Plus className="h-3 w-3" /> Add attendee
               </button>
@@ -262,9 +262,9 @@ function ScheduleModal({
 
           {/* Notes for attendees */}
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Notes for Attendees</label>
+            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Notes for Attendees</label>
             <textarea
-              className="w-full border border-gray-200 px-3 py-2 text-sm rounded focus:outline-none focus:border-[#00bceb] resize-none"
+              className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2] resize-none"
               rows={2}
               placeholder="Will be included in the calendar invite / pre-meeting email..."
               value={form.notes_for_attendees}
@@ -281,14 +281,14 @@ function ScheduleModal({
           <button
             onClick={submit}
             disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#00bceb] text-white text-sm font-medium hover:bg-[#00a8d4] disabled:opacity-50 rounded transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#0175a2] text-white text-sm font-medium hover:bg-[#015a7a] disabled:opacity-50 rounded transition-colors"
           >
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Calendar className="h-4 w-4" />}
             {saving ? 'Scheduling...' : 'Schedule Review'}
           </button>
           <button
             onClick={onClose}
-            className="px-5 py-2.5 border border-gray-200 text-sm text-gray-600 hover:bg-white rounded"
+            className="px-5 py-2.5 border border-gray-200 text-sm text-gray-600 hover:bg-white rounded transition-colors"
           >
             Cancel
           </button>
