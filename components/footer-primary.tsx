@@ -105,7 +105,7 @@ export default function FooterPrimary() {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/10 pt-12 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex flex-wrap justify-center items-center gap-8 text-xs font-medium tracking-widest text-white/50">
+          <div className="flex flex-wrap justify-center items-center gap-8 text-xs font-medium text-white/50">
             <span>© 2026 HIPAA Hub Inc.</span>
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy policy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms of service</Link>

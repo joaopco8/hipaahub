@@ -134,7 +134,7 @@ function ScheduleModal({
           {/* Quarter + Year */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Review Quarter</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Review Quarter</label>
               <div className="grid grid-cols-4 gap-1">
                 {['Q1','Q2','Q3','Q4'].map(q => (
                   <button
@@ -154,7 +154,7 @@ function ScheduleModal({
               )}
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Year</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Year</label>
               <select
                 className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
                 value={form.year}
@@ -168,7 +168,7 @@ function ScheduleModal({
           {/* Date + Time */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Meeting Date</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Meeting Date</label>
               <input
                 type="date"
                 className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
@@ -177,7 +177,7 @@ function ScheduleModal({
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Time (optional)</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Time (optional)</label>
               <input
                 type="time"
                 className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
@@ -189,7 +189,7 @@ function ScheduleModal({
 
           {/* Location */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Location / Format</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Location / Format</label>
             <input
               className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2]"
               placeholder="e.g. Conference Room A, or Zoom"
@@ -200,7 +200,7 @@ function ScheduleModal({
 
           {/* Duration */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Meeting Duration</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Meeting Duration</label>
             <div className="flex gap-2">
               {[30, 60, 90].map(d => (
                 <button
@@ -219,7 +219,7 @@ function ScheduleModal({
 
           {/* Attendees */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Attendees</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Attendees</label>
             <div className="space-y-2">
               {attendees.map((a, i) => (
                 <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
@@ -262,7 +262,7 @@ function ScheduleModal({
 
           {/* Notes for attendees */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Notes for Attendees</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Notes for Attendees</label>
             <textarea
               className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 rounded bg-gray-50 focus:outline-none focus:border-[#0175a2] resize-none"
               rows={2}
@@ -308,7 +308,7 @@ function StatusBadge({ status }: { status: Review['status'] }) {
     cancelled:   { label: 'Cancelled',  cls: 'bg-gray-50 text-gray-500 border-gray-200' },
   }[status];
   return (
-    <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 border rounded-sm ${cfg.cls}`}>
+    <span className={`text-[10px] font-semibold px-2 py-0.5 border rounded-sm ${cfg.cls}`}>
       {status === 'in_progress' && (
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500 mr-1.5 animate-pulse" />
       )}
@@ -471,7 +471,7 @@ export default function QuarterlyIndexClient() {
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
-          <p className="text-xs font-medium text-[#00bceb] tracking-widest uppercase mb-1">Clinic Plan</p>
+          <p className="text-xs font-medium text-[#00bceb] mb-1">Clinic Plan</p>
           <h1 className="text-3xl font-light text-[#0e274e]">Quarterly Compliance Reviews</h1>
           <p className="text-sm text-gray-500 mt-1 font-light">
             Structured quarterly meetings to track, decide, and document your compliance program.
@@ -513,7 +513,7 @@ export default function QuarterlyIndexClient() {
           {/* In Progress */}
           {inProgress.length > 0 && (
             <section>
-              <h2 className="text-xs font-semibold text-[#0d9488] uppercase tracking-widest mb-3">
+              <h2 className="text-xs font-semibold text-[#0d9488]st mb-3">
                 In Progress
               </h2>
               <div className="space-y-3">
@@ -527,7 +527,7 @@ export default function QuarterlyIndexClient() {
           {/* Upcoming */}
           {upcoming.length > 0 && (
             <section>
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+              <h2 className="text-xs font-semibold text-gray-400st mb-3">
                 Upcoming ({upcoming.length})
               </h2>
               <div className="space-y-3">
@@ -541,7 +541,7 @@ export default function QuarterlyIndexClient() {
           {/* Completed */}
           {completed.length > 0 && (
             <section>
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+              <h2 className="text-xs font-semibold text-gray-400st mb-3">
                 Completed ({completed.length})
               </h2>
               <div className="space-y-3">

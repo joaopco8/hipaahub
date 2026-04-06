@@ -17,8 +17,8 @@ export default async function ContactPage() {
   return (
     <div className="flex w-full flex-col gap-6 page-transition-premium">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Contact Us</h1>
-        <p className="text-zinc-600 text-base">
+        <h1 className="text-2xl font-light text-[#0e274e]">Contact Us</h1>
+        <p className="text-zinc-600 text-base font-light">
           Get in touch with our support team. We're here to help with any questions about HIPAA Hub.
         </p>
       </div>

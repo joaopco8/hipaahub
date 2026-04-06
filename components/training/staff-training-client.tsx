@@ -497,7 +497,7 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+          <h3 className="text-xs font-medium text-gray-400">
             Staff Training Tracker
           </h3>
         </div>
@@ -536,7 +536,7 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="border-0 shadow-sm rounded-none col-span-2 md:col-span-1">
           <CardContent className="p-6">
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Team Compliance</p>
+            <p className="text-xs text-gray-400 mb-1">Team Compliance</p>
             <p className="text-5xl font-light text-[#0e274e]">{stats.compliance_pct}<span className="text-2xl">%</span></p>
             <p className="text-xs text-gray-400 font-light mt-1">{stats.fully_compliant} / {stats.total_employees} employees</p>
           </CardContent>
@@ -545,7 +545,7 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Complete</p>
+                <p className="text-xs text-gray-400 mb-1">Complete</p>
                 <p className="text-3xl font-light text-[#0e274e]">{stats.completed}</p>
               </div>
               <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -556,7 +556,7 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Pending</p>
+                <p className="text-xs text-gray-400 mb-1">Pending</p>
                 <p className="text-3xl font-light text-[#0e274e]">{stats.not_started + stats.in_progress}</p>
               </div>
               <Clock className="h-5 w-5 text-amber-500" />
@@ -567,7 +567,7 @@ export default function StaffTrainingClient({ initialEmployees, initialStats, in
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Expired</p>
+                <p className="text-xs text-gray-400 mb-1">Expired</p>
                 <p className="text-3xl font-light text-[#0e274e]">{stats.expired}</p>
               </div>
               <AlertCircle className="h-5 w-5 text-red-500" />

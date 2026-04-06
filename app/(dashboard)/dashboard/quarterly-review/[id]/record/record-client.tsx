@@ -143,7 +143,7 @@ export default function RecordClient({
         {/* Cover */}
         <div className="bg-white border border-gray-200 px-8 py-8 print:border-0">
           <div className="text-center border-b border-gray-100 pb-6 mb-6">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">Official Review Record</p>
+            <p className="text-xs font-semibold text-gray-400st mb-2">Official Review Record</p>
             <h2 className="text-2xl font-light text-[#0e274e] mb-1">
               {review.quarter} {review.year} Compliance Review
             </h2>
@@ -208,7 +208,7 @@ export default function RecordClient({
             <div key={section.id} className="bg-white border-x border-b border-gray-200 px-8 py-6">
               <div className="border-l-4 border-[#0d9488] pl-4 mb-4">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-semibold text-[#0e274e] uppercase tracking-wide">
+                  <h3 className="text-sm font-semibold text-[#0e274e]">
                     {section.section_label}
                   </h3>
                   {section.status === 'skipped' && (
@@ -223,7 +223,7 @@ export default function RecordClient({
               {/* Notes */}
               {section.discussion_notes && (
                 <div className="mb-4">
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Discussion Notes</p>
+                  <p className="text-[10px] font-semibold text-gray-400 mb-1.5">Discussion Notes</p>
                   <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{section.discussion_notes}</p>
                 </div>
               )}
@@ -231,7 +231,7 @@ export default function RecordClient({
               {/* Decisions */}
               {section.decisions.length > 0 && (
                 <div className="mb-4">
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Decisions Made</p>
+                  <p className="text-[10px] font-semibold text-gray-400 mb-1.5">Decisions Made</p>
                   <div className="space-y-1.5">
                     {section.decisions.map(d => (
                       <div key={d.id} className="flex items-start gap-2 bg-teal-50 border border-teal-100 px-3 py-2 rounded">
@@ -249,7 +249,7 @@ export default function RecordClient({
               {/* Action items for this section */}
               {actionItems.filter(a => a.section_id === section.id).length > 0 && (
                 <div>
-                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Action Items Created</p>
+                  <p className="text-[10px] font-semibold text-gray-400 mb-1.5">Action Items Created</p>
                   <div className="space-y-1.5">
                     {actionItems.filter(a => a.section_id === section.id).map(item => (
                       <ActionItemRow key={item.id} item={item} />
@@ -268,7 +268,7 @@ export default function RecordClient({
         {actionItems.length > 0 && (
           <div className="bg-white border-x border-b border-gray-200 px-8 py-6">
             <div className="border-l-4 border-orange-400 pl-4 mb-4">
-              <h3 className="text-sm font-semibold text-[#0e274e] uppercase tracking-wide">
+              <h3 className="text-sm font-semibold text-[#0e274e]">
                 Action Items Summary
               </h3>
             </div>
@@ -293,10 +293,10 @@ export default function RecordClient({
             <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">Task</th>
-                  <th className="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">Assignee</th>
-                  <th className="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">Due</th>
-                  <th className="text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wide px-3 py-2">Priority</th>
+                  <th className="text-left text-[10px] font-semibold text-gray-400 px-3 py-2">Task</th>
+                  <th className="text-left text-[10px] font-semibold text-gray-400 px-3 py-2">Assignee</th>
+                  <th className="text-left text-[10px] font-semibold text-gray-400 px-3 py-2">Due</th>
+                  <th className="text-left text-[10px] font-semibold text-gray-400 px-3 py-2">Priority</th>
                 </tr>
               </thead>
               <tbody>
@@ -363,7 +363,7 @@ function DetailRow({ icon, label, children }: { icon: React.ReactNode; label: st
     <div className="flex items-start gap-2">
       <span className="text-gray-300 mt-0.5 flex-shrink-0">{icon}</span>
       <div>
-        <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">{label}</p>
+        <p className="text-[10px] text-gray-400 font-medium">{label}</p>
         <p className="text-sm text-[#0e274e]">{children}</p>
       </div>
     </div>

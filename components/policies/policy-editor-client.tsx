@@ -967,7 +967,7 @@ export function PolicyEditorClient({
         >
           {/* Section 1: Policy Info */}
           <div className="p-5 border-b border-gray-200">
-            <h4 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+            <h4 className="text-xs font-medium text-gray-400 mb-3">
               Policy Info
             </h4>
             <p className="text-sm font-light text-[#0e274e] mb-2 leading-snug">{policyName}</p>
@@ -1011,7 +1011,7 @@ export function PolicyEditorClient({
 
           {/* Section 2: Placeholders */}
           <div className="p-5 border-b border-gray-200">
-            <h4 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+            <h4 className="text-xs font-medium text-gray-400 mb-3">
               Placeholders
             </h4>
             {detectedPlaceholders.length === 0 ? (
@@ -1056,7 +1056,7 @@ export function PolicyEditorClient({
 
           {/* Section 3: Actions */}
           <div className="p-5 flex flex-col gap-2">
-            <h4 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">
+            <h4 className="text-xs font-medium text-gray-400 mb-1">
               Actions
             </h4>
 

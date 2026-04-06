@@ -91,7 +91,7 @@ export default function EmployeeInvitesSection({
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Total</p>
+                <p className="text-xs text-gray-400 mb-1">Total</p>
                 <p className="text-2xl font-light text-[#0e274e]">{stats.total}</p>
               </div>
               <div className="h-9 w-9 rounded-full border-2 border-gray-300 flex items-center justify-center">
@@ -105,7 +105,7 @@ export default function EmployeeInvitesSection({
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Completed</p>
+                <p className="text-xs text-gray-400 mb-1">Completed</p>
                 <p className="text-2xl font-light text-[#0e274e]">{stats.completed}</p>
               </div>
               <div className="h-9 w-9 rounded-full border-2 border-[#1ad07a] flex items-center justify-center">
@@ -119,7 +119,7 @@ export default function EmployeeInvitesSection({
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Pending</p>
+                <p className="text-xs text-gray-400 mb-1">Pending</p>
                 <p className="text-2xl font-light text-[#0e274e]">{stats.pending}</p>
               </div>
               <div className="h-9 w-9 rounded-full border-2 border-yellow-500 flex items-center justify-center">
@@ -133,7 +133,7 @@ export default function EmployeeInvitesSection({
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide">Compliant</p>
+                <p className="text-xs text-gray-400 mb-1">Compliant</p>
                 <p className="text-2xl font-light text-[#0e274e]">{stats.compliancePercent}%</p>
               </div>
               <div className="h-9 w-9 rounded-full border-2 border-[#0c0b1d] flex items-center justify-center">
@@ -200,11 +200,11 @@ export default function EmployeeInvitesSection({
             <>
               {/* Table header */}
               <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 px-4 py-2 bg-[#f3f5f9] border-b border-gray-100">
-                <span className="text-xs text-gray-400 uppercase tracking-wide font-light">Name</span>
-                <span className="text-xs text-gray-400 uppercase tracking-wide font-light">Role</span>
-                <span className="text-xs text-gray-400 uppercase tracking-wide font-light">Status</span>
-                <span className="text-xs text-gray-400 uppercase tracking-wide font-light">Completed</span>
-                <span className="text-xs text-gray-400 uppercase tracking-wide font-light">Score</span>
+                <span className="text-xs text-gray-400 font-light">Name</span>
+                <span className="text-xs text-gray-400 font-light">Role</span>
+                <span className="text-xs text-gray-400 font-light">Status</span>
+                <span className="text-xs text-gray-400 font-light">Completed</span>
+                <span className="text-xs text-gray-400 font-light">Score</span>
               </div>
 
               <div className="divide-y divide-gray-100">
@@ -216,7 +216,7 @@ export default function EmployeeInvitesSection({
                     {/* Name + email */}
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 rounded-full bg-[#0c0b1d] flex items-center justify-center shrink-0">
-                        <span className="text-xs font-light text-white uppercase">
+                        <span className="text-xs font-light text-white">
                           {invite.name.charAt(0)}
                         </span>
                       </div>

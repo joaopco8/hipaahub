@@ -300,7 +300,7 @@ export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExpor
         <div className="bg-white border border-gray-100 p-6 hover:border-[#00bceb]/30 transition-colors">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
-              <p className="text-xs text-[#565656] mb-2 font-light uppercase tracking-wide">Compliance Score</p>
+              <p className="text-xs text-[#565656] mb-2 font-light">Compliance Score</p>
               <p className="text-3xl font-light text-[#0c0b1d] mb-3">{auditData.complianceScore}%</p>
               <div className="flex items-center gap-2">
                 <div className={`h-1.5 w-1.5 rounded-full ${readinessColor.replace('text-', 'bg-')}`} />
@@ -313,7 +313,7 @@ export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExpor
         <div className="bg-white border border-gray-100 p-6 hover:border-[#00bceb]/30 transition-colors">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-xs text-[#565656] mb-2 font-light uppercase tracking-wide">Policies Documented</p>
+              <p className="text-xs text-[#565656] mb-2 font-light">Policies Documented</p>
               <p className="text-3xl font-light text-[#0c0b1d]">
                 {policiesActive}
                 <span className="text-base text-[#565656] font-light"> / {auditData.policies.length}</span>
@@ -326,7 +326,7 @@ export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExpor
         <div className="bg-white border border-gray-100 p-6 hover:border-[#00bceb]/30 transition-colors">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-xs text-[#565656] mb-2 font-light uppercase tracking-wide">Employees Trained</p>
+              <p className="text-xs text-[#565656] mb-2 font-light">Employees Trained</p>
               <p className="text-3xl font-light text-[#0c0b1d]">
                 {trainedEmployees}
                 <span className="text-base text-[#565656] font-light"> / {auditData.trainingRecords.length}</span>
@@ -339,7 +339,7 @@ export function AuditExportClient({ auditData, isLocked, userEmail }: AuditExpor
         <div className="bg-white border border-gray-100 p-6 hover:border-[#00bceb]/30 transition-colors">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-xs text-[#565656] mb-2 font-light uppercase tracking-wide">Est. Pages</p>
+              <p className="text-xs text-[#565656] mb-2 font-light">Est. Pages</p>
               <p className="text-3xl font-light text-[#0c0b1d]">
                 ~{estimatedPages}
                 <span className="text-sm text-[#565656] font-light ml-1">pg</span>

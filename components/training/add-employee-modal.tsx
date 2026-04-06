@@ -149,7 +149,7 @@ export default function AddEmployeeModal({ open, onClose, onSuccess }: AddEmploy
             )}
 
             <div className="bg-[#f3f5f9] p-3 space-y-2">
-              <p className="text-xs text-gray-400 font-light uppercase tracking-wider">Training Link</p>
+              <p className="text-xs text-gray-400 font-light">Training Link</p>
               <div className="flex items-center gap-2">
                 <p className="text-xs text-[#0e274e] font-mono truncate flex-1">
                   {inviteResult.training_url}

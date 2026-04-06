@@ -310,7 +310,7 @@ export default function BAATrackerClient({ initialVendors, initialStats, isLocke
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider">BAA Tracker</h3>
+          <h3 className="text-xs font-medium text-gray-400">BAA Tracker</h3>
         </div>
         <div className="flex items-center gap-2">
           <ActionGate isLocked={isLocked} documentType="BAA Audit Report">
@@ -345,7 +345,7 @@ export default function BAATrackerClient({ initialVendors, initialStats, isLocke
         ].map((s) => (
           <Card key={s.label} className="border-0 shadow-sm rounded-none">
             <CardContent className="p-5">
-              <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">{s.label}</p>
+              <p className="text-xs text-gray-400 mb-1">{s.label}</p>
               <p className={`text-3xl font-light ${s.cls}`}>{s.value}</p>
             </CardContent>
           </Card>

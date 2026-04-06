@@ -64,7 +64,7 @@ export default async function ManageSubscriptionPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-light text-[#0e274e] tracking-tight">Subscription</h1>
+        <h1 className="text-2xl font-light text-[#0e274e]">Subscription</h1>
         <p className="text-sm text-zinc-500 font-light mt-1">
           Billing is handled securely through Stripe.
         </p>
@@ -73,7 +73,7 @@ export default async function ManageSubscriptionPage() {
       {/* Current Plan Card */}
       <div className="border border-zinc-200 bg-white">
         <div className="px-6 py-4 border-b border-zinc-100">
-          <p className="text-xs font-medium text-zinc-400 uppercase tracking-widest">Current Plan</p>
+          <p className="text-xs font-medium text-zinc-400">Current Plan</p>
         </div>
 
         {subscription ? (
@@ -82,7 +82,7 @@ export default async function ManageSubscriptionPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span
-                  className={`inline-flex items-center px-3 py-1 text-sm font-light border tracking-wide ${tierColor}`}
+                  className={`inline-flex items-center px-3 py-1 text-sm font-light border ${tierColor}`}
                 >
                   {tierLabel}
                 </span>
@@ -144,7 +144,7 @@ export default async function ManageSubscriptionPage() {
       {subscription && (
         <div className="border border-zinc-200 bg-white">
           <div className="px-6 py-4 border-b border-zinc-100">
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-widest">Billing</p>
+            <p className="text-xs font-medium text-zinc-400">Billing</p>
           </div>
           <div className="px-6 py-6 space-y-4">
             <p className="text-sm text-zinc-500 font-light">

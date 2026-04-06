@@ -152,7 +152,7 @@ export function OCRLetterModal({ open, onClose, incident, org }: Props) {
         <div className="overflow-y-auto flex-1 p-6 space-y-6">
           {/* Organization */}
           <div>
-            <p className="text-xs font-medium text-[#0e274e] uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
+            <p className="text-xs font-medium text-[#0e274e] mb-3 pb-2 border-b border-gray-100">
               Covered Entity Information
             </p>
             <div className="grid grid-cols-2 gap-4">
@@ -185,7 +185,7 @@ export function OCRLetterModal({ open, onClose, incident, org }: Props) {
 
           {/* Breach dates */}
           <div>
-            <p className="text-xs font-medium text-[#0e274e] uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
+            <p className="text-xs font-medium text-[#0e274e] mb-3 pb-2 border-b border-gray-100">
               Breach Dates
             </p>
             <div className="grid grid-cols-2 gap-4">
@@ -202,7 +202,7 @@ export function OCRLetterModal({ open, onClose, incident, org }: Props) {
 
           {/* Breach details */}
           <div>
-            <p className="text-xs font-medium text-[#0e274e] uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
+            <p className="text-xs font-medium text-[#0e274e] mb-3 pb-2 border-b border-gray-100">
               Breach Details
             </p>
             <div className="space-y-4">
@@ -239,7 +239,7 @@ export function OCRLetterModal({ open, onClose, incident, org }: Props) {
 
           {/* Response */}
           <div>
-            <p className="text-xs font-medium text-[#0e274e] uppercase tracking-wide mb-3 pb-2 border-b border-gray-100">
+            <p className="text-xs font-medium text-[#0e274e] mb-3 pb-2 border-b border-gray-100">
               Response & Prevention
             </p>
             <div className="space-y-4">

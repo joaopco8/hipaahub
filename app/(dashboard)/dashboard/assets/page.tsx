@@ -132,7 +132,7 @@ export default async function AssetInventoryPage() {
         ]}
       >
         <div>
-          <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-4">
+          <h3 className="text-xs font-medium text-gray-400 mb-4">
             Asset-Based Risk Identification
           </h3>
           <AssetRiskPanel assets={allAssets} organizationId={org.id} />

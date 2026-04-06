@@ -42,8 +42,8 @@ export default async function IncidentsPage() {
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Incident Reporting</h1>
-          <p className="text-zinc-600 text-base">
+          <h1 className="text-2xl font-light text-[#0e274e]">Incident Reporting</h1>
+          <p className="text-zinc-600 text-base font-light">
             Document and manage security incidents and potential breaches
           </p>
         </div>

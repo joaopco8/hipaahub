@@ -62,6 +62,8 @@ export function BlogNavbar() {
   const navLinks = [
     { label: 'Platform', href: '/#features' },
     { label: 'Blog', href: '/blog' },
+    { label: 'Research', href: '/#research' },
+    { label: 'Company', href: '/#company' },
     { label: 'Pricing', href: '/#pricing' },
   ];
 

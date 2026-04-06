@@ -45,18 +45,18 @@ function GapItemRow({ item }: { item: GapItem }) {
           {/* Current answer vs required */}
           <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
             <div className="bg-red-50 rounded-none px-3 py-2">
-              <p className="text-[10px] text-red-400 uppercase tracking-wide font-medium mb-0.5">Current Answer</p>
+              <p className="text-[10px] text-red-400 font-medium mb-0.5">Current Answer</p>
               <p className="text-xs text-red-700 font-light">{item.current_answer}</p>
             </div>
             <div className="bg-[#71bc48]/5 rounded-none px-3 py-2">
-              <p className="text-[10px] text-[#71bc48] uppercase tracking-wide font-medium mb-0.5">Required Standard</p>
+              <p className="text-[10px] text-[#71bc48] font-medium mb-0.5">Required Standard</p>
               <p className="text-xs text-[#3a6b24] font-light">{item.required_standard}</p>
             </div>
           </div>
 
           {/* Recommendation */}
           <div className="mt-2 bg-[#f3f5f9] px-3 py-2">
-            <p className="text-[10px] text-[#565656] uppercase tracking-wide font-medium mb-0.5">Recommendation</p>
+            <p className="text-[10px] text-[#565656] font-medium mb-0.5">Recommendation</p>
             <p className="text-xs text-[#565656] font-light">{item.recommendation}</p>
           </div>
 

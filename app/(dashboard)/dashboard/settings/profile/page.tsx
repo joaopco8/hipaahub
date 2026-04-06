@@ -68,7 +68,7 @@ export default async function ProfilePage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-thin text-[#0e274e]">User Account</h1>
+        <h1 className="text-2xl font-light text-[#0e274e]">User Account</h1>
         <p className="text-[#565656] text-base font-light">
           Manage your profile, subscription, and account settings
         </p>

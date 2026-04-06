@@ -116,7 +116,7 @@ export default function QuarterlyReviewPage() {
   return (
     <div className="max-w-3xl mx-auto py-10 px-4 md:px-8 space-y-8">
       <div>
-        <p className="text-xs font-medium text-[#00bceb] tracking-widest uppercase mb-1">Clinic Plan</p>
+        <p className="text-xs font-medium text-[#00bceb] mb-1">Clinic Plan</p>
         <h1 className="text-3xl font-light text-[#0e274e]">Quarterly Compliance Reviews</h1>
         <p className="text-sm text-gray-500 mt-1 font-light">
           Structured review checklist for each quarter. Progress is saved in your browser.

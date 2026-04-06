@@ -389,7 +389,7 @@ export default function CalendarClient({ orgName }: Props) {
   function TypeBadge({ type }: { type: EventType }) {
     const cfg = ET[type];
     return (
-      <span className={`text-[10px] font-medium px-1.5 py-0.5 border rounded-sm uppercase tracking-wide ${cfg.badge}`}>
+      <span className={`text-[10px] font-medium px-1.5 py-0.5 border rounded-sm ${cfg.badge}`}>
         {cfg.label}
       </span>
     );
@@ -398,7 +398,7 @@ export default function CalendarClient({ orgName }: Props) {
   function StatusBadge({ status }: { status: EventStatus }) {
     const s = statusLabel(status);
     return (
-      <span className={`text-[10px] font-medium px-1.5 py-0.5 border rounded-sm uppercase tracking-wide ${s.cls}`}>
+      <span className={`text-[10px] font-medium px-1.5 py-0.5 border rounded-sm ${s.cls}`}>
         {s.text}
       </span>
     );
@@ -470,7 +470,7 @@ export default function CalendarClient({ orgName }: Props) {
         {/* Day headers */}
         <div className="grid grid-cols-7 mb-1">
           {DAY_NAMES.map(d => (
-            <div key={d} className="text-center text-[10px] font-medium text-gray-400 py-1 uppercase tracking-wide">
+            <div key={d} className="text-center text-[10px] font-medium text-gray-400 py-1">
               {d}
             </div>
           ))}
@@ -602,7 +602,7 @@ export default function CalendarClient({ orgName }: Props) {
 
         {/* Full event list for the quarter below */}
         <div className="mt-6 space-y-1">
-          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">All Q{currentQ + 1} Events</p>
+          <p className="text-xs font-medium text-gray-500 mb-2">All Q{currentQ + 1} Events</p>
           {filtered
             .filter(e => {
               const d = new Date(e.due_date + 'T12:00:00');
@@ -646,7 +646,7 @@ export default function CalendarClient({ orgName }: Props) {
           const label = new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
           return (
             <div key={monthKey}>
-              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">{label}</h3>
+              <h3 className="text-xs font-semibold text-gray-400st mb-2">{label}</h3>
               <div className="space-y-1">
                 {monthEvents.map(e => (
                   <button
@@ -705,7 +705,7 @@ export default function CalendarClient({ orgName }: Props) {
             >
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-3.5 w-3.5 text-red-600" />
-                <span className="text-xs font-semibold text-red-700 uppercase tracking-wide">Overdue</span>
+                <span className="text-xs font-semibold text-red-700">Overdue</span>
                 <span className="text-[10px] bg-red-600 text-white px-1.5 py-0.5 rounded-full font-bold">{overdue.length}</span>
               </div>
               {expandedSections.has('overdue') ? <ChevronUp className="h-3 w-3 text-red-400" /> : <ChevronDown className="h-3 w-3 text-red-400" />}
@@ -736,7 +736,7 @@ export default function CalendarClient({ orgName }: Props) {
           >
             <div className="flex items-center gap-2">
               <Clock className="h-3.5 w-3.5 text-amber-500" />
-              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">This Week</span>
+              <span className="text-xs font-semibold text-gray-600">This Week</span>
               {thisWeek.length > 0 && (
                 <span className="text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-bold">{thisWeek.length}</span>
               )}
@@ -771,7 +771,7 @@ export default function CalendarClient({ orgName }: Props) {
           >
             <div className="flex items-center gap-2">
               <Calendar className="h-3.5 w-3.5 text-[#0d9488]" />
-              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">This Month</span>
+              <span className="text-xs font-semibold text-gray-600">This Month</span>
               {thisMonth.length > 0 && (
                 <span className="text-[10px] bg-[#0d9488] text-white px-1.5 py-0.5 rounded-full font-bold">{thisMonth.length}</span>
               )}
@@ -800,7 +800,7 @@ export default function CalendarClient({ orgName }: Props) {
           >
             <div className="flex items-center gap-2">
               <BarChart3 className="h-3.5 w-3.5 text-blue-500" />
-              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Next 90 Days</span>
+              <span className="text-xs font-semibold text-gray-600">Next 90 Days</span>
               {next90.length > 0 && (
                 <span className="text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full font-bold">{next90.length}</span>
               )}
@@ -816,7 +816,7 @@ export default function CalendarClient({ orgName }: Props) {
                   const label = new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'long' });
                   return (
                     <div key={mk} className="mb-2">
-                      <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide py-1">{label}</p>
+                      <p className="text-[10px] text-gray-400 font-medium py-1">{label}</p>
                       {mes.map(e => (
                         <div key={e.id} className="border-b border-gray-50 last:border-0 py-1">
                           <SidebarEventRow event={e} />
@@ -835,7 +835,7 @@ export default function CalendarClient({ orgName }: Props) {
           <div className="px-4 py-3">
             <div className="flex items-center gap-1.5 mb-2">
               <Filter className="h-3.5 w-3.5 text-gray-400" />
-              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Filter by Type</p>
+              <p className="text-xs font-semibold text-gray-600">Filter by Type</p>
             </div>
             <div className="space-y-1">
               {ALL_TYPES.map(t => {
@@ -1067,7 +1067,7 @@ export default function CalendarClient({ orgName }: Props) {
 
           <div className="p-6 space-y-4 bg-white">
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Event Title *</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Event Title *</label>
               <input
                 className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                 placeholder="e.g. Insurance Renewal"
@@ -1078,7 +1078,7 @@ export default function CalendarClient({ orgName }: Props) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Type</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Type</label>
                 <select
                   className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                   value={addForm.event_type}
@@ -1090,7 +1090,7 @@ export default function CalendarClient({ orgName }: Props) {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Recurrence</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Recurrence</label>
                 <select
                   className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                   value={addForm.recurrence}
@@ -1107,7 +1107,7 @@ export default function CalendarClient({ orgName }: Props) {
 
             {addForm.recurrence === 'custom' && (
               <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Repeat every (days)</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Repeat every (days)</label>
                 <input
                   type="number"
                   className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
@@ -1120,7 +1120,7 @@ export default function CalendarClient({ orgName }: Props) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Due Date *</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">Due Date *</label>
                 <input
                   type="date"
                   className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
@@ -1129,7 +1129,7 @@ export default function CalendarClient({ orgName }: Props) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">End Date</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1.5">End Date</label>
                 <input
                   type="date"
                   className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
@@ -1140,7 +1140,7 @@ export default function CalendarClient({ orgName }: Props) {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Location</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Location</label>
               <input
                 className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                 placeholder="e.g. Conference Room A"
@@ -1150,7 +1150,7 @@ export default function CalendarClient({ orgName }: Props) {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Notes</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1.5">Notes</label>
               <textarea
                 className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50 resize-none"
                 rows={3}
@@ -1189,7 +1189,7 @@ export default function CalendarClient({ orgName }: Props) {
       {/* Top bar */}
       <div className="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between flex-shrink-0">
         <div>
-          <p className="text-xs font-medium text-[#00bceb] tracking-widest uppercase">Clinic Plan</p>
+          <p className="text-xs font-medium text-[#00bceb]">Clinic Plan</p>
           <h1 className="text-lg font-light text-[#0e274e]">Compliance Calendar</h1>
         </div>
         <div className="flex items-center gap-2">

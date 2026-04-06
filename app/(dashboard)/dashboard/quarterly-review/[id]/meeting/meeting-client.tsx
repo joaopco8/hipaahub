@@ -250,7 +250,7 @@ function SectionEditor({
       {/* Roll call section */}
       {section.section_type === 'roll_call' && (
         <div>
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Mark Attendance</p>
+          <p className="text-xs font-semibold text-gray-500 mb-2">Mark Attendance</p>
           <div className="grid grid-cols-2 gap-2">
             {attendees.map(a => (
               <button
@@ -281,7 +281,7 @@ function SectionEditor({
       {/* Discussion notes */}
       <div>
         <div className="flex items-center justify-between mb-1.5">
-          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Discussion Notes</label>
+          <label className="text-xs font-semibold text-gray-500">Discussion Notes</label>
           {savingNotes && <span className="text-[10px] text-gray-400 flex items-center gap-1"><Loader2 className="h-3 w-3 animate-spin" />Saving…</span>}
         </div>
         <textarea
@@ -296,7 +296,7 @@ function SectionEditor({
       {/* Decisions */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Decisions Made</p>
+          <p className="text-xs font-semibold text-gray-500">Decisions Made</p>
           <button
             onClick={() => setAddingDecision(!addingDecision)}
             className="text-xs text-[#0d9488] hover:text-[#0b7e74] flex items-center gap-1"
@@ -362,7 +362,7 @@ function SectionEditor({
       {/* Action items */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Action Items</p>
+          <p className="text-xs font-semibold text-gray-500">Action Items</p>
           <button
             onClick={() => setAddingAction(!addingAction)}
             className="text-xs text-[#0d9488] hover:text-[#0b7e74] flex items-center gap-1"
@@ -438,7 +438,7 @@ function SectionEditor({
                 <p className="text-[10px] text-gray-400 mt-0.5">
                   {item.assigned_to_name && <>{item.assigned_to_name} · </>}
                   {item.due_date && <>Due {new Date(item.due_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · </>}
-                  <span className={`font-semibold uppercase ${priorityColors[item.priority]}`}>{item.priority}</span>
+                  <span className={`font-semibold ${priorityColors[item.priority]}`}>{item.priority}</span>
                 </p>
               </div>
               <button onClick={() => removeActionItem(item.id)} className="text-gray-300 hover:text-red-400 flex-shrink-0">
@@ -592,7 +592,7 @@ export default function MeetingClient({
         {/* Left navigator */}
         <div className="w-52 flex-shrink-0 bg-white border-r border-gray-100 overflow-y-auto">
           <div className="px-3 py-3 border-b border-gray-100">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Sections</p>
+            <p className="text-[10px] font-semibold text-gray-400r">Sections</p>
           </div>
           {sections.map((s, idx) => (
             <button
@@ -618,7 +618,7 @@ export default function MeetingClient({
                 <div className="h-1 bg-[#0d9488]" />
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                   <div>
-                    <p className="text-[10px] text-gray-400 uppercase tracking-widest font-medium">
+                    <p className="text-[10px] text-gray-400st font-medium">
                       Section {activeSection.section_order} of {sections.length}
                     </p>
                     <h2 className="text-lg font-medium text-[#0e274e]">{activeSection.section_label}</h2>

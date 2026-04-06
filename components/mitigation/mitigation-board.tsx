@@ -318,7 +318,7 @@ function ItemDetailPanel({ item, comments, onClose, onUpdate, onDelete }: {
 
         {/* Comments */}
         <div>
-          <h4 className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-3">
+          <h4 className="text-xs font-medium text-gray-400 mb-3">
             Comments ({localComments.length})
           </h4>
           <div className="space-y-3 mb-4">

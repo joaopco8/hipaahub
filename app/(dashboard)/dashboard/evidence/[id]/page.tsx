@@ -113,14 +113,14 @@ export default async function EvidenceDetailPage({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="border-0 shadow-sm rounded-none bg-white">
           <CardContent className="p-4 space-y-1">
-            <p className="text-[11px] text-gray-400 font-light uppercase tracking-wide">HIPAA Category</p>
+            <p className="text-[11px] text-gray-400 font-light">HIPAA Category</p>
             <p className="text-sm text-[#0e274e] font-light">{item.hipaa_category?.join(', ') || '—'}</p>
           </CardContent>
         </Card>
 
         <Card className="border-0 shadow-sm rounded-none bg-white">
           <CardContent className="p-4 space-y-1">
-            <p className="text-[11px] text-gray-400 font-light uppercase tracking-wide">Upload Date</p>
+            <p className="text-[11px] text-gray-400 font-light">Upload Date</p>
             <p className="text-sm text-[#0e274e] font-light flex items-center gap-1.5">
               <Calendar className="h-3.5 w-3.5 text-gray-400" />
               {item.upload_date
@@ -136,7 +136,7 @@ export default async function EvidenceDetailPage({
 
         <Card className="border-0 shadow-sm rounded-none bg-white">
           <CardContent className="p-4 space-y-1">
-            <p className="text-[11px] text-gray-400 font-light uppercase tracking-wide">Validity</p>
+            <p className="text-[11px] text-gray-400 font-light">Validity</p>
             <p className="text-sm text-[#0e274e] font-light flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5 text-gray-400" />
               {item.validity_end_date
@@ -149,7 +149,7 @@ export default async function EvidenceDetailPage({
         {item.file_name && (
           <Card className="border-0 shadow-sm rounded-none bg-white">
             <CardContent className="p-4 space-y-1">
-              <p className="text-[11px] text-gray-400 font-light uppercase tracking-wide">File</p>
+              <p className="text-[11px] text-gray-400 font-light">File</p>
               <p className="text-sm text-[#0e274e] font-light flex items-center gap-1.5 truncate">
                 <FileText className="h-3.5 w-3.5 text-gray-400 shrink-0" />
                 <span className="truncate">{item.file_name}</span>
@@ -164,7 +164,7 @@ export default async function EvidenceDetailPage({
         {item.external_link && (
           <Card className="border-0 shadow-sm rounded-none bg-white">
             <CardContent className="p-4 space-y-1">
-              <p className="text-[11px] text-gray-400 font-light uppercase tracking-wide">External Link</p>
+              <p className="text-[11px] text-gray-400 font-light">External Link</p>
               <a
                 href={item.external_link}
                 target="_blank"
@@ -181,7 +181,7 @@ export default async function EvidenceDetailPage({
         {item.legal_weight && (
           <Card className="border-0 shadow-sm rounded-none bg-white sm:col-span-2">
             <CardContent className="p-4 space-y-1">
-              <p className="text-[11px] text-gray-400 font-light uppercase tracking-wide">Legal Weight</p>
+              <p className="text-[11px] text-gray-400 font-light">Legal Weight</p>
               <p className="text-sm text-[#71bc48] font-light">{item.legal_weight}</p>
             </CardContent>
           </Card>
@@ -224,9 +224,9 @@ export default async function EvidenceDetailPage({
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100 bg-[#f3f5f9]">
-                      <th className="text-left px-5 py-3 text-[11px] font-light text-gray-400 uppercase tracking-wide">User</th>
-                      <th className="text-left px-5 py-3 text-[11px] font-light text-gray-400 uppercase tracking-wide">Action</th>
-                      <th className="text-left px-5 py-3 text-[11px] font-light text-gray-400 uppercase tracking-wide">Date & Time</th>
+                      <th className="text-left px-5 py-3 text-[11px] font-light text-gray-400">User</th>
+                      <th className="text-left px-5 py-3 text-[11px] font-light text-gray-400">Action</th>
+                      <th className="text-left px-5 py-3 text-[11px] font-light text-gray-400">Date & Time</th>
                     </tr>
                   </thead>
                   <tbody>

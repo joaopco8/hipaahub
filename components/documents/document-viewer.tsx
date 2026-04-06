@@ -158,7 +158,7 @@ export function DocumentViewer({ content, title, isLocked = false }: DocumentVie
         flushList();
         if (trimmed.startsWith('POLICY')) {
           elements.push(
-            <h1 key={`title-${index}`} className="text-2xl font-bold text-zinc-900 mt-8 mb-4 uppercase tracking-wide">
+            <h1 key={`title-${index}`} className="text-2xl font-light text-[#0e274e] mt-8 mb-4">
               {trimmed}
             </h1>
           );

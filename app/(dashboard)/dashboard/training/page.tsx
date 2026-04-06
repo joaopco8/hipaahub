@@ -144,7 +144,7 @@ export default async function TrainingPage() {
 
       {/* ── Section: My Training Records ── */}
       <div>
-        <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+        <h3 className="text-xs font-medium text-gray-400 mb-3">
           My Training
         </h3>
 
@@ -154,7 +154,7 @@ export default async function TrainingPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400 mb-1 uppercase tracking-wide">Completed</p>
+                  <p className="text-sm text-gray-400 mb-1">Completed</p>
                   <p className="text-3xl font-light text-[#0e274e]">{stats.completed}</p>
                 </div>
                 <div className="h-10 w-10 rounded-full border-2 border-[#71bc48] flex items-center justify-center">
@@ -168,7 +168,7 @@ export default async function TrainingPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400 mb-1 uppercase tracking-wide">Pending</p>
+                  <p className="text-sm text-gray-400 mb-1">Pending</p>
                   <p className="text-3xl font-light text-[#0e274e]">{stats.pending}</p>
                 </div>
                 <div className="h-10 w-10 rounded-full border-2 border-yellow-500 flex items-center justify-center">
@@ -182,7 +182,7 @@ export default async function TrainingPage() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400 mb-1 uppercase tracking-wide">Expired</p>
+                  <p className="text-sm text-gray-400 mb-1">Expired</p>
                   <p className="text-3xl font-light text-[#0e274e]">{stats.expired}</p>
                 </div>
                 <div className="h-10 w-10 rounded-full border-2 border-red-500 flex items-center justify-center">
@@ -302,7 +302,7 @@ export default async function TrainingPage() {
 
       {/* ── Section: Employee Training Compliance ── */}
       <div>
-        <h3 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+        <h3 className="text-xs font-medium text-gray-400 mb-3">
           Employee Compliance
         </h3>
         <EmployeeInvitesSection

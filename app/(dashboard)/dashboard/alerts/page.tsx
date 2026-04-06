@@ -88,8 +88,8 @@ export default async function AlertsPage() {
   return (
     <div className="flex min-h-screen w-full flex-col gap-6 max-w-7xl mx-auto">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Alerts & Notifications</h1>
-        <p className="text-zinc-600 text-base">
+        <h1 className="text-2xl font-light text-[#0e274e]">Alerts & Notifications</h1>
+        <p className="text-zinc-600 text-base font-light">
           Stay informed about important compliance deadlines and requirements
         </p>
       </div>

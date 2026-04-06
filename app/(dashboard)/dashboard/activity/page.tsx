@@ -83,7 +83,7 @@ export default async function ActivityPage() {
         <div className="space-y-6">
           {Array.from(grouped.entries()).map(([date, dayEvents]) => (
             <div key={date}>
-              <p className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">{date}</p>
+              <p className="text-xs font-medium text-gray-400 mb-3">{date}</p>
               <Card className="border-0 shadow-sm bg-white rounded-none">
                 <CardContent className="p-0">
                   <div className="divide-y divide-gray-50">

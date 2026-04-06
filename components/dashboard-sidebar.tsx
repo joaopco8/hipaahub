@@ -63,10 +63,9 @@ const Sidebar = ({ navConfig, theme = 'blue', planTier = 'unknown' }: SidebarPro
     <nav className="relative flex flex-col px-0">
       {groups.map(({ group, items }, gi) => (
         <div key={group + gi}>
-          {/* Section label */}
-          <p className="px-6 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/35 select-none">
-            {GROUP_LABELS[group] ?? group}
-          </p>
+          {gi > 0 && (
+            <div className="mx-6 my-2 border-t border-white/10" />
+          )}
 
           {items.map((item, index) => {
             const IconComponent = iconComponents[item.icon as keyof typeof iconComponents]!;
@@ -103,7 +102,7 @@ const Sidebar = ({ navConfig, theme = 'blue', planTier = 'unknown' }: SidebarPro
               return (
                 <div key={`${item.href}-${index}`} className={baseClasses}>
                   <IconComponent className={cn('h-[17px] w-[17px] shrink-0', iconClasses)} strokeWidth={1.5} />
-                  <span className="text-[13px] tracking-wide !font-semibold">{item.label}</span>
+                  <span className="text-[13px] !font-semibold">{item.label}</span>
                 </div>
               );
             }
@@ -121,7 +120,7 @@ const Sidebar = ({ navConfig, theme = 'blue', planTier = 'unknown' }: SidebarPro
                     className={cn('shrink-0 h-[17px] w-[17px] transition-colors', iconClasses)}
                     strokeWidth={isActive ? 2 : 1.5}
                   />
-                  <span className="text-[13px] tracking-wide truncate !font-semibold flex-1">
+                  <span className="text-[13px] truncate !font-semibold flex-1">
                     {item.label}
                   </span>
 

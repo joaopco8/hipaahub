@@ -148,7 +148,7 @@ function EditRiskModal({
           {/* Live Score */}
           <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-100">
             <div>
-              <p className="text-xs text-gray-400 font-light uppercase tracking-wide">Live Risk Score</p>
+              <p className="text-xs text-gray-400 font-light">Live Risk Score</p>
               <p className="text-3xl font-light" style={{ color: liveScore > 45 ? '#dc2626' : liveScore > 20 ? '#d97706' : '#16a34a' }}>
                 {liveScore}
               </p>
@@ -270,13 +270,13 @@ export function AssetRiskPanel({ assets: initialAssets, organizationId }: Props)
       <div className="grid grid-cols-3 gap-3">
         <Card className="border-0 shadow-sm rounded-none">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wide font-light mb-1">High Risk</p>
+            <p className="text-xs text-gray-400 font-light mb-1">High Risk</p>
             <p className="text-2xl font-light text-red-600">{highRisk.length}</p>
           </CardContent>
         </Card>
         <Card className="border-0 shadow-sm rounded-none">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wide font-light mb-1">Medium Risk</p>
+            <p className="text-xs text-gray-400 font-light mb-1">Medium Risk</p>
             <p className="text-2xl font-light text-amber-600">
               {assetsWithScore.filter((a) => a.practiceScore > 20 && a.practiceScore <= 45).length}
             </p>
@@ -284,7 +284,7 @@ export function AssetRiskPanel({ assets: initialAssets, organizationId }: Props)
         </Card>
         <Card className="border-0 shadow-sm rounded-none">
           <CardContent className="p-4">
-            <p className="text-xs text-gray-400 uppercase tracking-wide font-light mb-1">Low Risk</p>
+            <p className="text-xs text-gray-400 font-light mb-1">Low Risk</p>
             <p className="text-2xl font-light text-green-600">
               {assetsWithScore.filter((a) => a.practiceScore <= 20).length}
             </p>

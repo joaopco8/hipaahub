@@ -84,7 +84,7 @@ export default function SidebarLayout({
             <span className="text-xs text-white/80 font-light">View Profile & Plan</span>
           </div>
         </Link>
-        <p className="text-[10px] text-white/30 font-light text-center mt-2 tracking-wide">v3.2.1</p>
+        <p className="text-[10px] text-white/30 font-light text-center mt-2">v3.2.1</p>
       </div>
     </>
   );

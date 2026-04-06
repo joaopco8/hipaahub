@@ -160,7 +160,7 @@ export default function PrepareClient({
           {/* Document header */}
           <div className="bg-white border border-gray-200 px-8 py-6">
             <div className="text-center border-b border-gray-100 pb-4 mb-4">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Confidential — Internal Use Only</p>
+              <p className="text-xs font-semibold text-gray-400st mb-1">Confidential — Internal Use Only</p>
               <h2 className="text-xl font-light text-[#0e274e]">
                 Pre-Meeting Brief — {review.quarter} {review.year} Review
               </h2>
@@ -312,7 +312,7 @@ export default function PrepareClient({
             <BriefSection title="Section 3 — BAA & Vendor Status">
               {data.baas.expired.length > 0 && (
                 <div className="mb-3">
-                  <p className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-2">Expired</p>
+                  <p className="text-xs font-semibold text-red-600 mb-2">Expired</p>
                   {data.baas.expired.map((b: any) => (
                     <div key={b.id} className="flex items-center gap-2 py-1.5 text-sm">
                       <AlertTriangle className="h-3.5 w-3.5 text-red-400 flex-shrink-0" />
@@ -324,7 +324,7 @@ export default function PrepareClient({
               )}
               {data.baas.expiring.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-2">Expiring Within 90 Days</p>
+                  <p className="text-xs font-semibold text-amber-600 mb-2">Expiring Within 90 Days</p>
                   {data.baas.expiring.map((b: any) => {
                     const days = Math.ceil((new Date(b.expiration_date).getTime() - Date.now()) / 86400000);
                     return (
@@ -364,7 +364,7 @@ export default function PrepareClient({
                           {isOverdue && <span className="text-red-500 font-medium"> · OVERDUE</span>}
                         </p>
                       </div>
-                      <span className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded-sm ${
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-sm ${
                         item.status === 'complete' ? 'bg-green-50 text-green-600' :
                         item.status === 'in_progress' ? 'bg-blue-50 text-blue-600' :
                         isOverdue ? 'bg-red-50 text-red-600' :
@@ -434,7 +434,7 @@ function BriefSection({ title, children }: { title: string; children: React.Reac
   return (
     <div className="bg-white border-x border-b border-gray-200 px-8 py-6">
       <div className="border-l-4 border-[#0d9488] pl-4 mb-4">
-        <h3 className="text-sm font-semibold text-[#0e274e] uppercase tracking-wide">{title}</h3>
+        <h3 className="text-sm font-semibold text-[#0e274e]">{title}</h3>
       </div>
       {children}
     </div>
@@ -469,7 +469,7 @@ function DecisionItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-start gap-2 flex-wrap">
             <p className="text-sm font-medium text-[#0e274e]">{title}</p>
-            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${sevCls}`}>{severity}</span>
+            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${sevCls}`}>{severity}</span>
           </div>
           <p className="text-xs text-gray-500 mt-1">{description}</p>
           <div className="mt-2 flex flex-wrap gap-2">

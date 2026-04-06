@@ -151,7 +151,7 @@ export function ExpiredTrialWall({ userEmail, userName, planTier }: Props) {
                 }`}
               >
                 {plan.id === 'practice' && (
-                  <span className="text-[10px] font-thin tracking-[0.18em] uppercase text-[#00bceb] mb-4 block">
+                  <span className="text-[10px] font-thin text-[#00bceb] mb-4 block">
                     Most popular
                   </span>
                 )}

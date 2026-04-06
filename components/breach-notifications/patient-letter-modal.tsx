@@ -135,7 +135,7 @@ export function PatientLetterModal({ open, onClose, incident, org }: Props) {
 
   const sectionLabel = (label: string, sub?: string) => (
     <div className="pb-2 border-b border-gray-100 mb-3">
-      <p className="text-xs font-medium text-[#0e274e] uppercase tracking-wide">{label}</p>
+      <p className="text-xs font-medium text-[#0e274e]">{label}</p>
       {sub && <p className="text-xs font-light text-gray-400 mt-0.5">{sub}</p>}
     </div>
   );

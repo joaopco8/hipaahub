@@ -141,7 +141,7 @@ function Badge({ label, color }: { label: string; color: 'green' | 'teal' | 'amb
     red: 'bg-red-50 text-red-700 border-red-200',
     gray: 'bg-gray-50 text-gray-500 border-gray-200',
   }[color];
-  return <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide border rounded-sm', cls)}>{label}</span>;
+  return <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-semibold border rounded-sm', cls)}>{label}</span>;
 }
 
 function StatusDot({ status }: { status: string }) {
@@ -156,7 +156,7 @@ function StatusDot({ status }: { status: string }) {
 function SectionHeader({ label }: { label: string }) {
   return (
     <div className="mb-4">
-      <p className="text-[11px] font-bold tracking-[0.15em] uppercase text-[#0175a2]">{label}</p>
+      <p className="text-[11px] font-bold text-[#0175a2]">{label}</p>
       <div className="mt-1.5 h-px bg-gradient-to-r from-[#0175a2]/30 to-transparent" />
     </div>
   );
@@ -173,7 +173,7 @@ function ReportTable({ headers, rows, emptyMessage }: { headers: string[]; rows:
       <table className="w-full text-xs border-collapse">
         <thead>
           <tr className="bg-gray-50 border-b border-gray-200">
-            {headers.map((h, i) => <th key={i} className="text-left px-3 py-2 font-semibold text-gray-500 uppercase tracking-wide text-[10px]">{h}</th>)}
+            {headers.map((h, i) => <th key={i} className="text-left px-3 py-2 font-semibold text-gray-500 text-[10px]">{h}</th>)}
           </tr>
         </thead>
         <tbody>
@@ -201,7 +201,7 @@ function ExecutiveSummarySection({ d }: { d: BoardReportData }) {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Score */}
         <div className="border border-gray-200 p-4 bg-white">
-          <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Compliance Score</p>
+          <p className="text-[10px] text-gray-400 mb-2">Compliance Score</p>
           <div className="flex items-baseline gap-1 mb-2">
             <span className={cn('text-4xl font-light', s.complianceScore >= 80 ? 'text-green-600' : s.complianceScore >= 50 ? 'text-amber-600' : 'text-red-600')}>{s.complianceScore}</span>
             <span className="text-sm text-gray-400">/100</span>
@@ -211,7 +211,7 @@ function ExecutiveSummarySection({ d }: { d: BoardReportData }) {
         </div>
         {/* Training */}
         <div className="border border-gray-200 p-4 bg-white">
-          <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Staff Training</p>
+          <p className="text-[10px] text-gray-400 mb-2">Staff Training</p>
           <div className="flex items-baseline gap-1 mb-2">
             <span className="text-4xl font-light text-[#0e274e]">{s.staffTrainingPct}</span>
             <span className="text-sm text-gray-400">%</span>
@@ -221,7 +221,7 @@ function ExecutiveSummarySection({ d }: { d: BoardReportData }) {
         </div>
         {/* BAAs */}
         <div className="border border-gray-200 p-4 bg-white">
-          <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">BAAs Active</p>
+          <p className="text-[10px] text-gray-400 mb-2">BAAs Active</p>
           <div className="flex items-baseline gap-1 mb-2">
             <span className="text-4xl font-light text-[#0e274e]">{s.baasActive}</span>
             <span className="text-sm text-gray-400">/{s.baasTotal}</span>
@@ -231,7 +231,7 @@ function ExecutiveSummarySection({ d }: { d: BoardReportData }) {
         </div>
         {/* Risk */}
         <div className="border border-gray-200 p-4 bg-white">
-          <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Open Risk Items</p>
+          <p className="text-[10px] text-gray-400 mb-2">Open Risk Items</p>
           <div className="flex items-baseline gap-1 mb-2">
             <span className="text-4xl font-light text-[#0e274e]">{s.openRiskItems}</span>
             <span className="text-sm text-gray-400">items</span>
@@ -288,7 +288,7 @@ function RegulatorySection({ d }: { d: BoardReportData }) {
       )}
       {ra.regulatoryUpdates.length > 0 && (
         <div className="mt-4">
-          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-2">Regulatory Updates</p>
+          <p className="text-[10px] font-semibold text-gray-500 mb-2">Regulatory Updates</p>
           {ra.regulatoryUpdates.map((u: any, i: number) => (
             <div key={i} className="border-l-2 border-[#0175a2]/30 pl-3 mb-2">
               <p className="text-xs font-medium text-[#0e274e]">{u.title}</p>
@@ -346,7 +346,7 @@ function TrainingSection({ d }: { d: BoardReportData }) {
         {[['Total Staff', t.totalStaff], ['Compliant', t.compliantStaff], ['Overdue', t.overdue]].map(([label, val]) => (
           <div key={label as string} className="border border-gray-100 p-3">
             <p className="text-2xl font-light text-[#0e274e]">{val}</p>
-            <p className="text-[10px] text-gray-400 uppercase tracking-wide mt-1">{label}</p>
+            <p className="text-[10px] text-gray-400 mt-1">{label}</p>
           </div>
         ))}
       </div>
@@ -400,7 +400,7 @@ function RiskAssessmentSection({ d }: { d: BoardReportData }) {
       <div className="grid grid-cols-2 gap-3 mb-4 text-xs">
         {[['Last Completed', r.lastCompleted], ['Conducted By', r.conductedBy], ['Overall Score', `${r.score}/100`], ['Next Review', r.nextReview]].map(([k, v]) => (
           <div key={k as string} className="border border-gray-100 p-3">
-            <p className="text-gray-400 uppercase tracking-wide text-[10px] mb-1">{k}</p>
+            <p className="text-gray-400 text-[10px] mb-1">{k}</p>
             <p className="font-medium text-[#0e274e]">{v}</p>
           </div>
         ))}
@@ -442,7 +442,7 @@ function IncidentsSection({ d }: { d: BoardReportData }) {
             {[['Incidents', inc.total], ['Require OCR', inc.requireOCR], ['OCR Inquiries', inc.ocrInquiries]].map(([l, v]) => (
               <div key={l as string} className="border border-gray-100 p-3">
                 <p className={cn('text-2xl font-light', (v as number) > 0 ? 'text-red-600' : 'text-[#0e274e]')}>{v}</p>
-                <p className="text-[10px] text-gray-400 uppercase tracking-wide mt-1">{l}</p>
+                <p className="text-[10px] text-gray-400 mt-1">{l}</p>
               </div>
             ))}
           </div>
@@ -470,8 +470,8 @@ function UpcomingEventsSection({ d }: { d: BoardReportData }) {
             <div key={i} className="flex items-start gap-3 text-xs py-2 border-b border-gray-100 last:border-0">
               <span className={cn('shrink-0 text-[10px] font-mono w-20 text-gray-400')}>{new Date(e.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
               <span className="flex-1 text-gray-700">{e.description}</span>
-              {e.urgency === 'critical' && <span className="shrink-0 text-red-600 font-semibold text-[10px] uppercase">🔴 Urgent</span>}
-              {e.urgency === 'warning' && <span className="shrink-0 text-amber-600 font-semibold text-[10px] uppercase">⚠ Soon</span>}
+              {e.urgency === 'critical' && <span className="shrink-0 text-red-600 font-semibold text-[10px]">🔴 Urgent</span>}
+              {e.urgency === 'warning' && <span className="shrink-0 text-amber-600 font-semibold text-[10px]">⚠ Soon</span>}
             </div>
           ))}
         </div>
@@ -875,7 +875,7 @@ function ScheduleModal({ onClose, data, sections }: { onClose: () => void; data:
         <div className="px-6 py-5 space-y-5">
           {/* Frequency */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-2">Frequency</label>
+            <label className="text-xs font-semibold text-gray-500 block mb-2">Frequency</label>
             <div className="flex gap-1">
               {(['monthly', 'quarterly', 'annual'] as const).map(f => (
                 <button key={f} onClick={() => setFreq(f)} className={cn('flex-1 py-2 text-xs font-semibold capitalize border transition-colors', freq === f ? 'bg-[#0175a2] text-white border-[#0175a2]' : 'text-gray-600 border-gray-200 hover:border-[#0175a2]/50')}>{f}</button>
@@ -885,7 +885,7 @@ function ScheduleModal({ onClose, data, sections }: { onClose: () => void; data:
 
           {/* Send on day */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-2">Send on day of {freq === 'annual' ? 'year' : freq === 'quarterly' ? 'quarter' : 'month'}</label>
+            <label className="text-xs font-semibold text-gray-500 block mb-2">Send on day of {freq === 'annual' ? 'year' : freq === 'quarterly' ? 'quarter' : 'month'}</label>
             <select value={sendDay} onChange={e => setSendDay(Number(e.target.value))} className="w-full border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#0175a2]">
               {[1, 5, 10, 15, 20, 25, 28].map(d => <option key={d} value={d}>Day {d}</option>)}
             </select>
@@ -893,7 +893,7 @@ function ScheduleModal({ onClose, data, sections }: { onClose: () => void; data:
 
           {/* Recipients */}
           <div>
-            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-2">Recipients</label>
+            <label className="text-xs font-semibold text-gray-500 block mb-2">Recipients</label>
             <div className="flex gap-2 mb-2">
               <input value={emailInput} onChange={e => setEmailInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addEmail()} placeholder="email@example.com" className="flex-1 border border-gray-200 text-sm px-3 py-2 focus:outline-none focus:border-[#0175a2]" />
               <button onClick={addEmail} className="px-3 py-2 bg-[#0175a2] text-white text-xs hover:bg-[#015a7a]"><Plus className="h-3.5 w-3.5" /></button>
@@ -926,7 +926,7 @@ function Accordion({ title, children, defaultOpen = false }: { title: string; ch
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="border-b border-white/10">
-      <button onClick={() => setOpen(o => !o)} className="flex items-center justify-between w-full px-4 py-3 text-xs font-semibold text-white/70 uppercase tracking-wide hover:bg-white/5 transition-colors">
+      <button onClick={() => setOpen(o => !o)} className="flex items-center justify-between w-full px-4 py-3 text-xs font-semibold text-white/70 hover:bg-white/5 transition-colors">
         {title}
         {open ? <ChevronUp className="h-3.5 w-3.5 text-white/40" /> : <ChevronDown className="h-3.5 w-3.5 text-white/40" />}
       </button>
@@ -1122,15 +1122,15 @@ export default function BoardReportClient() {
           <Accordion title="Branding">
             <div className="space-y-3">
               <div>
-                <label className="block text-[10px] text-white/50 uppercase tracking-wide mb-1">Organization Name</label>
+                <label className="block text-[10px] text-white/50 mb-1">Organization Name</label>
                 <input value={orgNameOverride} onChange={e => setOrgNameOverride(e.target.value)} placeholder="Your organization" className="w-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-xs px-2.5 py-1.5 focus:outline-none focus:border-white/60" />
               </div>
               <div>
-                <label className="block text-[10px] text-white/50 uppercase tracking-wide mb-1">Prepared For</label>
+                <label className="block text-[10px] text-white/50 mb-1">Prepared For</label>
                 <input value={preparedFor} onChange={e => setPreparedFor(e.target.value)} placeholder="Board of Directors" className="w-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-xs px-2.5 py-1.5 focus:outline-none focus:border-white/60" />
               </div>
               <div>
-                <label className="block text-[10px] text-white/50 uppercase tracking-wide mb-1">Prepared By</label>
+                <label className="block text-[10px] text-white/50 mb-1">Prepared By</label>
                 <input value={preparedBy} onChange={e => setPreparedBy(e.target.value)} placeholder="Compliance Officer" className="w-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-xs px-2.5 py-1.5 focus:outline-none focus:border-white/60" />
               </div>
             </div>
@@ -1188,7 +1188,7 @@ export default function BoardReportClient() {
                       <p><span className="text-gray-500">Prepared for:</span> {preparedFor}</p>
                       <p><span className="text-gray-500">Prepared by:</span> {preparedBy || data.org.complianceOfficer}</p>
                       <p><span className="text-gray-500">Generated:</span> {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                      <p className="font-semibold text-[#0e274e] uppercase tracking-wide text-[10px] mt-1">Confidential</p>
+                      <p className="font-semibold text-[#0e274e] text-[10px] mt-1">Confidential</p>
                     </div>
                   </div>
                 </div>

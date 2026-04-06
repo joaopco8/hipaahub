@@ -235,7 +235,7 @@ export default async function DocumentPreviewPage({
             </Button>
           </Link>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
+            <h1 className="text-2xl font-light text-[#0e274e]">
               {document.name}
             </h1>
             <p className="text-sm text-zinc-600 mt-1">
