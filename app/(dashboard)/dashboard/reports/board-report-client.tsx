@@ -480,15 +480,15 @@ function UpcomingEventsSection({ d }: { d: BoardReportData }) {
   );
 }
 
-function ComplianceStatementSection({ d, statement }: { d: BoardReportData; statement: string }) {
+function ComplianceStatementSection({ statement, orgName, complianceOfficer }: { statement: string; orgName: string; complianceOfficer: string }) {
   return (
     <ReportSection>
       <SectionHeader label="Compliance Officer Statement" />
       <div className="border-l-4 border-[#0175a2]/40 pl-4 py-2">
         <p className="text-sm text-gray-700 font-light leading-relaxed italic">"{statement}"</p>
         <div className="mt-4 text-xs text-gray-500">
-          <p className="font-semibold text-gray-700">{d.org.complianceOfficer}</p>
-          <p>Compliance Officer — {d.org.name}</p>
+          <p className="font-semibold text-gray-700">{complianceOfficer}</p>
+          <p>Compliance Officer — {orgName}</p>
           <p>{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
         </div>
       </div>
@@ -1181,7 +1181,8 @@ export default function BoardReportClient() {
                   <div className="flex items-start justify-between gap-6">
                     <div className="flex-1">
                       <p className="text-xl font-semibold text-[#0e274e]">HIPAA Compliance Report</p>
-                      <p className="text-sm text-[#0175a2] mt-0.5">{data.period.label} — {new Date(data.period.start).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} to {new Date(data.period.end).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                      <p className="text-base text-[#0e274e]/70 font-light mt-0.5">{orgNameOverride || data.org.name}</p>
+                      <p className="text-sm text-[#0175a2] mt-1">{data.period.label} — {new Date(data.period.start).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} to {new Date(data.period.end).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                     </div>
                     <div className="text-right text-xs text-gray-400 space-y-0.5 shrink-0">
                       <p><span className="text-gray-500">Prepared for:</span> {preparedFor}</p>
@@ -1203,7 +1204,7 @@ export default function BoardReportClient() {
                   {sections.riskAssessment && <RiskAssessmentSection d={data} />}
                   {sections.incidents && <IncidentsSection d={data} />}
                   {sections.upcomingEvents && <UpcomingEventsSection d={data} />}
-                  {sections.complianceStatement && <ComplianceStatementSection d={data} statement={statement} />}
+                  {sections.complianceStatement && <ComplianceStatementSection statement={statement} orgName={orgNameOverride || data.org.name} complianceOfficer={preparedBy || data.org.complianceOfficer} />}
                 </div>
 
                 {/* Footer note */}
