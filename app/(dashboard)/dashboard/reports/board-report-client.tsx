@@ -925,10 +925,10 @@ function ScheduleModal({ onClose, data, sections }: { onClose: () => void; data:
 function Accordion({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="border-b border-gray-100">
-      <button onClick={() => setOpen(o => !o)} className="flex items-center justify-between w-full px-4 py-3 text-xs font-semibold text-gray-700 uppercase tracking-wide hover:bg-gray-50 transition-colors">
+    <div className="border-b border-white/10">
+      <button onClick={() => setOpen(o => !o)} className="flex items-center justify-between w-full px-4 py-3 text-xs font-semibold text-white/70 uppercase tracking-wide hover:bg-white/5 transition-colors">
         {title}
-        {open ? <ChevronUp className="h-3.5 w-3.5 text-gray-400" /> : <ChevronDown className="h-3.5 w-3.5 text-gray-400" />}
+        {open ? <ChevronUp className="h-3.5 w-3.5 text-white/40" /> : <ChevronDown className="h-3.5 w-3.5 text-white/40" />}
       </button>
       {open && <div className="px-4 pb-4">{children}</div>}
     </div>
@@ -958,13 +958,21 @@ export default function BoardReportClient() {
     complianceStatement: true,
   });
 
-  // Branding
-  const [preparedFor, setPreparedFor] = useState('Board of Directors');
-  const [preparedBy, setPreparedBy] = useState('');
-  const [orgNameOverride, setOrgNameOverride] = useState('');
+  // Branding — persisted to localStorage
+  const [preparedFor, setPreparedFor] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('br_preparedFor') ?? 'Board of Directors' : 'Board of Directors'
+  );
+  const [preparedBy, setPreparedBy] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('br_preparedBy') ?? '' : ''
+  );
+  const [orgNameOverride, setOrgNameOverride] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('br_orgName') ?? '' : ''
+  );
 
-  // Statement
-  const [statement, setStatement] = useState('');
+  // Statement — persisted to localStorage
+  const [statement, setStatement] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('br_statement') ?? '' : ''
+  );
 
   // Recipients
   const [recipientInput, setRecipientInput] = useState('');
@@ -986,9 +994,9 @@ export default function BoardReportClient() {
       if (!res.ok) throw new Error('Failed to load report data');
       const json = await res.json();
       setData(json);
-      if (!statement && json.complianceOfficerStatement) setStatement(json.complianceOfficerStatement);
-      if (!preparedBy && json.org?.complianceOfficer) setPreparedBy(json.org.complianceOfficer);
-      if (!orgNameOverride && json.org?.name) setOrgNameOverride(json.org.name);
+      if (!localStorage.getItem('br_statement') && json.complianceOfficerStatement) setStatement(json.complianceOfficerStatement);
+      if (!localStorage.getItem('br_preparedBy') && json.org?.complianceOfficer) setPreparedBy(json.org.complianceOfficer);
+      if (!localStorage.getItem('br_orgName') && json.org?.name) setOrgNameOverride(json.org.name);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -997,6 +1005,12 @@ export default function BoardReportClient() {
   }, [periodType, quarter, month, year]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // Persist branding + statement to localStorage on change
+  useEffect(() => { localStorage.setItem('br_preparedFor', preparedFor); }, [preparedFor]);
+  useEffect(() => { localStorage.setItem('br_preparedBy', preparedBy); }, [preparedBy]);
+  useEffect(() => { localStorage.setItem('br_orgName', orgNameOverride); }, [orgNameOverride]);
+  useEffect(() => { localStorage.setItem('br_statement', statement); }, [statement]);
 
   const handleExport = async () => {
     if (!data) return;
@@ -1055,39 +1069,39 @@ export default function BoardReportClient() {
       <div className="flex flex-1 overflow-hidden">
 
         {/* ── Left Config Sidebar ─────────────────────────────────────── */}
-        <aside className="w-64 shrink-0 bg-white border-r border-gray-200 overflow-y-auto flex flex-col">
+        <aside className="w-64 shrink-0 bg-[#0e274e] overflow-y-auto flex flex-col">
 
           <Accordion title="Report Period" defaultOpen>
             {/* Period type */}
             <div className="flex gap-0.5 mb-3">
               {(['quarterly', 'monthly', 'annual'] as const).map(t => (
-                <button key={t} onClick={() => setPeriodType(t)} className={cn('flex-1 py-1.5 text-[10px] font-semibold capitalize border transition-colors', periodType === t ? 'bg-[#0175a2] text-white border-[#0175a2]' : 'text-gray-500 border-gray-200 hover:border-[#0175a2]/40')}>{t}</button>
+                <button key={t} onClick={() => setPeriodType(t)} className={cn('flex-1 py-1.5 text-[10px] font-semibold capitalize border transition-colors', periodType === t ? 'bg-white text-[#0e274e] border-white' : 'text-white/60 border-white/20 hover:border-white/50')}>{t}</button>
               ))}
             </div>
             {/* Date selectors */}
             {periodType === 'quarterly' && (
               <div className="flex gap-2">
-                <select value={quarter} onChange={e => setQuarter(Number(e.target.value))} className="flex-1 border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#0175a2]">
-                  {[1, 2, 3, 4].map(q => <option key={q} value={q}>Q{q}</option>)}
+                <select value={quarter} onChange={e => setQuarter(Number(e.target.value))} className="flex-1 bg-white/10 border border-white/20 text-white text-xs px-2 py-1.5 focus:outline-none focus:border-white/60">
+                  {[1, 2, 3, 4].map(q => <option key={q} value={q} className="text-[#0e274e] bg-white">Q{q}</option>)}
                 </select>
-                <select value={year} onChange={e => setYear(Number(e.target.value))} className="flex-1 border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#0175a2]">
-                  {years.map(y => <option key={y} value={y}>{y}</option>)}
+                <select value={year} onChange={e => setYear(Number(e.target.value))} className="flex-1 bg-white/10 border border-white/20 text-white text-xs px-2 py-1.5 focus:outline-none focus:border-white/60">
+                  {years.map(y => <option key={y} value={y} className="text-[#0e274e] bg-white">{y}</option>)}
                 </select>
               </div>
             )}
             {periodType === 'monthly' && (
               <div className="flex gap-2">
-                <select value={month} onChange={e => setMonth(Number(e.target.value))} className="flex-1 border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#0175a2]">
-                  {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+                <select value={month} onChange={e => setMonth(Number(e.target.value))} className="flex-1 bg-white/10 border border-white/20 text-white text-xs px-2 py-1.5 focus:outline-none focus:border-white/60">
+                  {months.map((m, i) => <option key={i} value={i + 1} className="text-[#0e274e] bg-white">{m}</option>)}
                 </select>
-                <select value={year} onChange={e => setYear(Number(e.target.value))} className="flex-1 border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#0175a2]">
-                  {years.map(y => <option key={y} value={y}>{y}</option>)}
+                <select value={year} onChange={e => setYear(Number(e.target.value))} className="flex-1 bg-white/10 border border-white/20 text-white text-xs px-2 py-1.5 focus:outline-none focus:border-white/60">
+                  {years.map(y => <option key={y} value={y} className="text-[#0e274e] bg-white">{y}</option>)}
                 </select>
               </div>
             )}
             {periodType === 'annual' && (
-              <select value={year} onChange={e => setYear(Number(e.target.value))} className="w-full border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#0175a2]">
-                {years.map(y => <option key={y} value={y}>{y}</option>)}
+              <select value={year} onChange={e => setYear(Number(e.target.value))} className="w-full bg-white/10 border border-white/20 text-white text-xs px-2 py-1.5 focus:outline-none focus:border-white/60">
+                {years.map(y => <option key={y} value={y} className="text-[#0e274e] bg-white">{y}</option>)}
               </select>
             )}
           </Accordion>
@@ -1096,10 +1110,10 @@ export default function BoardReportClient() {
             <div className="space-y-2">
               {(Object.keys(sections) as (keyof Sections)[]).map(key => (
                 <label key={key} className="flex items-center gap-2.5 cursor-pointer group">
-                  <div onClick={() => toggleSection(key)} className={cn('w-4 h-4 border flex items-center justify-center shrink-0 transition-colors', sections[key] ? 'bg-[#0175a2] border-[#0175a2]' : 'border-gray-300 group-hover:border-[#0175a2]/50')}>
-                    {sections[key] && <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                  <div onClick={() => toggleSection(key)} className={cn('w-4 h-4 border flex items-center justify-center shrink-0 transition-colors', sections[key] ? 'bg-white border-white' : 'border-white/30 group-hover:border-white/60')}>
+                    {sections[key] && <svg className="w-2.5 h-2.5 text-[#0e274e]" viewBox="0 0 10 10"><polyline points="1.5,5 4,7.5 8.5,2.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                   </div>
-                  <span className="text-xs text-gray-600">{SECTION_LABELS[key]}</span>
+                  <span className="text-xs text-white/80">{SECTION_LABELS[key]}</span>
                 </label>
               ))}
             </div>
@@ -1108,38 +1122,38 @@ export default function BoardReportClient() {
           <Accordion title="Branding">
             <div className="space-y-3">
               <div>
-                <label className="block text-[10px] text-gray-500 uppercase tracking-wide mb-1">Organization Name</label>
-                <input value={orgNameOverride} onChange={e => setOrgNameOverride(e.target.value)} className="w-full border border-gray-200 text-xs px-2.5 py-1.5 focus:outline-none focus:border-[#0175a2]" />
+                <label className="block text-[10px] text-white/50 uppercase tracking-wide mb-1">Organization Name</label>
+                <input value={orgNameOverride} onChange={e => setOrgNameOverride(e.target.value)} placeholder="Your organization" className="w-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-xs px-2.5 py-1.5 focus:outline-none focus:border-white/60" />
               </div>
               <div>
-                <label className="block text-[10px] text-gray-500 uppercase tracking-wide mb-1">Prepared For</label>
-                <input value={preparedFor} onChange={e => setPreparedFor(e.target.value)} className="w-full border border-gray-200 text-xs px-2.5 py-1.5 focus:outline-none focus:border-[#0175a2]" />
+                <label className="block text-[10px] text-white/50 uppercase tracking-wide mb-1">Prepared For</label>
+                <input value={preparedFor} onChange={e => setPreparedFor(e.target.value)} placeholder="Board of Directors" className="w-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-xs px-2.5 py-1.5 focus:outline-none focus:border-white/60" />
               </div>
               <div>
-                <label className="block text-[10px] text-gray-500 uppercase tracking-wide mb-1">Prepared By</label>
-                <input value={preparedBy} onChange={e => setPreparedBy(e.target.value)} className="w-full border border-gray-200 text-xs px-2.5 py-1.5 focus:outline-none focus:border-[#0175a2]" />
+                <label className="block text-[10px] text-white/50 uppercase tracking-wide mb-1">Prepared By</label>
+                <input value={preparedBy} onChange={e => setPreparedBy(e.target.value)} placeholder="Compliance Officer" className="w-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-xs px-2.5 py-1.5 focus:outline-none focus:border-white/60" />
               </div>
             </div>
           </Accordion>
 
           <Accordion title="CO Statement">
             <div>
-              <textarea value={statement} onChange={e => { if (e.target.value.length <= 600) setStatement(e.target.value); }} rows={6} className="w-full border border-gray-200 text-xs px-2.5 py-2 focus:outline-none focus:border-[#0175a2] resize-none leading-relaxed" />
-              <p className="text-[10px] text-gray-400 text-right mt-1">{statement.length}/600</p>
+              <textarea value={statement} onChange={e => { if (e.target.value.length <= 600) setStatement(e.target.value); }} rows={6} placeholder="Enter the compliance officer's statement…" className="w-full bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-xs px-2.5 py-2 focus:outline-none focus:border-white/60 resize-none leading-relaxed" />
+              <p className="text-[10px] text-white/40 text-right mt-1">{statement.length}/600</p>
             </div>
           </Accordion>
 
           <Accordion title="Recipients">
             <div className="space-y-2">
               <div className="flex gap-1.5">
-                <input value={recipientInput} onChange={e => setRecipientInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addRecipient()} placeholder="email@example.com" className="flex-1 border border-gray-200 text-xs px-2 py-1.5 focus:outline-none focus:border-[#0175a2] min-w-0" />
-                <button onClick={addRecipient} className="px-2 py-1.5 bg-[#0175a2] text-white hover:bg-[#015a7a]"><Plus className="h-3.5 w-3.5" /></button>
+                <input value={recipientInput} onChange={e => setRecipientInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && addRecipient()} placeholder="email@example.com" className="flex-1 bg-white/10 border border-white/20 text-white placeholder:text-white/40 text-xs px-2 py-1.5 focus:outline-none focus:border-white/60 min-w-0" />
+                <button onClick={addRecipient} className="px-2 py-1.5 bg-white/20 text-white hover:bg-white/30"><Plus className="h-3.5 w-3.5" /></button>
               </div>
               <div className="space-y-1">
                 {recipients.map(r => (
-                  <div key={r} className="flex items-center justify-between text-xs bg-gray-50 px-2 py-1">
-                    <span className="truncate text-gray-600">{r}</span>
-                    <button onClick={() => setRecipients(rs => rs.filter(x => x !== r))}><X className="h-3 w-3 text-gray-400 hover:text-red-500" /></button>
+                  <div key={r} className="flex items-center justify-between text-xs bg-white/10 px-2 py-1">
+                    <span className="truncate text-white/80">{r}</span>
+                    <button onClick={() => setRecipients(rs => rs.filter(x => x !== r))}><X className="h-3 w-3 text-white/40 hover:text-red-400" /></button>
                   </div>
                 ))}
               </div>
