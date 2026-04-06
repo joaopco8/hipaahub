@@ -1056,20 +1056,20 @@ export default function CalendarClient({ orgName }: Props) {
   function AddEventModal() {
     if (!showAddModal) return null;
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-        <div className="bg-white w-full max-w-lg border border-gray-200 shadow-2xl max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-            <h3 className="text-base font-medium text-[#0e274e]">Add Compliance Event</h3>
-            <button onClick={() => setShowAddModal(false)} className="p-1 hover:bg-gray-100 rounded">
-              <X className="h-4 w-4 text-gray-400" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div className="bg-white w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto rounded-lg overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 bg-[#0e274e]">
+            <h3 className="text-base font-medium text-white">Add Compliance Event</h3>
+            <button onClick={() => setShowAddModal(false)} className="p-1 hover:bg-white/10 rounded transition-colors">
+              <X className="h-4 w-4 text-white/70" />
             </button>
           </div>
 
-          <div className="p-6 space-y-4">
+          <div className="p-6 space-y-4 bg-white">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Event Title *</label>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Event Title *</label>
               <input
-                className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#00bceb] rounded"
+                className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                 placeholder="e.g. Insurance Renewal"
                 value={addForm.title}
                 onChange={e => setAddForm(f => ({ ...f, title: e.target.value }))}
@@ -1078,9 +1078,9 @@ export default function CalendarClient({ orgName }: Props) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Type</label>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Type</label>
                 <select
-                  className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#00bceb] rounded bg-white"
+                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                   value={addForm.event_type}
                   onChange={e => setAddForm(f => ({ ...f, event_type: e.target.value as EventType }))}
                 >
@@ -1090,9 +1090,9 @@ export default function CalendarClient({ orgName }: Props) {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Recurrence</label>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Recurrence</label>
                 <select
-                  className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#00bceb] rounded bg-white"
+                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                   value={addForm.recurrence}
                   onChange={e => setAddForm(f => ({ ...f, recurrence: e.target.value }))}
                 >
@@ -1107,10 +1107,10 @@ export default function CalendarClient({ orgName }: Props) {
 
             {addForm.recurrence === 'custom' && (
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Repeat every (days)</label>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Repeat every (days)</label>
                 <input
                   type="number"
-                  className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#00bceb] rounded"
+                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                   placeholder="e.g. 180"
                   value={addForm.recurrence_interval_days}
                   onChange={e => setAddForm(f => ({ ...f, recurrence_interval_days: e.target.value }))}
@@ -1120,19 +1120,19 @@ export default function CalendarClient({ orgName }: Props) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Due Date *</label>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Due Date *</label>
                 <input
                   type="date"
-                  className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#00bceb] rounded"
+                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                   value={addForm.due_date}
                   onChange={e => setAddForm(f => ({ ...f, due_date: e.target.value }))}
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">End Date</label>
+                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">End Date</label>
                 <input
                   type="date"
-                  className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#00bceb] rounded"
+                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                   value={addForm.end_date}
                   onChange={e => setAddForm(f => ({ ...f, end_date: e.target.value }))}
                 />
@@ -1140,9 +1140,9 @@ export default function CalendarClient({ orgName }: Props) {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Location</label>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Location</label>
               <input
-                className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#00bceb] rounded"
+                className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
                 placeholder="e.g. Conference Room A"
                 value={addForm.location}
                 onChange={e => setAddForm(f => ({ ...f, location: e.target.value }))}
@@ -1150,9 +1150,9 @@ export default function CalendarClient({ orgName }: Props) {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+              <label className="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Notes</label>
               <textarea
-                className="w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#00bceb] rounded resize-none"
+                className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50 resize-none"
                 rows={3}
                 placeholder="Additional notes..."
                 value={addForm.notes}
@@ -1165,13 +1165,13 @@ export default function CalendarClient({ orgName }: Props) {
             <button
               onClick={createEvent}
               disabled={!addForm.title || !addForm.due_date || actionLoading === 'create'}
-              className="flex-1 py-2.5 bg-[#00bceb] text-white text-sm font-medium hover:bg-[#00a8d4] disabled:opacity-50 rounded transition-colors"
+              className="flex-1 py-2.5 bg-[#0175a2] text-white text-sm font-medium hover:bg-[#015a7a] disabled:opacity-50 rounded transition-colors"
             >
               {actionLoading === 'create' ? 'Creating...' : 'Create Event'}
             </button>
             <button
               onClick={() => setShowAddModal(false)}
-              className="px-6 py-2.5 border border-gray-200 text-sm text-gray-600 hover:bg-white rounded"
+              className="px-6 py-2.5 border border-gray-200 text-sm text-gray-600 hover:bg-white rounded transition-colors"
             >
               Cancel
             </button>
