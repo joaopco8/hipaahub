@@ -118,7 +118,7 @@ export default function Page(): React.ReactElement {
       {/* Bottom CTA */}
       <div className="mt-20 bg-[#0e274e] text-white p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8">
         <div>
-          <p className="text-xs font-thin tracking-[0.2em] uppercase text-[#00bceb] mb-3">Audit Ready in 7 Days</p>
+          <p className="text-xs font-thin tracking-[0.2em] uppercase text-[#00bceb] mb-3">Audit Ready in 1-3 Hours</p>
           <h2 className="text-2xl md:text-3xl font-thin leading-tight max-w-lg">
             Everything your private practice needs for HIPAA compliance, in one place.
           </h2>

@@ -1,969 +1,236 @@
-// All 50 training questions organized by category
+// HIPAA Fundamentals for Healthcare Staff — 14 questions across 4 sections
+// This module is OCR-defensible per 45 CFR 164.530(b) and 45 CFR 164.308(a)(5)
+
 export interface TrainingQuestion {
   id: string;
-  category: string;
+  sectionId: string;
   question: string;
   options: string[];
   correctAnswer: number; // 0-based index
   explanation: string;
 }
 
-export const allTrainingQuestions: TrainingQuestion[] = [
-  // Understanding PHI & Privacy (5 questions)
-  {
-    id: 'PHI-01',
-    category: 'Understanding PHI & Privacy',
-    question: 'What does PHI stand for?',
-    options: [
-      'Personal Health Information',
-      'Protected Health Information',
-      'Patient Hospital Information',
-      'Private Healthcare Identification'
-    ],
-    correctAnswer: 1,
-    explanation: 'PHI stands for Protected Health Information. It includes any health information that can identify a patient, such as name, date of birth, medical record number, or diagnosis. All employees must protect PHI as required by HIPAA.'
-  },
-  {
-    id: 'PHI-02',
-    category: 'Understanding PHI & Privacy',
-    question: 'Which of the following is NOT considered PHI?',
-    options: [
-      'Patient\'s social security number',
-      'Patient\'s medical diagnosis',
-      'A completely de-identified statistical report about disease trends',
-      'Patient\'s phone number'
-    ],
-    correctAnswer: 2,
-    explanation: 'De-identified information that cannot be linked to a specific patient is not considered PHI. Once information is properly de-identified (removing all identifiers), it is no longer protected under HIPAA.'
-  },
-  {
-    id: 'PHI-03',
-    category: 'Understanding PHI & Privacy',
-    question: 'You overhear a conversation in the hallway about a patient\'s condition. What should you do?',
-    options: [
-      'Share the information with colleagues who might find it interesting',
-      'Post about it on social media without naming the patient',
-      'Report the breach to your supervisor or Privacy Officer',
-      'Do nothing, it\'s just casual conversation'
-    ],
-    correctAnswer: 2,
-    explanation: 'Any unauthorized disclosure of PHI is a breach, even if overheard accidentally. You should report it to your supervisor or Privacy Officer immediately. Discussing patient information in public areas violates HIPAA.'
-  },
-  {
-    id: 'PHI-04',
-    category: 'Understanding PHI & Privacy',
-    question: 'A patient\'s adult child calls and asks for the patient\'s test results. The patient is conscious and has not provided written authorization. What should you do?',
-    options: [
-      'Share the results — family members have the right to know',
-      'Share only general health status, not specific results',
-      'Decline to share any PHI until you have the patient\'s explicit authorization',
-      'Ask the adult child to come in person, then share freely'
-    ],
-    correctAnswer: 2,
-    explanation: 'Under HIPAA, even immediate family members cannot receive PHI without the patient\'s explicit authorization. The patient must designate who may receive their health information, typically in writing. Without that authorization, you must politely decline to share any PHI — regardless of the caller\'s relationship to the patient.'
-  },
-  {
-    id: 'PHI-05',
-    category: 'Understanding PHI & Privacy',
-    question: 'A patient requests access to their medical records. How long do you have to provide them?',
-    options: [
-      '7 days',
-      '14 days',
-      '30 days',
-      '60 days'
-    ],
-    correctAnswer: 2,
-    explanation: 'HIPAA requires covered entities to provide patients with access to their medical records within 30 days of request. This is a patient right under the HIPAA Privacy Rule.'
-  },
-  // Password & Access Security (5 questions)
-  {
-    id: 'PASSWORD-01',
-    category: 'Password & Access Security',
-    question: 'What is a strong password?',
-    options: [
-      'Your name followed by your birth year (e.g., John1985)',
-      'A 12-character password with uppercase, lowercase, numbers, and special characters',
-      'Your pet\'s name repeated twice (e.g., Fluffy123Fluffy123)',
-      'Your username with numbers added (e.g., Admin2024)'
-    ],
-    correctAnswer: 1,
-    explanation: 'A strong password should be at least 12 characters long and include a mix of uppercase letters, lowercase letters, numbers, and special characters. This makes it much harder for attackers to guess or crack your password.'
-  },
-  {
-    id: 'PASSWORD-02',
-    category: 'Password & Access Security',
-    question: 'Under current NIST guidelines, when should you change your password?',
-    options: [
-      'Every 30 days regardless of circumstances',
-      'Only when there is evidence of compromise, or when prompted by your organization\'s policy',
-      'Every week to stay safe',
-      'Never — strong passwords never need to be changed'
-    ],
-    correctAnswer: 1,
-    explanation: 'NIST SP 800-63B (the current standard) recommends changing passwords when there is evidence of compromise or when required by your organization\'s policy — NOT on a fixed arbitrary schedule. Forced periodic changes without cause can actually reduce security by leading to predictable patterns. Always follow your organization\'s specific policy.'
-  },
-  {
-    id: 'PASSWORD-03',
-    category: 'Password & Access Security',
-    question: 'You receive an email asking you to reset your password by clicking a link. What should you do?',
-    options: [
-      'Click the link immediately and reset your password',
-      'Ignore the email and go directly to the official website to reset your password',
-      'Forward the email to your IT department to verify it\'s legitimate',
-      'Call the sender to confirm it\'s real'
-    ],
-    correctAnswer: 1,
-    explanation: 'This is a common phishing attack. Never click links in emails asking you to reset your password. Always go directly to the official website or application to reset your password. This prevents attackers from capturing your credentials.'
-  },
-  {
-    id: 'PASSWORD-04',
-    category: 'Password & Access Security',
-    question: 'Is it okay to write your password on a sticky note and put it on your monitor?',
-    options: [
-      'Yes, as long as you\'re the only one in your office',
-      'Yes, it\'s convenient and you can see it easily',
-      'No, never write down your password',
-      'Only if you use a code instead of your actual password'
-    ],
-    correctAnswer: 2,
-    explanation: 'Never write down your password or store it in an unsecured location. Written passwords can be easily discovered by unauthorized individuals. Use a password manager if you need help remembering passwords.'
-  },
-  {
-    id: 'PASSWORD-05',
-    category: 'Password & Access Security',
-    question: 'Your colleague asks you to share your password so they can access a file while you\'re away. What should you do?',
-    options: [
-      'Share your password to help them',
-      'Refuse and suggest they contact IT or your manager',
-      'Create a temporary account for them',
-      'Share your password but ask them to change it back when done'
-    ],
-    correctAnswer: 1,
-    explanation: 'Never share your password with anyone, even colleagues. Each person should have their own unique login credentials. If someone needs access to a file, they should request it through proper channels (IT department or manager).'
-  },
-  // Phishing & Email Security (5 questions)
-  {
-    id: 'PHISHING-01',
-    category: 'Phishing & Email Security',
-    question: 'What is a phishing email?',
-    options: [
-      'An email from a legitimate company asking you to confirm your account',
-      'A fraudulent email designed to trick you into revealing sensitive information',
-      'An email with a file attachment',
-      'An email from an unknown sender'
-    ],
-    correctAnswer: 1,
-    explanation: 'Phishing emails are fraudulent messages designed to trick you into revealing sensitive information like passwords, credit card numbers, or PHI. They often impersonate legitimate companies or colleagues.'
-  },
-  {
-    id: 'PHISHING-02',
-    category: 'Phishing & Email Security',
-    question: 'You receive an email from \'your bank\' asking you to verify your account information. The email looks legitimate. What should you do?',
-    options: [
-      'Click the link and verify your information',
-      'Call the bank directly using the phone number on your bank card, not the number in the email',
-      'Reply to the email asking for more information',
-      'Delete the email without taking any action'
-    ],
-    correctAnswer: 1,
-    explanation: 'Never click links in emails asking for sensitive information. Instead, contact the organization directly using a phone number or website you know is legitimate. This prevents you from falling victim to phishing attacks.'
-  },
-  {
-    id: 'PHISHING-03',
-    category: 'Phishing & Email Security',
-    question: 'What is a red flag that an email might be a phishing attempt?',
-    options: [
-      'The email asks you to click a link to verify your account',
-      'The email contains urgent language like \'Act now\' or \'Verify immediately\'',
-      'The email sender\'s address looks slightly different from the legitimate company',
-      'All of the above'
-    ],
-    correctAnswer: 3,
-    explanation: 'All of these are red flags for phishing emails. Other warning signs include spelling errors, generic greetings, requests for personal information, and suspicious attachments. Always be cautious with unsolicited emails.'
-  },
-  {
-    id: 'PHISHING-04',
-    category: 'Phishing & Email Security',
-    question: 'You receive an email with an attachment from someone you don\'t recognize. What should you do?',
-    options: [
-      'Open the attachment to see what it is',
-      'Delete the email immediately',
-      'Contact the sender to verify the attachment is legitimate before opening it',
-      'Forward it to your IT department for analysis'
-    ],
-    correctAnswer: 2,
-    explanation: 'Never open attachments from unknown senders without verification. Malicious attachments can contain viruses or ransomware that compromise your system and patient data. Contact the sender through a known phone number or email to verify before opening.'
-  },
-  {
-    id: 'PHISHING-05',
-    category: 'Phishing & Email Security',
-    question: 'You receive an email that appears to be from your CEO asking you to transfer money urgently. What should you do?',
-    options: [
-      'Process the transfer immediately',
-      'Contact your CEO directly using a phone number from the company directory to verify the request',
-      'Forward the email to accounting to process',
-      'Reply to the email asking for more details'
-    ],
-    correctAnswer: 1,
-    explanation: 'This is a common business email compromise (BEC) scam. Always verify urgent requests for money or sensitive actions by contacting the person directly using a known phone number. Never reply to the email or click links.'
-  },
-  // Access Control & Minimum Necessary (5 questions)
-  {
-    id: 'ACCESS-01',
-    category: 'Access Control & Minimum Necessary',
-    question: 'What does \'minimum necessary\' mean in HIPAA?',
-    options: [
-      'You can access any patient information you want',
-      'You should only access the minimum amount of PHI needed to do your job',
-      'You can access patient information only on Mondays',
-      'You can share patient information with anyone who asks'
-    ],
-    correctAnswer: 1,
-    explanation: 'The \'minimum necessary\' principle means you should only access and use the least amount of PHI needed to accomplish your specific job function. This reduces the risk of unauthorized disclosure and protects patient privacy.'
-  },
-  {
-    id: 'ACCESS-02',
-    category: 'Access Control & Minimum Necessary',
-    question: 'You work in billing and need to process a patient\'s insurance claim. What information do you need?',
-    options: [
-      'The patient\'s full medical history and all diagnoses',
-      'Only the diagnosis codes and treatment dates relevant to the claim',
-      'The patient\'s complete medical record',
-      'The patient\'s social security number and financial information'
-    ],
-    correctAnswer: 1,
-    explanation: 'You should only access the specific information needed for your job function. In this case, you need diagnosis codes and treatment dates for the insurance claim, not the entire medical record. This follows the minimum necessary principle.'
-  },
-  {
-    id: 'ACCESS-03',
-    category: 'Access Control & Minimum Necessary',
-    question: 'A colleague asks you to look up a patient\'s information because they\'re curious about a celebrity who came to the clinic. What should you do?',
-    options: [
-      'Look up the information and share it with your colleague',
-      'Refuse and explain that accessing PHI without a business need is a violation',
-      'Look up the information but don\'t tell anyone',
-      'Tell your colleague to look it up themselves'
-    ],
-    correctAnswer: 1,
-    explanation: 'Accessing PHI without a legitimate business need is a serious HIPAA violation. This includes accessing records out of curiosity, even if the patient is famous. Report any unauthorized access attempts to your supervisor or Privacy Officer.'
-  },
-  {
-    id: 'ACCESS-04',
-    category: 'Access Control & Minimum Necessary',
-    question: 'You\'re on vacation and a colleague asks you to access a patient\'s information on their behalf. What should you do?',
-    options: [
-      'Access the information and send it to them',
-      'Refuse and suggest they access it themselves or contact your manager',
-      'Access the information but ask them to keep it confidential',
-      'Tell them to wait until you return from vacation'
-    ],
-    correctAnswer: 1,
-    explanation: 'You should never access PHI on behalf of someone else. Each person should access only the information they need for their own job function. If they need information, they should access it themselves or request it through proper channels.'
-  },
-  {
-    id: 'ACCESS-05',
-    category: 'Access Control & Minimum Necessary',
-    question: 'When you change jobs within the organization, what should happen to your access?',
-    options: [
-      'Your access should remain the same',
-      'Your old access should be removed and new access granted based on your new role',
-      'You should keep both old and new access',
-      'You should request access to everything in case you need it'
-    ],
-    correctAnswer: 1,
-    explanation: 'When you change roles, your access should be updated to match your new job function. Old access should be removed to follow the minimum necessary principle. This prevents unauthorized access to systems you no longer need.'
-  },
-  // Incident Response & Breach Reporting (5 questions)
-  {
-    id: 'INCIDENT-01',
-    category: 'Incident Response & Breach Reporting',
-    question: 'What should you do if you suspect a security incident or breach?',
-    options: [
-      'Keep it quiet and monitor the situation',
-      'Tell your colleagues but not your manager',
-      'Report it immediately to your supervisor or Privacy Officer',
-      'Wait to see if anything happens before reporting'
-    ],
-    correctAnswer: 2,
-    explanation: 'Any suspected security incident or breach must be reported immediately to your supervisor or Privacy Officer. Early reporting allows the organization to respond quickly and minimize harm. Delays in reporting can result in disciplinary action.'
-  },
-  {
-    id: 'INCIDENT-02',
-    category: 'Incident Response & Breach Reporting',
-    question: 'You accidentally send a patient\'s medical record to the wrong email address. What should you do?',
-    options: [
-      'Hope the recipient doesn\'t open it',
-      'Report it immediately to your Privacy Officer and IT department',
-      'Ask the recipient to delete it but don\'t report it internally',
-      'Send a follow-up email asking them to ignore the first email'
-    ],
-    correctAnswer: 1,
-    explanation: 'This is a breach of PHI. You must report it immediately to your Privacy Officer and IT department. They will determine if the recipient accessed the information and what steps need to be taken. Attempting to cover it up is a serious violation.'
-  },
-  {
-    id: 'INCIDENT-03',
-    category: 'Incident Response & Breach Reporting',
-    question: 'You notice someone accessing patient records who shouldn\'t have access. What should you do?',
-    options: [
-      'Confront the person directly',
-      'Report it to your supervisor or Security Officer immediately',
-      'Monitor them to gather more information before reporting',
-      'Ask other colleagues if they\'ve noticed anything suspicious'
-    ],
-    correctAnswer: 1,
-    explanation: 'Report any suspicious activity to your supervisor or Security Officer immediately. Do not confront the person or investigate on your own. This allows the organization to respond appropriately and preserve evidence.'
-  },
-  {
-    id: 'INCIDENT-04',
-    category: 'Incident Response & Breach Reporting',
-    question: 'Under HIPAA\'s Breach Notification Rule, if a breach affects 500 or more patients in a state, what must the covered entity do?',
-    options: [
-      'Notify affected patients within 1 year and optionally notify HHS',
-      'Notify affected patients, HHS, and prominent local media within 60 days of discovery',
-      'Notify only HHS — patients do not need to be informed',
-      'Only notify if the breach was intentional'
-    ],
-    correctAnswer: 1,
-    explanation: 'For breaches affecting 500 or more individuals in a state or jurisdiction, the covered entity must: (1) notify affected individuals without unreasonable delay and within 60 days; (2) notify HHS simultaneously; and (3) notify prominent media outlets in the affected area. For breaches under 500, media notification is not required but HHS must still be notified annually.'
-  },
-  {
-    id: 'INCIDENT-05',
-    category: 'Incident Response & Breach Reporting',
-    question: 'You find a patient\'s medical record left on a printer. What should you do?',
-    options: [
-      'Leave it there for the person who printed it to retrieve',
-      'Take it to your supervisor or Privacy Officer immediately',
-      'Shred it without telling anyone',
-      'Post a note asking whose document it is'
-    ],
-    correctAnswer: 1,
-    explanation: 'Unattended PHI is a security risk. Take it to your supervisor or Privacy Officer immediately. This ensures proper handling and documentation. Leaving it unattended or shredding it without reporting could be a violation.'
-  },
-  // Device & Data Security (5 questions)
-  {
-    id: 'DEVICE-01',
-    category: 'Device & Data Security',
-    question: 'What should you do with your work computer when you leave your desk?',
-    options: [
-      'Leave it on and unlocked for quick access when you return',
-      'Lock your computer or log off before leaving',
-      'Close the monitor but leave it logged in',
-      'Leave it on but minimize all windows'
-    ],
-    correctAnswer: 1,
-    explanation: 'Always lock your computer or log off before leaving your desk. This prevents unauthorized access to PHI. Many organizations have policies requiring automatic logoff after a period of inactivity.'
-  },
-  {
-    id: 'DEVICE-02',
-    category: 'Device & Data Security',
-    question: 'You need to work from home. What should you do to protect PHI?',
-    options: [
-      'Use your personal computer and internet connection',
-      'Use the organization\'s VPN and encrypted connection on an approved device',
-      'Access the system through a public WiFi network',
-      'Share your login credentials with a family member to help you'
-    ],
-    correctAnswer: 1,
-    explanation: 'When working remotely, you must use the organization\'s VPN and an approved, encrypted device. Never use personal computers or public WiFi networks to access PHI. This protects patient data from interception.'
-  },
-  {
-    id: 'DEVICE-03',
-    category: 'Device & Data Security',
-    question: 'Your laptop contains patient information. What should you do if you lose it?',
-    options: [
-      'Hope no one finds it',
-      'Report it immediately to your IT department and supervisor',
-      'Wait a few days to see if someone returns it',
-      'Replace it and don\'t tell anyone'
-    ],
-    correctAnswer: 1,
-    explanation: 'Lost or stolen devices containing PHI must be reported immediately. Your IT department can remotely wipe the device and determine if patient data was accessed. Delays in reporting can result in disciplinary action and regulatory fines.'
-  },
-  {
-    id: 'DEVICE-04',
-    category: 'Device & Data Security',
-    question: 'Can you take patient records home on a USB drive?',
-    options: [
-      'Yes, as long as you keep it in a safe place',
-      'Only if you have written permission from your manager',
-      'Only if the drive is encrypted and you follow your organization\'s policy',
-      'No, never remove patient records from the facility'
-    ],
-    correctAnswer: 2,
-    explanation: 'Portable devices like USB drives are a security risk. If your organization allows it, the drive must be encrypted and you must follow strict policies. Many organizations prohibit removing PHI from the facility entirely.'
-  },
-  {
-    id: 'DEVICE-05',
-    category: 'Device & Data Security',
-    question: 'You\'re using a shared computer in a common area. What should you do?',
-    options: [
-      'Log in and access patient information normally',
-      'Log in, access only what you need, and log off immediately',
-      'Don\'t log in and ask someone else to access the information for you',
-      'Leave yourself logged in so others can access it quickly'
-    ],
-    correctAnswer: 1,
-    explanation: 'When using shared computers, log in, access only the information you need, and log off immediately. This prevents other users from accessing PHI. Always log off, even if you\'ll only be away for a few minutes.'
-  },
-  // Physical Security (5 questions)
-  {
-    id: 'PHYSICAL-01',
-    category: 'Physical Security',
-    question: 'You notice a door to the server room is propped open. What should you do?',
-    options: [
-      'Leave it open for convenience',
-      'Close it and report it to your IT department or supervisor',
-      'Leave it open but lock the server room later',
-      'Ask someone else to close it'
-    ],
-    correctAnswer: 1,
-    explanation: 'Propped-open doors to secure areas are a security risk. Close the door and report it immediately. This prevents unauthorized access to systems containing PHI and ensures physical security controls are maintained.'
-  },
-  {
-    id: 'PHYSICAL-02',
-    category: 'Physical Security',
-    question: 'A stranger asks you to let them into a secure area because they say they forgot their badge. What should you do?',
-    options: [
-      'Let them in to be helpful',
-      'Verify their identity and ask them to use their own badge or contact their manager',
-      'Let them in but watch them closely',
-      'Tell them to wait outside'
-    ],
-    correctAnswer: 1,
-    explanation: 'Never let unauthorized individuals into secure areas. This is called \'tailgating\' and is a common security breach. Always verify identity and require proper credentials. If they don\'t have a badge, they should contact their manager or IT.'
-  },
-  {
-    id: 'PHYSICAL-03',
-    category: 'Physical Security',
-    question: 'Where should you store printed documents containing PHI?',
-    options: [
-      'On your desk where you can see them',
-      'In a locked cabinet or drawer',
-      'In a public area so you remember to file them',
-      'In the trash when you\'re done with them'
-    ],
-    correctAnswer: 1,
-    explanation: 'Printed documents containing PHI must be stored in locked cabinets or drawers when not in use. This prevents unauthorized access. When you\'re done with them, they should be shredded, not thrown in the trash.'
-  },
-  {
-    id: 'PHYSICAL-04',
-    category: 'Physical Security',
-    question: 'You have a printed patient record that you no longer need. What should you do?',
-    options: [
-      'Throw it in the regular trash',
-      'Shred it or use the organization\'s document destruction service',
-      'Leave it on your desk for someone else to handle',
-      'Recycle it'
-    ],
-    correctAnswer: 1,
-    explanation: 'All printed documents containing PHI must be shredded or destroyed using the organization\'s document destruction service. Never throw PHI in regular trash or recycling. This prevents dumpster diving and unauthorized access.'
-  },
-  {
-    id: 'PHYSICAL-05',
-    category: 'Physical Security',
-    question: 'You see a visitor in the clinic without a visitor badge. What should you do?',
-    options: [
-      'Ignore them, they probably belong here',
-      'Ask them for their visitor badge and direct them to check in if they don\'t have one',
-      'Tell your manager later',
-      'Follow them to see where they\'re going'
-    ],
-    correctAnswer: 1,
-    explanation: 'All visitors should have a visitor badge. If you see someone without one, politely ask them for their badge and direct them to check in. This maintains physical security and prevents unauthorized access to patient areas.'
-  },
-  // Workforce Security & Training (5 questions)
-  {
-    id: 'TRAINING-01',
-    category: 'Workforce Security & Training',
-    question: 'Why is HIPAA training important?',
-    options: [
-      'It\'s required by law and helps you understand your responsibilities',
-      'It\'s just a formality that doesn\'t really matter',
-      'It only applies to IT staff',
-      'It\'s only important for managers'
-    ],
-    correctAnswer: 0,
-    explanation: 'HIPAA training is required by law and is essential for all employees. It helps you understand your responsibilities in protecting patient privacy and security. Training is a key component of HIPAA compliance.'
-  },
-  {
-    id: 'TRAINING-02',
-    category: 'Workforce Security & Training',
-    question: 'How often should you complete HIPAA training?',
-    options: [
-      'Only once when you\'re hired',
-      'Every year',
-      'Every 5 years',
-      'Never, once is enough'
-    ],
-    correctAnswer: 1,
-    explanation: 'HIPAA training should be completed annually. This ensures you stay informed about security threats, policy updates, and best practices. Your organization may require additional training if there\'s a breach or policy change.'
-  },
-  {
-    id: 'TRAINING-03',
-    category: 'Workforce Security & Training',
-    question: 'What should you do if you don\'t understand a HIPAA policy?',
-    options: [
-      'Ignore it and do what seems right',
-      'Ask your manager or Privacy Officer for clarification',
-      'Ask your colleagues what they do',
-      'Assume it doesn\'t apply to your job'
-    ],
-    correctAnswer: 1,
-    explanation: 'If you don\'t understand a HIPAA policy, ask your manager or Privacy Officer for clarification. It\'s better to ask than to violate the policy unintentionally. Your organization wants to ensure all employees understand their responsibilities.'
-  },
-  {
-    id: 'TRAINING-04',
-    category: 'Workforce Security & Training',
-    question: 'What is the consequence of violating HIPAA?',
-    options: [
-      'A warning',
-      'Disciplinary action up to and including termination, plus potential fines',
-      'Nothing, it\'s not a serious violation',
-      'Just a conversation with your manager'
-    ],
-    correctAnswer: 1,
-    explanation: 'HIPAA violations can result in serious consequences including disciplinary action, termination of employment, and significant fines. The organization can face fines up to $50,000 per violation. Individual employees can also face criminal charges.'
-  },
-  {
-    id: 'TRAINING-05',
-    category: 'Workforce Security & Training',
-    question: 'Who is responsible for protecting patient privacy?',
-    options: [
-      'Only the IT department',
-      'Only the Privacy Officer',
-      'Only doctors and nurses',
-      'Every employee in the organization'
-    ],
-    correctAnswer: 3,
-    explanation: 'Every employee is responsible for protecting patient privacy. This includes administrative staff, IT personnel, clinical staff, and management. HIPAA compliance is a shared responsibility.'
-  },
-  // Secure Communication (5 questions)
-  {
-    id: 'COMMUNICATION-01',
-    category: 'Secure Communication',
-    question: 'Can you discuss patient information over the phone?',
-    options: [
-      'Yes, always',
-      'Only if you verify the caller\'s identity and they have authorization',
-      'Never, only in person',
-      'Only if it\'s a quick conversation'
-    ],
-    correctAnswer: 1,
-    explanation: 'You can discuss patient information over the phone only if you verify the caller\'s identity and they are authorized to receive the information. Always confirm who you\'re speaking with before discussing PHI.'
-  },
-  {
-    id: 'COMMUNICATION-02',
-    category: 'Secure Communication',
-    question: 'What should you do if you accidentally include the wrong patient\'s information in an email?',
-    options: [
-      'Send another email correcting the mistake',
-      'Report it immediately to your Privacy Officer and IT department',
-      'Call the recipient and ask them to delete it',
-      'Hope they don\'t notice'
-    ],
-    correctAnswer: 1,
-    explanation: 'This is a breach of PHI. Report it immediately to your Privacy Officer and IT department. They will determine if the recipient accessed the information and what steps need to be taken.'
-  },
-  {
-    id: 'COMMUNICATION-03',
-    category: 'Secure Communication',
-    question: 'Can you text a patient\'s medical information to a colleague?',
-    options: [
-      'Yes, texting is secure',
-      'Only if you use an encrypted messaging app approved by your organization',
-      'No, never text PHI',
-      'Yes, as long as you delete the message after'
-    ],
-    correctAnswer: 1,
-    explanation: 'Regular text messages are not secure. If your organization allows texting, you must use an encrypted messaging app approved by your organization. Standard SMS is not HIPAA-compliant.'
-  },
-  {
-    id: 'COMMUNICATION-04',
-    category: 'Secure Communication',
-    question: 'You need to send a patient\'s medical record to another provider. What\'s the safest way?',
-    options: [
-      'Email it as an attachment',
-      'Text it to them',
-      'Use your organization\'s secure fax or encrypted email system',
-      'Print it and mail it'
-    ],
-    correctAnswer: 2,
-    explanation: 'Use your organization\'s secure fax or encrypted email system to send PHI to other providers. These methods protect the information from interception. Never use regular email or text messages.'
-  },
-  {
-    id: 'COMMUNICATION-05',
-    category: 'Secure Communication',
-    question: 'A patient calls asking about their test results. What should you do?',
-    options: [
-      'Provide the results immediately',
-      'Verify their identity and check if they\'re authorized to receive results before providing them',
-      'Tell them to contact their doctor',
-      'Ask them to come in person'
-    ],
-    correctAnswer: 1,
-    explanation: 'Always verify the caller\'s identity before discussing any PHI. Confirm their name, date of birth, or other identifying information. This prevents unauthorized disclosure of patient information.'
-  },
-  // Visitor & Contractor Management (2 questions)
-  {
-    id: 'VISITOR-01',
-    category: 'Visitor & Contractor Management',
-    question: 'An IT contractor arrives to upgrade your EHR server. They say they don\'t need a signed BAA because they "won\'t look at patient data." What is the correct response?',
-    options: [
-      'Allow access — if they don\'t intentionally view PHI, no BAA is needed',
-      'Require a signed BAA regardless — incidental access to PHI is still covered under HIPAA',
-      'Let them work but have a staff member watch them at all times instead',
-      'Ask them to sign a general NDA instead of a BAA'
-    ],
-    correctAnswer: 1,
-    explanation: 'A BAA is required for any Business Associate who could potentially access, process, or transmit PHI — even if access is incidental. Simply "not looking" at PHI does not eliminate the requirement. Server maintenance provides physical or logical access to systems containing PHI, which legally requires a signed BAA before work begins.'
-  },
-  {
-    id: 'VISITOR-02',
-    category: 'Visitor & Contractor Management',
-    question: 'Your organization\'s BAA with a cloud storage vendor expires next week. The vendor says they need two more weeks to process the renewal. What should you do?',
-    options: [
-      'Continue using the vendor — the lapse is only temporary',
-      'Stop storing or transmitting PHI through that vendor until the BAA is renewed',
-      'Ask the vendor to sign the renewal retroactively',
-      'Switch to a verbal agreement temporarily'
-    ],
-    correctAnswer: 1,
-    explanation: 'Operating without a valid BAA — even briefly — is a HIPAA violation. Any PHI stored or transmitted through a vendor without a current BAA creates legal exposure. You must suspend PHI-related use of that vendor\'s services until the BAA is fully executed. Plan BAA renewals well in advance to avoid gaps.'
-  },
-  // Third-Party & Vendor Management (2 questions)
-  {
-    id: 'VENDOR-01',
-    category: 'Third-Party & Vendor Management',
-    question: 'Your organization uses a cloud-based EHR system. What should you verify about the vendor?',
-    options: [
-      'Nothing, just trust them',
-      'That they have a signed BAA and use encryption to protect PHI',
-      'That they\'re a large company',
-      'That they offer the cheapest price'
-    ],
-    correctAnswer: 1,
-    explanation: 'Before using any vendor\'s system to store or process PHI, verify they have a signed BAA and use encryption. Ask about their security practices, data backup procedures, and breach notification policies.'
-  },
-  {
-    id: 'VENDOR-02',
-    category: 'Third-Party & Vendor Management',
-    question: 'Your cloud EHR vendor notifies you of a breach that exposed PHI for 600 of your patients. They tell you they "handle all notifications." What is your organization\'s obligation?',
-    options: [
-      'None — the breach is the vendor\'s problem since it happened on their system',
-      'Wait for the vendor to confirm patient impact before taking any action',
-      'Independently notify affected patients, HHS, and prominent local media within 60 days — the covered entity (you) bears primary liability',
-      'Only notify HHS if the vendor fails to do so within 90 days'
-    ],
-    correctAnswer: 2,
-    explanation: 'Under HIPAA, the covered entity — your organization — bears primary breach notification responsibility, even when the breach occurs at a Business Associate. Your vendor\'s BAA may require them to notify you, but you are still obligated to notify affected individuals, HHS, and (for 500+ patients in a state) prominent local media — all within 60 days of discovery. Never delegate this legal duty entirely to a vendor.'
-  },
-  // General Compliance (5 questions)
-  {
-    id: 'COMPLIANCE-01',
-    category: 'General Compliance',
-    question: 'What does HIPAA stand for?',
-    options: [
-      'Health Information Privacy and Protection Act',
-      'Health Insurance Portability and Accountability Act',
-      'Healthcare Information Privacy Act',
-      'Health Information Protection and Access Act'
-    ],
-    correctAnswer: 1,
-    explanation: 'HIPAA stands for the Health Insurance Portability and Accountability Act. It\'s a federal law that requires healthcare organizations to protect patient privacy and security.'
-  },
-  {
-    id: 'COMPLIANCE-02',
-    category: 'General Compliance',
-    question: 'Who enforces HIPAA?',
-    options: [
-      'The FBI',
-      'The Department of Health and Human Services (HHS) Office for Civil Rights (OCR)',
-      'The CIA',
-      'Local police'
-    ],
-    correctAnswer: 1,
-    explanation: 'The Department of Health and Human Services (HHS) Office for Civil Rights (OCR) enforces HIPAA. They investigate complaints and can impose significant fines for violations.'
-  },
-  {
-    id: 'COMPLIANCE-03',
-    category: 'General Compliance',
-    question: 'What is a HIPAA audit?',
-    options: [
-      'A financial review of the organization',
-      'An investigation by OCR to verify HIPAA compliance',
-      'A review of employee performance',
-      'An annual meeting with staff'
-    ],
-    correctAnswer: 1,
-    explanation: 'A HIPAA audit is an investigation by OCR to verify that the organization is complying with HIPAA requirements. Audits can be triggered by complaints or conducted randomly. Organizations must be prepared to provide documentation.'
-  },
-  {
-    id: 'COMPLIANCE-04',
-    category: 'General Compliance',
-    question: 'What should you do if you receive a complaint about a HIPAA violation?',
-    options: [
-      'Ignore it',
-      'Report it to your Privacy Officer or supervisor immediately',
-      'Investigate it yourself',
-      'Tell other employees about it'
-    ],
-    correctAnswer: 1,
-    explanation: 'Any complaint about a HIPAA violation should be reported immediately to your Privacy Officer or supervisor. They will investigate and take appropriate action. Do not investigate on your own or discuss it with other employees.'
-  },
-  {
-    id: 'COMPLIANCE-05',
-    category: 'General Compliance',
-    question: 'A covered entity is found to have willfully neglected HIPAA rules and failed to correct the issue. Which fine tier applies, and what is the maximum annual penalty?',
-    options: [
-      'Tier 1 — up to $25,000 per year (unknowing violation)',
-      'Tier 2 — up to $100,000 per year (reasonable cause)',
-      'Tier 3 — up to $250,000 per year (willful neglect, corrected)',
-      'Tier 4 — up to $1.9 million per year (willful neglect, not corrected)'
-    ],
-    correctAnswer: 3,
-    explanation: 'HIPAA fines are tiered by culpability. Tier 4 (willful neglect not corrected) carries the highest penalty — a minimum of $50,000 per violation and an annual ceiling of $1.9 million (inflation-adjusted). Criminal penalties are also possible for intentional violations, including imprisonment. Even Tier 1 (unknowing) carries up to $25,000 per year — so no violation is without consequence.'
-  },
-  // Social Engineering & Manipulation (5 questions)
-  {
-    id: 'SOCIAL-01',
-    category: 'Social Engineering & Manipulation',
-    question: 'What is social engineering?',
-    options: [
-      'A type of computer virus',
-      'A technique to trick people into revealing sensitive information',
-      'A networking event for healthcare professionals',
-      'A software update'
-    ],
-    correctAnswer: 1,
-    explanation: 'Social engineering is a technique used by attackers to trick people into revealing sensitive information or performing actions that compromise security. Examples include phishing, pretexting, and baiting.'
-  },
-  {
-    id: 'SOCIAL-02',
-    category: 'Social Engineering & Manipulation',
-    question: 'Someone calls claiming to be from IT asking for your password. What should you do?',
-    options: [
-      'Provide your password',
-      'Refuse and contact IT directly using a known phone number',
-      'Give them a fake password',
-      'Ask them to call back later'
-    ],
-    correctAnswer: 1,
-    explanation: 'Legitimate IT staff will never ask for your password. This is a common social engineering attack. Refuse and contact IT directly using a phone number from your company directory.'
-  },
-  {
-    id: 'SOCIAL-03',
-    category: 'Social Engineering & Manipulation',
-    question: 'What is pretexting?',
-    options: [
-      'Sending a phishing email',
-      'Creating a false scenario to trick someone into revealing information',
-      'Leaving a malicious USB drive in a parking lot',
-      'Installing spyware on a computer'
-    ],
-    correctAnswer: 1,
-    explanation: 'Pretexting is creating a false scenario to trick someone into revealing sensitive information. For example, someone might call claiming to be from your bank to get your account number.'
-  },
-  {
-    id: 'SOCIAL-04',
-    category: 'Social Engineering & Manipulation',
-    question: 'You receive a call from someone claiming to be a patient asking for another patient\'s contact information. What should you do?',
-    options: [
-      'Provide the information',
-      'Refuse and explain that you cannot share patient information without authorization',
-      'Ask them why they need it',
-      'Tell them to call back later'
-    ],
-    correctAnswer: 1,
-    explanation: 'Never share patient information without authorization. This is a social engineering attack. Politely refuse and explain that you cannot share patient information with anyone except the patient themselves or authorized individuals.'
-  },
-  {
-    id: 'SOCIAL-05',
-    category: 'Social Engineering & Manipulation',
-    question: 'What should you do if you suspect someone is trying to manipulate you into breaking security rules?',
-    options: [
-      'Go along with it to be helpful',
-      'Report it to your supervisor or Security Officer immediately',
-      'Ignore it and hope it goes away',
-      'Tell your colleagues but not management'
-    ],
-    correctAnswer: 1,
-    explanation: 'Report any suspected social engineering attempts to your supervisor or Security Officer immediately. This helps the organization identify and prevent attacks. Do not go along with requests that violate security rules.'
-  },
-  // Mobile Device Security (3 questions)
-  {
-    id: 'MOBILE-01',
-    category: 'Mobile Device Security',
-    question: 'Can you use your personal smartphone to access patient information?',
-    options: [
-      'Yes, as long as you have a password',
-      'Only if your organization approves it and the device meets security requirements',
-      'No, never use personal devices',
-      'Yes, if you\'re careful'
-    ],
-    correctAnswer: 1,
-    explanation: 'Personal devices may be used to access PHI only if your organization approves it and the device meets security requirements (encryption, password protection, etc.). Always follow your organization\'s mobile device policy.'
-  },
-  {
-    id: 'MOBILE-02',
-    category: 'Mobile Device Security',
-    question: 'What should you do if you lose your work smartphone that contains PHI?',
-    options: [
-      'Hope someone returns it',
-      'Report it immediately to your IT department and supervisor',
-      'Wait a few days before reporting',
-      'Replace it and don\'t tell anyone'
-    ],
-    correctAnswer: 1,
-    explanation: 'Lost or stolen devices containing PHI must be reported immediately. Your IT department can remotely wipe the device and determine if patient data was accessed. Delays in reporting can result in disciplinary action.'
-  },
-  {
-    id: 'MOBILE-03',
-    category: 'Mobile Device Security',
-    question: 'Should you use public WiFi to access patient information?',
-    options: [
-      'Yes, it\'s convenient',
-      'Only if you use a VPN',
-      'No, never use public WiFi for PHI',
-      'Only if the connection is password-protected'
-    ],
-    correctAnswer: 1,
-    explanation: 'Public WiFi networks are not secure. If you must access PHI on public WiFi, use your organization\'s VPN. The VPN encrypts your connection and protects PHI from interception.'
-  },
-  // Data Backup & Recovery (3 questions)
-  {
-    id: 'BACKUP-01',
-    category: 'Data Backup & Recovery',
-    question: 'Why is data backup important?',
-    options: [
-      'It\'s not really important',
-      'It ensures PHI can be recovered if systems fail or are attacked',
-      'It\'s only important for IT staff',
-      'It\'s a waste of time and resources'
-    ],
-    correctAnswer: 1,
-    explanation: 'Data backup is critical for ensuring PHI can be recovered if systems fail, are attacked, or experience data loss. Regular backups are a key component of HIPAA compliance and business continuity.'
-  },
-  {
-    id: 'BACKUP-02',
-    category: 'Data Backup & Recovery',
-    question: 'Where should backup data be stored?',
-    options: [
-      'In the same location as the original data',
-      'In a separate, secure location away from the original data',
-      'On a USB drive in your desk',
-      'On the cloud without encryption'
-    ],
-    correctAnswer: 1,
-    explanation: 'Backup data should be stored in a separate, secure location away from the original data. This protects against site-wide disasters. Backups should also be encrypted and regularly tested for recovery.'
-  },
-  {
-    id: 'BACKUP-03',
-    category: 'Data Backup & Recovery',
-    question: 'How often should data backups be performed?',
-    options: [
-      'Once a year',
-      'Once a month',
-      'Daily or more frequently, depending on the organization\'s policy',
-      'Only when IT remembers to do it'
-    ],
-    correctAnswer: 2,
-    explanation: 'Data backups should be performed daily or more frequently, depending on the organization\'s policy and the importance of the data. Regular backups minimize data loss in case of a disaster.'
-  },
-  // Security Awareness (5 questions)
-  {
-    id: 'AWARENESS-01',
-    category: 'Security Awareness',
-    question: 'What is the first step in protecting patient privacy?',
-    options: [
-      'Installing antivirus software',
-      'Being aware of security risks and following policies',
-      'Hiring a security consultant',
-      'Purchasing expensive security systems'
-    ],
-    correctAnswer: 1,
-    explanation: 'Security awareness is the first step in protecting patient privacy. Understanding risks and following security policies is more important than technology alone. Every employee plays a role in protecting PHI.'
-  },
-  {
-    id: 'AWARENESS-02',
-    category: 'Security Awareness',
-    question: 'What should you do if you see a security vulnerability or weakness?',
-    options: [
-      'Ignore it',
-      'Try to fix it yourself',
-      'Report it to your IT department or supervisor',
-      'Tell your colleagues but not management'
-    ],
-    correctAnswer: 2,
-    explanation: 'Report any security vulnerabilities or weaknesses to your IT department or supervisor. Do not attempt to fix them yourself. This allows the organization to address the issue properly and prevent exploitation.'
-  },
-  {
-    id: 'AWARENESS-03',
-    category: 'Security Awareness',
-    question: 'Why is it important to keep your antivirus software updated?',
-    options: [
-      'It\'s not important',
-      'Updated software detects and removes new malware threats',
-      'It\'s just a marketing gimmick',
-      'Updates slow down your computer'
-    ],
-    correctAnswer: 1,
-    explanation: 'Updated antivirus software includes the latest virus definitions and can detect and remove new malware threats. Always keep your antivirus software updated to protect against the latest threats.'
-  },
-  {
-    id: 'AWARENESS-04',
-    category: 'Security Awareness',
-    question: 'What is the best way to stay informed about security threats?',
-    options: [
-      'Ignore security news',
-      'Attend security training and read security awareness communications from your organization',
-      'Only worry about it if there\'s a breach',
-      'Assume it won\'t happen to you'
-    ],
-    correctAnswer: 1,
-    explanation: 'Stay informed by attending security training and reading security awareness communications from your organization. This helps you recognize and respond to threats. Security awareness is an ongoing process.'
-  },
-  {
-    id: 'AWARENESS-05',
-    category: 'Security Awareness',
-    question: 'What is the most important thing you can do to protect patient privacy?',
-    options: [
-      'Use a strong password',
-      'Think before you act and follow security policies',
-      'Install antivirus software',
-      'Lock your door'
-    ],
-    correctAnswer: 1,
-    explanation: 'The most important thing you can do is think before you act and follow security policies. Security awareness and good judgment are the foundation of protecting patient privacy. Technology alone is not enough.'
-  }
-];
-
-// Helper function to get questions by category
-export function getQuestionsByCategory(category: string): TrainingQuestion[] {
-  return allTrainingQuestions.filter(q => q.category === category);
-}
-
-// Helper function to map questions to section IDs
-// Total: 50 questions distributed across 8 sections
 export function getQuestionsForSection(sectionId: string): TrainingQuestion[] {
-  const mapping: Record<string, string[]> = {
-    // Section 1: Introduction to HIPAA (6 questions)
-    'introduction': ['COMPLIANCE-01', 'COMPLIANCE-02', 'COMPLIANCE-03', 'COMPLIANCE-04', 'COMPLIANCE-05', 'TRAINING-01'],
-    // Section 2: Understanding PHI (6 questions)
-    'phi': ['PHI-01', 'PHI-02', 'PHI-03', 'PHI-04', 'PHI-05', 'TRAINING-02'],
-    // Section 3: Minimum Necessary (6 questions)
-    'minimum-necessary': ['ACCESS-01', 'ACCESS-02', 'ACCESS-03', 'ACCESS-04', 'ACCESS-05', 'TRAINING-03'],
-    // Section 4: Access Controls & Passwords (7 questions)
-    'access-controls': ['PASSWORD-01', 'PASSWORD-02', 'PASSWORD-03', 'PASSWORD-04', 'PASSWORD-05', 'DEVICE-01', 'DEVICE-02'],
-    // Section 5: Email & Communication Security (7 questions)
-    'communication': ['PHISHING-01', 'PHISHING-02', 'PHISHING-03', 'PHISHING-04', 'PHISHING-05', 'COMMUNICATION-01', 'COMMUNICATION-02'],
-    // Section 6: Incident & Breach Reporting (7 questions)
-    'incident-reporting': ['INCIDENT-01', 'INCIDENT-02', 'INCIDENT-03', 'INCIDENT-04', 'INCIDENT-05', 'COMMUNICATION-03', 'COMMUNICATION-04'],
-    // Section 7: Sanctions for Violations (7 questions)
-    'sanctions': ['TRAINING-04', 'TRAINING-05', 'PHYSICAL-01', 'PHYSICAL-02', 'PHYSICAL-03', 'PHYSICAL-04', 'PHYSICAL-05'],
-    // Section 8: Privacy Rights & Additional Topics (4 questions)
-    'patient-rights': ['COMMUNICATION-05', 'VISITOR-01', 'VISITOR-02', 'VENDOR-01', 'VENDOR-02', 'SOCIAL-01', 'SOCIAL-02', 'SOCIAL-03', 'SOCIAL-04', 'SOCIAL-05', 'MOBILE-01', 'MOBILE-02', 'MOBILE-03', 'BACKUP-01', 'BACKUP-02', 'BACKUP-03', 'AWARENESS-01', 'AWARENESS-02', 'AWARENESS-03', 'AWARENESS-04', 'AWARENESS-05', 'DEVICE-03', 'DEVICE-04', 'DEVICE-05']
-  };
-
-  const questionIds = mapping[sectionId] || [];
-  return allTrainingQuestions.filter(q => questionIds.includes(q.id));
+  return TRAINING_QUESTIONS.filter(q => q.sectionId === sectionId);
 }
+
+export const TRAINING_QUESTIONS: TrainingQuestion[] = [
+
+  // ── Section A: What is PHI ──────────────────────────────────────────────────
+
+  {
+    id: 'A-01',
+    sectionId: 'phi',
+    question:
+      'A colleague asks you the name of a patient you saw yesterday. This information is:',
+    options: [
+      'PHI only if you also share their diagnosis',
+      'PHI — a patient\'s name alone, when linked to the fact they are a patient, is PHI',
+      'Not PHI — names are public information',
+      'PHI only if shared outside the building',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'Under HIPAA, a patient\'s name combined with the fact that they received services at your practice qualifies as PHI. Even appointment confirmations that include a patient\'s name must be handled carefully.',
+  },
+  {
+    id: 'A-02',
+    sectionId: 'phi',
+    question: 'Which of the following is an example of PHI?',
+    options: [
+      'A list of staff names and their work schedules',
+      'A patient\'s name, date of birth, and diagnosis',
+      'General statistics about anxiety rates in the US',
+      'The name of a medication with no patient attached',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'PHI requires both an identifier (like name or date of birth) AND health-related information (like a diagnosis). Option B has both. General statistics or medication names without patient identifiers are not PHI.',
+  },
+  {
+    id: 'A-03',
+    sectionId: 'phi',
+    question:
+      'You overhear a colleague discussing a patient\'s treatment plan loudly in the waiting room. This is:',
+    options: [
+      'Acceptable if the patient is not present',
+      'A potential HIPAA violation — PHI should only be discussed where it cannot be overheard by others',
+      'Acceptable because it is verbal, not written',
+      'Only a problem if the patient files a complaint',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'HIPAA\'s Minimum Necessary standard requires that PHI disclosures happen only to those who need the information and in settings where privacy can be maintained. Verbal disclosures are fully covered by HIPAA — the medium does not matter.',
+  },
+  {
+    id: 'A-04',
+    sectionId: 'phi',
+    question:
+      'A patient calls asking about their upcoming appointment. You can confirm the appointment to:',
+    options: [
+      'Anyone who calls and knows the patient\'s name',
+      'The patient themselves, after verifying their identity',
+      'The patient\'s spouse without patient authorization',
+      'The patient\'s employer if they request it',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'You can share information with the patient directly after verifying who they are. Sharing with spouses, family members, or employers requires either explicit written patient authorization or the patient to be present and verbally consent.',
+  },
+
+  // ── Section B: How to Access and Handle Data Securely ──────────────────────
+
+  {
+    id: 'B-01',
+    sectionId: 'secure-access',
+    question:
+      'You need to step away from your desk for 5 minutes. You should:',
+    options: [
+      'Leave your computer as-is since you\'ll be right back',
+      'Lock your screen before leaving',
+      'Close the patient record but leave the computer unlocked',
+      'Ask a colleague to watch your screen',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'Even a brief absence is enough time for unauthorized access. Locking your screen takes one second (Windows+L or CMD+Control+Q on Mac) and is required every time you leave your workstation — without exception.',
+  },
+  {
+    id: 'B-02',
+    sectionId: 'secure-access',
+    question:
+      'A colleague asks to use your login to quickly check a patient record because they forgot their password. You should:',
+    options: [
+      'Help them out since it\'s an emergency',
+      'Refuse and direct them to reset their own password',
+      'Log in for them but watch what they access',
+      'It\'s fine if a supervisor approves it verbally',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'HIPAA requires unique user identification. Sharing login credentials makes it impossible to track who accessed what and when — which destroys the audit trail. Your credentials are your sole responsibility, regardless of who asks.',
+  },
+  {
+    id: 'B-03',
+    sectionId: 'secure-access',
+    question:
+      'A patient\'s family member calls asking for the patient\'s appointment details. The patient is an adult. You should:',
+    options: [
+      'Provide the information if they sound like family',
+      'Provide the information only if the patient has signed an authorization for that person',
+      'Refuse to confirm the patient is even a client',
+      'Provide the information as long as you don\'t mention the diagnosis',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'Adult patients control their own health information. Without written authorization from the patient designating that person as someone who may receive information, you cannot share appointment details — regardless of the relationship.',
+  },
+  {
+    id: 'B-04',
+    sectionId: 'secure-access',
+    question:
+      'You receive an email that appears to be from your EHR vendor asking you to click a link and verify your login credentials. You should:',
+    options: [
+      'Click the link and verify — vendors need access',
+      'Forward it to your supervisor to review first',
+      'Delete it without telling anyone',
+      'Reply with your credentials if the email looks official',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'This is a phishing attempt. Legitimate vendors never ask for your credentials via email. Do not click links in suspicious emails. Report it to your supervisor or designated security officer immediately so it can be assessed and communicated to the team.',
+  },
+
+  // ── Section C: What to Do If You Suspect a Breach ─────────────────────────
+
+  {
+    id: 'C-01',
+    sectionId: 'breach-reporting',
+    question:
+      'You accidentally send an email with a patient\'s name and appointment time to the wrong email address. You should:',
+    options: [
+      'Delete the sent email and hope the recipient ignores it',
+      'Report it to your supervisor immediately, even if it seems minor',
+      'Send a follow-up email asking the recipient to delete it, then consider it handled',
+      'Only report it if the patient finds out',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'Every potential breach must be reported internally and assessed — even minor-seeming ones. The practice needs to evaluate whether OCR notification is required. Concealing a breach is a separate and more serious HIPAA violation than the original incident.',
+  },
+  {
+    id: 'C-02',
+    sectionId: 'breach-reporting',
+    question:
+      'You discover that a former employee\'s login credentials still work in your EHR system two weeks after they left. This is:',
+    options: [
+      'Not a concern unless they actually accessed records',
+      'A security incident that must be reported to your supervisor immediately',
+      'Normal — IT will get to it eventually',
+      'Only a problem if the former employee was terminated for cause',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'Active credentials for former employees represent an unauthorized access risk and must be treated as a security incident. The longer they remain active, the greater the exposure. Report it so access can be revoked and an audit can determine whether any unauthorized access occurred.',
+  },
+  {
+    id: 'C-03',
+    sectionId: 'breach-reporting',
+    question: 'How quickly must you report a suspected breach to your supervisor?',
+    options: [
+      'Within 30 days',
+      'Within 72 hours — same day is the standard',
+      'By the end of the week',
+      'Only after you are certain a breach occurred',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'You should report as soon as possible — the same day is the expected standard. HIPAA gives the practice 72 hours from discovery to notify OCR for large breaches (500+ patients). That clock starts the moment anyone at the practice becomes aware. Your delay becomes the practice\'s legal problem.',
+  },
+
+  // ── Section D: Penalties and Why This Matters ──────────────────────────────
+
+  {
+    id: 'D-01',
+    sectionId: 'penalties',
+    question:
+      'A coworker tells you they looked up a celebrity patient\'s records out of curiosity. They ask you not to say anything. You should:',
+    options: [
+      'Keep it between you — they made a mistake and are sorry',
+      'Report it to your supervisor immediately',
+      'Warn them once and monitor the situation',
+      'Only report it if the celebrity finds out',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'Accessing records without a legitimate work reason is a HIPAA violation regardless of whether the patient ever finds out. Knowing about a violation and concealing it makes you potentially liable as well. Reporting protects you, the practice, and the patient.',
+  },
+  {
+    id: 'D-02',
+    sectionId: 'penalties',
+    question: 'Which statement about HIPAA penalties is correct?',
+    options: [
+      'Only the practice owner can be held responsible, not individual staff',
+      'Individual staff members can face criminal charges for intentional violations',
+      'Penalties only apply to violations that cause visible harm to patients',
+      'Apologizing to the patient resolves the HIPAA violation',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'Individual employees can face federal criminal prosecution for intentional HIPAA violations — separate from any action taken against the practice. Penalties range from 1 year in prison for knowing violations to 10 years for violations intended to sell data or cause harm.',
+  },
+  {
+    id: 'D-03',
+    sectionId: 'penalties',
+    question: 'The best reason to complete this training is:',
+    options: [
+      'Because your employer requires it',
+      'Because it protects patients, the practice, and yourself from preventable harm',
+      'To avoid being fined personally',
+      'Because OCR randomly audits staff knowledge',
+    ],
+    correctAnswer: 1,
+    explanation:
+      'The goal of HIPAA is to protect patients\' most sensitive information. Understanding these rules helps you make better decisions every day — not just in audits. Your training record is evidence that you were informed and capable of making those decisions.',
+  },
+];

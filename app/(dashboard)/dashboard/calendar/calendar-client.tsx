@@ -66,6 +66,106 @@ const ET: Record<EventType, { label: string; color: string; dot: string; badge: 
 
 const ALL_TYPES = Object.keys(ET) as EventType[];
 
+// ── DateInput component ────────────────────────────────────────────────────────
+// Replaces native <input type="date"> which has poor year-typing UX on Windows.
+// Renders three separate numeric fields: DD / MM / YYYY
+// value/onChange use YYYY-MM-DD format for API compatibility.
+
+function DateInput({
+  value,
+  onChange,
+  className = '',
+  min,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  className?: string;
+  min?: string;
+}) {
+  const [dd, setDd] = useState('');
+  const [mm, setMm] = useState('');
+  const [yyyy, setYyyy] = useState('');
+  const mmRef = useRef<HTMLInputElement>(null);
+  const yyyyRef = useRef<HTMLInputElement>(null);
+
+  // Sync from external value (YYYY-MM-DD)
+  useEffect(() => {
+    if (value && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      const [y, mo, d] = value.split('-');
+      setYyyy(y); setMm(mo); setDd(d);
+    } else if (!value) {
+      setDd(''); setMm(''); setYyyy('');
+    }
+  }, [value]);
+
+  function emit(d: string, m: string, y: string) {
+    if (d.length === 2 && m.length === 2 && y.length === 4) {
+      const iso = `${y}-${m}-${d}`;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) onChange(iso);
+    } else if (!d && !m && !y) {
+      onChange('');
+    }
+  }
+
+  function handleDd(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+    setDd(v);
+    emit(v, mm, yyyy);
+    if (v.length === 2) mmRef.current?.focus();
+  }
+
+  function handleMm(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 2);
+    setMm(v);
+    emit(dd, v, yyyy);
+    if (v.length === 2) yyyyRef.current?.focus();
+  }
+
+  function handleYyyy(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = e.target.value.replace(/\D/g, '').slice(0, 4);
+    setYyyy(v);
+    emit(dd, mm, v);
+  }
+
+  const base = 'text-center focus:outline-none focus:border-[#0175a2] bg-transparent';
+
+  return (
+    <div className={`flex items-center border border-gray-200 bg-gray-50 rounded px-2 py-2 gap-0.5 ${className}`}>
+      <input
+        type="text"
+        inputMode="numeric"
+        placeholder="DD"
+        maxLength={2}
+        value={dd}
+        onChange={handleDd}
+        className={`${base} w-7 text-sm text-gray-800`}
+      />
+      <span className="text-gray-400 text-sm">/</span>
+      <input
+        ref={mmRef}
+        type="text"
+        inputMode="numeric"
+        placeholder="MM"
+        maxLength={2}
+        value={mm}
+        onChange={handleMm}
+        className={`${base} w-7 text-sm text-gray-800`}
+      />
+      <span className="text-gray-400 text-sm">/</span>
+      <input
+        ref={yyyyRef}
+        type="text"
+        inputMode="numeric"
+        placeholder="AAAA"
+        maxLength={4}
+        value={yyyy}
+        onChange={handleYyyy}
+        className={`${base} w-12 text-sm text-gray-800`}
+      />
+    </div>
+  );
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function today(): string {
@@ -969,12 +1069,10 @@ export default function CalendarClient({ orgName }: Props) {
           {snoozePanel && (
             <div className="border border-amber-100 bg-amber-50 p-3 rounded space-y-2">
               <p className="text-xs font-medium text-amber-700">Snooze until</p>
-              <input
-                type="date"
-                className="w-full text-xs border border-amber-200 bg-white p-1.5 rounded focus:outline-none"
+              <DateInput
+                className="w-full border-amber-200 bg-white"
                 value={snoozeDate}
-                min={todayStr}
-                onChange={ev => setSnoozeDate(ev.target.value)}
+                onChange={v => setSnoozeDate(v)}
               />
               <input
                 type="text"
@@ -1121,20 +1219,18 @@ export default function CalendarClient({ orgName }: Props) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1.5">Due Date *</label>
-                <input
-                  type="date"
-                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
+                <DateInput
+                  className="w-full"
                   value={addForm.due_date}
-                  onChange={e => setAddForm(f => ({ ...f, due_date: e.target.value }))}
+                  onChange={v => setAddForm(f => ({ ...f, due_date: v }))}
                 />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-500 mb-1.5">End Date</label>
-                <input
-                  type="date"
-                  className="w-full border border-gray-200 px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:border-[#0175a2] rounded bg-gray-50"
+                <DateInput
+                  className="w-full"
                   value={addForm.end_date}
-                  onChange={e => setAddForm(f => ({ ...f, end_date: e.target.value }))}
+                  onChange={v => setAddForm(f => ({ ...f, end_date: v }))}
                 />
               </div>
             </div>

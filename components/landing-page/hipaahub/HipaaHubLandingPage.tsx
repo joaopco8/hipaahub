@@ -108,7 +108,7 @@ const HipaaHubLandingPage: React.FC = () => {
             <div className="bg-[#f8f9fa] border-b border-gray-100 py-4 px-4 md:px-12">
               <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
                 {[
-                  'Audit-ready in 7 days',
+                  'Audit-ready in 1-3 hours',
                   '14-day free trial',
                   'Cancel anytime',
                   'HIPAA BAA included',

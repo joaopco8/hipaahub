@@ -71,6 +71,7 @@ export default async function DashboardPage() {
     mitigationResult,
     practiceTrainingResult,
     practiceBAAResult,
+    breachResponsePlanResult,
   ] = await Promise.all([
     getPolicyDocumentsCount(supabase, user.id),
     getEvidenceStatistics().catch(() => ({
@@ -116,6 +117,14 @@ export default async function DashboardPage() {
           .then((r: any) => r.data ?? [])
           .catch(() => [])
       : Promise.resolve(null),
+    // Breach response plan status
+    (supabase as any)
+      .from('breach_response_plan')
+      .select('plan_status')
+      .eq('organization_id', orgId)
+      .single()
+      .then((r: any) => r.data ?? null)
+      .catch(() => null),
   ]);
 
   const evidenceStats = evidenceStatsResult || {
@@ -182,25 +191,36 @@ export default async function DashboardPage() {
   let validBAAs: number;
   let totalVendorsWithPHI: number;
   let baaScore: number;
+  let expiringBAAsPractice: number = 0;
+  let expiredBAAsPractice: number = 0;
+  let unsignedBAAsPractice: number = 0;
 
   if (hasPractice && practiceBAAResult) {
     const allBaas = practiceBAAResult as any[];
     validBAAs = allBaas.filter((b) => b.status === 'active').length;
-    totalVendorsWithPHI = allBaas.length || 1;
-    baaScore = Math.round((validBAAs / totalVendorsWithPHI) * 25);
+    expiringBAAsPractice = allBaas.filter((b) => b.status === 'expiring_soon').length;
+    expiredBAAsPractice = allBaas.filter((b) => b.status === 'expired').length;
+    unsignedBAAsPractice = allBaas.filter((b) => b.status === 'not_signed').length;
+    // Use actual vendor count — 0 vendors is NOT the same as "all vendors covered"
+    totalVendorsWithPHI = vendors.length;
+    baaScore = totalVendorsWithPHI === 0 ? 0 : Math.round((validBAAs / totalVendorsWithPHI) * 25);
   } else {
+    totalVendorsWithPHI = vendors.filter((v: any) => v.has_phi_access).length;
     validBAAs = vendors.filter((v: any) => {
       if (!v.baa_signed || !v.baa_expiration_date) return false;
       return new Date(v.baa_expiration_date) > today;
     }).length;
-    totalVendorsWithPHI = vendors.filter((v: any) => v.has_phi_access).length || 1;
-    baaScore = Math.round((validBAAs / totalVendorsWithPHI) * 25);
+    baaScore = totalVendorsWithPHI === 0 ? 0 : Math.round((validBAAs / totalVendorsWithPHI) * 25);
   }
 
   const openIncidents = incidents.filter((inc: any) => inc.status === 'open').length;
   const incidentVendorScore = Math.min(25, baaScore);
 
-  const complianceScore = documentationScore + riskManagementScore + trainingScore + incidentVendorScore;
+  // Breach Response Plan — -10 penalty if no active plan
+  const hasActiveBRP = (breachResponsePlanResult as any)?.plan_status === 'active';
+  const brpPenalty   = hasActiveBRP ? 0 : 10;
+
+  const complianceScore = Math.max(0, documentationScore + riskManagementScore + trainingScore + incidentVendorScore - brpPenalty);
   const scoreTier = complianceScore < 40 ? 'low' : complianceScore < 70 ? 'medium' : 'high';
   const scoreColor = scoreTier === 'high' ? '#1ad07a' : scoreTier === 'medium' ? '#fbab18' : '#e2231a';
   const scoreLabel = scoreTier === 'high' ? 'Protected' : scoreTier === 'medium' ? 'Partial' : 'At Risk';
@@ -380,17 +400,29 @@ export default async function DashboardPage() {
   const totalActionItems = pendingActionItems.length;
 
   // ── Vendor & BAA Status ────────────────────────────────────────────────────
-  const expiringBAAs = vendors.filter((v: any) => {
-    if (!v.baa_expiration_date) return false;
-    const expDate = new Date(v.baa_expiration_date);
-    const daysUntilExpiry = Math.ceil((expDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
-  }).length;
-  const expiredBAAs = vendors.filter((v: any) => {
-    if (!v.baa_expiration_date) return false;
-    const expDate = new Date(v.baa_expiration_date);
-    return expDate < today;
-  }).length;
+  // For Practice+: use statuses from the dedicated baas table (already computed above).
+  // For Solo: compute from the vendors table with a 90-day window.
+  let expiringBAAs: number;
+  let expiredBAAs: number;
+  let unsignedBAAs: number;
+
+  if (hasPractice && practiceBAAResult) {
+    expiringBAAs = expiringBAAsPractice;
+    expiredBAAs = expiredBAAsPractice;
+    unsignedBAAs = unsignedBAAsPractice;
+  } else {
+    const ninetyDays = new Date(today.getTime() + 90 * 24 * 60 * 60 * 1000);
+    expiringBAAs = vendors.filter((v: any) => {
+      if (!v.baa_expiration_date) return false;
+      const expDate = new Date(v.baa_expiration_date);
+      return expDate > today && expDate <= ninetyDays;
+    }).length;
+    expiredBAAs = vendors.filter((v: any) => {
+      if (!v.baa_expiration_date) return false;
+      return new Date(v.baa_expiration_date) <= today;
+    }).length;
+    unsignedBAAs = vendors.filter((v: any) => v.has_phi_access && !v.baa_signed).length;
+  }
 
   // ── Incident Status ───────────────────────────────────────────────────────
   const lastIncident = incidents.length > 0 ? incidents[0] : null;
@@ -687,15 +719,26 @@ export default async function DashboardPage() {
                   <span className="text-sm font-thin text-[#0e274e]">{incidentVendorScore} / 25 pts</span>
                 </div>
                 <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className="h-full transition-all"
-                    style={{ 
+                    style={{
                       width: `${(incidentVendorScore / 25) * 100}%`,
                       backgroundColor: incidentVendorScore >= 20 ? '#1ad07a' : incidentVendorScore >= 10 ? '#fbab18' : '#e2231a'
                     }}
                   />
                 </div>
               </div>
+
+              {!hasActiveBRP && (
+                <div className="flex items-center gap-2 bg-red-50 border border-red-200 px-3 py-2 mt-1">
+                  <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                  <span className="text-xs text-red-700 font-thin">
+                    No breach response plan on file — required by HIPAA.{' '}
+                    <a href="/dashboard/breach-notifications/response-plan" className="underline hover:text-red-900">Create plan →</a>
+                    {' '}<span className="font-medium">(-10 pts)</span>
+                  </span>
+                </div>
+              )}
 
               <p className="text-xs text-gray-500 font-thin mt-4 pt-4 border-t border-gray-100">
                 {getScoreContext()}
@@ -957,38 +1000,68 @@ export default async function DashboardPage() {
                   <p className="text-xs text-gray-400 font-thin">BAA tracking requires Practice plan</p>
                 </>
               ) : totalVendorsWithPHI === 0 ? (
+                // No vendors at all — amber warning, not a neutral/green state
                 <>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-sm font-thin text-gray-500">No vendors registered</span>
+                    <AlertTriangle className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm font-thin text-amber-600">No vendors registered</span>
                   </div>
+                  <p className="text-xs text-gray-500 font-thin mb-3">
+                    You haven&apos;t added any vendors yet. Most practices need BAAs with their EHR, telehealth platform, billing software, scheduling tool, and email provider.
+                  </p>
                   <Link href="/dashboard/policies/vendors">
-                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-gray-200 text-[#565656] hover:bg-gray-50">
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-amber-200 text-amber-700 hover:bg-amber-50">
                       Add your first vendor <ArrowRight className="w-3 h-3 ml-2" />
                     </Button>
                   </Link>
                 </>
-              ) : expiringBAAs > 0 || expiredBAAs > 0 ? (
+              ) : expiredBAAs > 0 || unsignedBAAs > 0 ? (
+                // Expired or unsigned BAAs — red state
                 <>
                   <div className="flex items-center gap-2 mb-3">
-                    <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                    <span className="text-sm font-thin text-yellow-600">
-                      {expiringBAAs + expiredBAAs} {expiredBAAs > 0 ? 'expired' : 'expiring'} in {expiringBAAs > 0 ? '30 days' : ''}
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-sm font-thin text-red-600">
+                      {expiredBAAs + unsignedBAAs} vendor{expiredBAAs + unsignedBAAs !== 1 ? 's' : ''} need attention
                     </span>
                   </div>
+                  <p className="text-xs text-gray-500 font-thin mb-3">
+                    {expiredBAAs > 0 && <>{expiredBAAs} expired</>}
+                    {expiredBAAs > 0 && expiringBAAs > 0 && <> · </>}
+                    {expiringBAAs > 0 && <>{expiringBAAs} expiring soon</>}
+                    {(expiredBAAs > 0 || expiringBAAs > 0) && unsignedBAAs > 0 && <> · </>}
+                    {unsignedBAAs > 0 && <>{unsignedBAAs} unsigned</>}
+                  </p>
                   <Link href="/dashboard/policies/vendors">
-                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-yellow-200 text-yellow-700 hover:bg-yellow-50">
-                      Renew BAAs
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-red-200 text-red-700 hover:bg-red-50">
+                      Review BAAs
+                    </Button>
+                  </Link>
+                </>
+              ) : expiringBAAs > 0 ? (
+                // Expiring within 90 days but none expired/unsigned — amber state
+                <>
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm font-thin text-amber-600">
+                      {expiringBAAs} BAA{expiringBAAs !== 1 ? 's' : ''} expiring soon
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 font-thin mb-3">Renewal needed within 90 days</p>
+                  <Link href="/dashboard/policies/vendors">
+                    <Button variant="outline" className="w-full rounded-none font-thin text-xs border-amber-200 text-amber-700 hover:bg-amber-50">
+                      Review BAAs
                     </Button>
                   </Link>
                 </>
               ) : (
+                // All vendors covered — green state
                 <>
                   <div className="flex items-center gap-2 mb-3">
                     <CheckCircle2 className="w-4 h-4 text-green-600" />
                     <span className="text-sm font-thin text-green-600">All BAAs valid</span>
                   </div>
                   <p className="text-xs text-gray-500 font-thin mb-3">
-                    {validBAAs} of {totalVendorsWithPHI} vendors
+                    {validBAAs} of {totalVendorsWithPHI} vendors covered
                   </p>
                   <Link href="/dashboard/policies/vendors">
                     <Button variant="outline" className="w-full rounded-none font-thin text-xs border-gray-200 text-[#565656] hover:bg-gray-50">

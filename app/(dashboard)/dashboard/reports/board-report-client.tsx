@@ -192,7 +192,7 @@ function ExecutiveSummarySection({ d }: { d: BoardReportData }) {
   const s = d.executiveSummary;
   const scoreBadge = s.complianceScore >= 80 ? { label: 'PROTECTED', color: 'green' as const } : s.complianceScore >= 50 ? { label: 'PARTIAL', color: 'amber' as const } : { label: 'AT RISK', color: 'red' as const };
   const trainingBadge = s.staffTotal === 0 ? { label: 'NO DATA', color: 'gray' as const } : s.staffTrainingPct === 100 ? { label: 'FULLY COMPLIANT', color: 'green' as const } : s.staffTrainingPct > 80 ? { label: 'ON TRACK', color: 'teal' as const } : { label: 'NEEDS ATTENTION', color: 'amber' as const };
-  const baaBadge = s.baasTotal === 0 ? { label: 'N/A', color: 'gray' as const } : s.baasExpired > 0 ? { label: `${s.baasExpired} EXPIRED`, color: 'red' as const } : s.baasExpiringSoon > 0 ? { label: `${s.baasExpiringSoon} EXPIRING`, color: 'amber' as const } : { label: 'ALL CURRENT', color: 'green' as const };
+  const baaBadge = s.baasTotal === 0 ? { label: 'NO VENDORS', color: 'amber' as const } : s.baasExpired > 0 ? { label: `${s.baasExpired} EXPIRED`, color: 'red' as const } : s.baasExpiringSoon > 0 ? { label: `${s.baasExpiringSoon} EXPIRING`, color: 'amber' as const } : { label: 'ALL CURRENT', color: 'green' as const };
   const riskBadge = s.openRiskItems === 0 ? { label: 'ALL RESOLVED', color: 'green' as const } : s.openRiskItems <= 3 ? { label: 'BEING MANAGED', color: 'teal' as const } : { label: 'NEEDS ATTENTION', color: 'amber' as const };
 
   return (
@@ -227,7 +227,7 @@ function ExecutiveSummarySection({ d }: { d: BoardReportData }) {
             <span className="text-sm text-gray-400">/{s.baasTotal}</span>
           </div>
           <Badge {...baaBadge} />
-          {s.baasTotal === 0 && <p className="text-[10px] text-gray-400 mt-1.5">No BAAs tracked</p>}
+          {s.baasTotal === 0 && <p className="text-[10px] text-amber-500 mt-1.5">No vendors registered</p>}
         </div>
         {/* Risk */}
         <div className="border border-gray-200 p-4 bg-white">

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, AlertCircle, History } from 'lucide-react';
+import { Mail, AlertCircle, History, ShieldCheck } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 export function BreachNavigation() {
@@ -10,6 +10,7 @@ export function BreachNavigation() {
   const isLettersPage = pathname === '/dashboard/breach-notifications';
   const isIncidentsPage = pathname?.startsWith('/dashboard/breach-notifications/incidents');
   const isHistoryPage = pathname?.startsWith('/dashboard/breach-notifications/history');
+  const isResponsePlanPage = pathname?.startsWith('/dashboard/breach-notifications/response-plan');
 
   return (
     <div className="border-b border-gray-200 mb-6">
@@ -49,6 +50,18 @@ export function BreachNavigation() {
         >
           <History className="h-4 w-4" />
           History
+        </Link>
+        <Link
+          href="/dashboard/breach-notifications/response-plan"
+          className={cn(
+            "flex items-center gap-2 px-6 py-3 border-b-2 transition-colors font-light text-sm",
+            isResponsePlanPage
+              ? "border-[#00bceb] text-[#00bceb]"
+              : "border-transparent text-gray-600 hover:text-[#00bceb] hover:border-gray-300"
+          )}
+        >
+          <ShieldCheck className="h-4 w-4" />
+          Response Plan
         </Link>
       </nav>
     </div>

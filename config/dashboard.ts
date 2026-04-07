@@ -78,6 +78,7 @@ export const navConfig = [
   { href: '/dashboard/mitigation', icon: 'Wrench', label: 'Mitigation', group: 'core', requiresPlan: 'practice' },
   { href: '/dashboard/policies', icon: 'FileText', label: 'Policies & Documents', group: 'compliance' },
   { href: '/dashboard/training', icon: 'Users', label: 'Training & Employees', group: 'compliance', requiresPlan: 'practice' },
+  { href: '/dashboard/policies/vendors', icon: 'FileCheck', label: 'BAA Tracker', group: 'compliance', requiresPlan: 'practice' },
   { href: '/dashboard/assets', icon: 'Package', label: 'Asset Inventory', group: 'compliance', requiresPlan: 'practice' },
   { href: '/dashboard/risk-assessment', icon: 'ShieldAlert', label: 'Risk Assessment', group: 'compliance' },
   { href: '/dashboard/breach-notifications', icon: 'Mail', label: 'Breach Notifications', group: 'compliance' },

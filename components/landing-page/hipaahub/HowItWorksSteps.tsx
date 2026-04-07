@@ -59,13 +59,13 @@ const HowItWorksSteps: React.FC = () => {
             number="3"
             icon={<LayoutGrid size={40} strokeWidth={1} />}
             title="Implement"
-            duration="1-7 days"
+            duration="1-3 hours"
             list={["Customize policies", "Upload documentation", "Schedule training", "Verify audit readiness"]}
           />
         </div>
         
         <div className="mt-20 text-center">
-           <p className="text-xl font-thin text-cisco-navy">Timeline: Audit-ready in 7 days.</p>
+           <p className="text-xl font-thin text-cisco-navy">Timeline: Audit-ready in 1-3 hours.</p>
         </div>
       </div>
     </section>

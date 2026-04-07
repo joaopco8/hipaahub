@@ -3,7 +3,6 @@ import { getUser } from '@/utils/supabase/queries';
 import { redirect } from 'next/navigation';
 import { getUserPlanTier, isPracticePlus } from '@/lib/plan-gating';
 import { PlanGate } from '@/components/plan-gate';
-import { PoliciesNavigation } from '@/components/policies/policies-navigation';
 import BAATrackerClient from '@/components/baa/baa-tracker-client';
 import { getVendorsWithBAA, getBAAStats } from '@/app/actions/baa-tracker';
 import { getSubscription } from '@/utils/supabase/queries';
@@ -36,18 +35,7 @@ export default async function VendorsPage() {
     <div className="flex w-full flex-col gap-6">
       {/* Header */}
       <div className="mb-2">
-        <h2 className="text-2xl font-light text-[#0e274e]">Policies & Documents</h2>
-        <p className="text-sm text-gray-400 font-light">
-          Manage HIPAA policy templates and documentation
-        </p>
-      </div>
-
-      {/* Navigation Tabs */}
-      <PoliciesNavigation />
-
-      {/* Page sub-header */}
-      <div>
-        <h3 className="text-xl font-light text-[#0e274e]">Vendor & BAA Tracker</h3>
+        <h2 className="text-2xl font-light text-[#0e274e]">BAA Tracker</h2>
         <p className="text-sm text-gray-400 font-light">
           Track Business Associate Agreements, expiration dates, and vendor PHI exposure
         </p>

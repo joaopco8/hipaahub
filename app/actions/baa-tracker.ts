@@ -14,6 +14,8 @@ export interface Vendor {
   organization_id: string;
   vendor_name: string;
   service_type: string;
+  category: string | null;
+  baa_url: string | null;
   contact_name: string | null;
   contact_email: string | null;
   contact_phone: string | null;
@@ -104,6 +106,8 @@ export async function getVendorsWithBAA(): Promise<VendorWithBAA[]> {
 export async function createVendor(payload: {
   vendor_name: string;
   service_type: string;
+  category?: string;
+  baa_url?: string;
   contact_name?: string;
   contact_email?: string;
   contact_phone?: string;
@@ -121,6 +125,8 @@ export async function createVendor(payload: {
     .insert({
       vendor_name: payload.vendor_name,
       service_type: payload.service_type,
+      category: payload.category ?? null,
+      baa_url: payload.baa_url ?? null,
       contact_name: payload.contact_name ?? null,
       contact_email: payload.contact_email ?? null,
       contact_phone: payload.contact_phone ?? null,
@@ -138,7 +144,7 @@ export async function createVendor(payload: {
 
 export async function updateVendor(
   id: string,
-  payload: Partial<Pick<Vendor, 'vendor_name' | 'service_type' | 'contact_name' | 'contact_email' | 'contact_phone' | 'notes' | 'start_date'>>
+  payload: Partial<Pick<Vendor, 'vendor_name' | 'service_type' | 'category' | 'baa_url' | 'contact_name' | 'contact_email' | 'contact_phone' | 'notes' | 'start_date'>>
 ): Promise<void> {
   const supabase = createClient();
   const user = await getUser(supabase);

@@ -9,7 +9,7 @@ const rows = [
   },
   {
     label: 'Setup time',
-    hipaaHub: '7 days',
+    hipaaHub: '1-3 hours',
     compliancyGroup: '4–6 weeks',
     manual: 'Months',
   },
