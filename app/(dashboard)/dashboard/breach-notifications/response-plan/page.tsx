@@ -109,7 +109,7 @@ function SectionHeader({ number, title, guidance }: { number: string; title: str
 
 export default function ResponsePlanPage() {
   const { planTier } = useSubscription();
-  const isTrialOrFree = planTier === 'solo' || planTier === 'trial' || !planTier;
+  const isTrialOrFree = planTier !== 'practice' && planTier !== 'clinic' && planTier !== 'enterprise';
 
   const [plan, setPlan] = useState<BreachResponsePlan>({ ...DEFAULT_PLAN, assessment_factors: DEFAULT_ASSESSMENT_FACTORS });
   const [planId, setPlanId] = useState<string | null>(null);

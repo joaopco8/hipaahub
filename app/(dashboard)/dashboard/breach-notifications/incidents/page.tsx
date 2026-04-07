@@ -186,7 +186,7 @@ function getRiskStyle(r: string) {
 export default function IncidentsPage() {
   const router = useRouter();
   const { planTier } = useSubscription();
-  const isTrialOrFree = planTier === 'solo' || planTier === 'trial' || !planTier;
+  const isTrialOrFree = planTier !== 'practice' && planTier !== 'clinic' && planTier !== 'enterprise';
 
   const [incidents, setIncidents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
