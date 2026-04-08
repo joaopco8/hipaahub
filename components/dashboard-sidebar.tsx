@@ -35,7 +35,8 @@ function isNavLocked(item: NavItem, planTier: string): boolean {
 const GROUP_LABELS: Record<string, string> = {
   core: 'Main',
   organization: 'Organization',
-  compliance: 'Compliance',
+  primary: 'Core Features',
+  compliance: 'Tools',
   help: 'Help',
 };
 
@@ -63,7 +64,23 @@ const Sidebar = ({ navConfig, theme = 'blue', planTier = 'unknown' }: SidebarPro
     <nav className="relative flex flex-col px-0">
       {groups.map(({ group, items }, gi) => (
         <div key={group + gi}>
-          {gi > 0 && (
+          {gi > 0 && group === 'primary' && (
+            <div className="mx-4 my-3">
+              <div className="border-t border-white/20" />
+              <p className="text-[9px] font-semibold tracking-widest text-white/35 uppercase px-2 pt-2.5 pb-0.5">
+                {GROUP_LABELS['primary']}
+              </p>
+            </div>
+          )}
+          {gi > 0 && group !== 'primary' && group === 'compliance' && (
+            <div className="mx-4 my-3">
+              <div className="border-t border-white/20" />
+              <p className="text-[9px] font-semibold tracking-widest text-white/35 uppercase px-2 pt-2.5 pb-0.5">
+                {GROUP_LABELS['compliance']}
+              </p>
+            </div>
+          )}
+          {gi > 0 && group !== 'primary' && group !== 'compliance' && (
             <div className="mx-6 my-2 border-t border-white/10" />
           )}
 

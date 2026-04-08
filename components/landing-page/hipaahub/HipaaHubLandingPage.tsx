@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import Navbar from './Navbar';
 import Hero from './Hero';
 import SolutionSection from './SolutionSection';
-import StatsSection from './StatsSection';
 import HowItWorks from './HowItWorks';
 import HowItWorksSteps from './HowItWorksSteps';
 import WhatsIncluded from './WhatsIncluded';
 import BuiltForYourPractice from './BuiltForYourPractice';
 import WhyPracticesChoose from './WhyPracticesChoose';
+import G2ReviewsSection from './G2ReviewsSection';
 import SocialProof from './SocialProof';
 import BlogSection from './BlogSection';
 import AuditGuarantee from './AuditGuarantee';
@@ -124,12 +124,12 @@ const HipaaHubLandingPage: React.FC = () => {
             </div>
 
             <SolutionSection />
-            <StatsSection onAssessmentClick={handleAssessmentClick} />
             <HowItWorksSteps />
             <WhatsIncluded onDemoClick={handleWatchDemoClick} onAssessmentClick={handleAssessmentClick} />
             <HowItWorks onGetStarted={handleAssessmentClick} />
             <BuiltForYourPractice />
             <WhyPracticesChoose />
+            <G2ReviewsSection />
             <SocialProof />
             <PricingSection onDemoClick={handleWatchDemoClick} />
             <FAQSection />

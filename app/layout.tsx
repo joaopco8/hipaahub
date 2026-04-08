@@ -47,33 +47,30 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
-    'Next.js',
-    'React',
-    'Tailwind CSS',
-    'Server Components',
-    'Radix UI'
+    'HIPAA compliance',
+    'HIPAA risk assessment',
+    'healthcare compliance software',
+    'private practice HIPAA',
+    'BAA tracker',
+    'HIPAA policies',
+    'breach notification',
+    'OCR audit'
   ],
-  authors: [
-    {
-      name: 'antoineross',
-      url: 'https://antoineross.com'
-    }
-  ],
-  creator: 'antoineross',
+  authors: [{ name: 'HIPAA Hub Health, Inc.' }],
+  creator: 'HIPAA Hub',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: siteConfig.url,
     title: siteConfig.name,
     description: siteConfig.description,
-    siteName: siteConfig.name
+    siteName: siteConfig.name,
   },
   twitter: {
     card: 'summary_large_image',
     title: siteConfig.name,
     description: siteConfig.description,
-    images: [`${siteConfig.url}/og.jpg`],
-    creator: '@antoineross'
+    creator: '@hipaahub',
   },
   icons: {
     icon: '/images/FAVICON.png',
