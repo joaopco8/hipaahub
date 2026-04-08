@@ -598,8 +598,12 @@ export default async function DashboardPage() {
       {/* One-time toast when returning from Stripe checkout */}
       <Suspense fallback={null}><SubscribedToast /></Suspense>
       {/* ── 1. Header Contextual ───────────────────────────────────────────── */}
-      <div className="border-b border-gray-200 pb-4">
-        <h1 className="text-2xl md:text-3xl font-thin text-[#0e274e] leading-tight mb-2">
+      <div className="border-b border-gray-200 pb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-1 h-5 rounded-full" style={{ backgroundColor: scoreColor }} />
+          <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: scoreColor }}>{scoreLabel}</span>
+        </div>
+        <h1 className="text-2xl md:text-3xl font-light text-[#0e274e] leading-tight mb-2">
           {headerStatus.title}
         </h1>
         <p className="text-sm text-[#565656] font-thin">
@@ -632,9 +636,10 @@ export default async function DashboardPage() {
       {showOnboarding && <OnboardingChecklist items={onboardingItems} />}
 
       {/* ── 2. Compliance Score Gauge ─────────────────────────────────────── */}
-      <Card className="border-0 shadow-sm bg-white rounded-none">
-        <CardContent className="p-8 md:p-12">
-          <div className="grid md:grid-cols-[auto_1fr] gap-8 md:gap-12 items-center">
+      <Card className="shadow-sm bg-white border border-slate-200/80">
+        <CardContent className="p-6 md:p-8">
+          <p className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/40 mb-6">Compliance Score</p>
+          <div className="grid md:grid-cols-[auto_1fr] gap-8 md:gap-10 items-center">
             {/* Gauge Circle */}
             <div className="flex flex-col items-center justify-center">
               <div className="relative w-48 h-48 md:w-64 md:h-64">
@@ -670,7 +675,7 @@ export default async function DashboardPage() {
                   <span className="text-sm font-thin text-[#565656]">Documentation</span>
                   <span className="text-sm font-thin text-[#0e274e]">{documentationScore} / 25 pts</span>
                 </div>
-                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     className="h-full transition-all"
                     style={{ 
@@ -686,7 +691,7 @@ export default async function DashboardPage() {
                   <span className="text-sm font-thin text-[#565656]">Risk Management</span>
                   <span className="text-sm font-thin text-[#0e274e]">{riskManagementScore} / 25 pts</span>
                 </div>
-                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     className="h-full transition-all"
                     style={{ 
@@ -702,7 +707,7 @@ export default async function DashboardPage() {
                   <span className="text-sm font-thin text-[#565656]">Training</span>
                   <span className="text-sm font-thin text-[#0e274e]">{trainingScore} / 25 pts</span>
                 </div>
-                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
                   <div 
                     className="h-full transition-all"
                     style={{ 
@@ -718,7 +723,7 @@ export default async function DashboardPage() {
                   <span className="text-sm font-thin text-[#565656]">Incident & Vendor Control</span>
                   <span className="text-sm font-thin text-[#0e274e]">{incidentVendorScore} / 25 pts</span>
                 </div>
-                <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className="h-full transition-all"
                     style={{
@@ -752,7 +757,7 @@ export default async function DashboardPage() {
       {prioritizedActions.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-thin text-[#0e274e]">Action Center</h2>
+            <h2 className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/50">Action Center</h2>
             {totalActionItems > 3 && (
               <Link href="/dashboard/action-items" className="text-sm font-thin text-[#0175a2] hover:underline">
                 View all action items ({totalActionItems})
@@ -761,32 +766,38 @@ export default async function DashboardPage() {
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             {prioritizedActions.map((action, i) => (
-              <Card key={i} className="border-0 shadow-sm bg-white rounded-none">
+              <Card key={i} className={`shadow-sm bg-white border border-l-4 ${
+                action.severity === 'critical' ? 'border-slate-200/80 border-l-red-500' :
+                action.severity === 'warning' ? 'border-slate-200/80 border-l-amber-400' :
+                'border-slate-200/80 border-l-blue-400'
+              }`}>
                 <CardContent className="p-6">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div 
-                      className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  <div className="flex items-start gap-3 mb-4">
+                    <div
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                         action.severity === 'critical' ? 'bg-red-50 text-red-600' :
-                        action.severity === 'warning' ? 'bg-yellow-50 text-yellow-600' :
+                        action.severity === 'warning' ? 'bg-amber-50 text-amber-600' :
                         'bg-blue-50 text-blue-600'
                       }`}
                     >
                       {action.icon}
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-base font-thin text-[#0e274e] mb-1">{action.title}</h3>
+                      <h3 className="text-sm font-medium text-[#0e274e] mb-1 leading-snug">{action.title}</h3>
                       <p className="text-xs text-gray-500 font-thin leading-relaxed">{action.description}</p>
                     </div>
                   </div>
                   <Link href={action.link}>
-                    <Button 
-                      className={`w-full rounded-none font-thin text-xs ${
-                        action.severity === 'critical' 
-                          ? 'bg-[#e2231a] text-white hover:bg-[#c01e17]' 
+                    <Button
+                      className={`w-full rounded-md text-xs font-light ${
+                        action.severity === 'critical'
+                          ? 'bg-red-600 text-white hover:bg-red-700'
+                          : action.severity === 'warning'
+                          ? 'bg-amber-500 text-white hover:bg-amber-600'
                           : 'bg-[#0175a2] text-white hover:bg-[#0e274e]'
                       }`}
                     >
-                      {action.severity === 'critical' ? 'Activate now' : action.severity === 'warning' ? 'Fix now' : 'View'} <ArrowRight className="w-3 h-3 ml-2" />
+                      {action.severity === 'critical' ? 'Fix now' : action.severity === 'warning' ? 'Review' : 'View'} <ArrowRight className="w-3 h-3 ml-2" />
                     </Button>
                   </Link>
                 </CardContent>
@@ -798,14 +809,14 @@ export default async function DashboardPage() {
 
       {/* ── 4. Documentation Health (4 cards) ──────────────────────────────── */}
       <div>
-        <h2 className="text-xl font-thin text-[#0e274e] mb-4">Documentation Health</h2>
+        <h2 className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/50 mb-4">Documentation Health</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Policies Card */}
-          <Card className="border-0 shadow-sm bg-white rounded-none">
+          <Card className="shadow-sm bg-white border border-slate-200/80">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <FileText className="w-5 h-5 text-[#0175a2]" />
-                <h3 className="text-sm font-thin text-[#0e274e]">Policies</h3>
+                <h3 className="text-sm font-medium text-[#0e274e]">Policies</h3>
               </div>
               {policiesCompleted === 0 ? (
                 <>
@@ -848,11 +859,11 @@ export default async function DashboardPage() {
           </Card>
 
           {/* Training Card */}
-          <Card className="border-0 shadow-sm bg-white rounded-none">
+          <Card className="shadow-sm bg-white border border-slate-200/80">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Users className="w-5 h-5 text-[#0175a2]" />
-                <h3 className="text-sm font-thin text-[#0e274e]">Staff Training</h3>
+                <h3 className="text-sm font-medium text-[#0e274e]">Staff Training</h3>
               </div>
               {!hasPractice ? (
                 <>
@@ -879,7 +890,7 @@ export default async function DashboardPage() {
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-thin text-[#0e274e]">{trainingRate}%</span>
                     </div>
-                    <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-yellow-500"
                         style={{ width: `${trainingRate}%` }}
@@ -914,11 +925,11 @@ export default async function DashboardPage() {
           </Card>
 
           {/* Risk Assessment Card */}
-          <Card className="border-0 shadow-sm bg-white rounded-none">
+          <Card className="shadow-sm bg-white border border-slate-200/80">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <Shield className="w-5 h-5 text-[#0175a2]" />
-                <h3 className="text-sm font-thin text-[#0e274e]">Risk Assessment</h3>
+                <h3 className="text-sm font-medium text-[#0e274e]">Risk Assessment</h3>
               </div>
               {!hasRiskAssessment ? (
                 <>
@@ -986,11 +997,11 @@ export default async function DashboardPage() {
           </Card>
 
           {/* BAAs Card */}
-          <Card className="border-0 shadow-sm bg-white rounded-none">
+          <Card className="shadow-sm bg-white border border-slate-200/80">
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <FileCheck className="w-5 h-5 text-[#0175a2]" />
-                <h3 className="text-sm font-thin text-[#0e274e]">BAAs</h3>
+                <h3 className="text-sm font-medium text-[#0e274e]">BAAs</h3>
               </div>
               {!hasPractice ? (
                 <>
@@ -1078,10 +1089,10 @@ export default async function DashboardPage() {
       {/* ── 5. Incidents | Vendors (2 cards side by side) ──────────────────── */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Incidents Card */}
-        <Card className="border-0 shadow-sm bg-white rounded-none">
+        <Card className="shadow-sm bg-white border border-slate-200/80">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-thin text-[#0e274e]">Incidents</h3>
+              <h3 className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/50">Incidents</h3>
               <Link href="/dashboard/breach-notifications/incidents" className="text-xs font-thin text-[#0175a2] hover:underline">
                 View incident log <ArrowRight className="w-3 h-3 inline ml-1" />
               </Link>
@@ -1117,10 +1128,10 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Vendors Card */}
-        <Card className="border-0 shadow-sm bg-white rounded-none">
+        <Card className="shadow-sm bg-white border border-slate-200/80">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-thin text-[#0e274e]">Vendors</h3>
+              <h3 className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/50">Vendors</h3>
               <Link href="/dashboard/policies/vendors" className="text-xs font-thin text-[#0175a2] hover:underline">
                 Manage vendors <ArrowRight className="w-3 h-3 inline ml-1" />
               </Link>
@@ -1154,10 +1165,10 @@ export default async function DashboardPage() {
 
       {/* ── 6. Upcoming Expirations (next 90 days) ─────────────────────────── */}
       {upcomingExpirations.length > 0 && (
-        <Card className="border-0 shadow-sm bg-white rounded-none">
+        <Card className="shadow-sm bg-white border border-slate-200/80">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-thin text-[#0e274e]">Upcoming Expirations</h3>
+              <h3 className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/50">Upcoming Expirations</h3>
               <span className="text-xs text-gray-400 font-thin">Next 90 days</span>
             </div>
             <div className="space-y-2">
@@ -1191,9 +1202,9 @@ export default async function DashboardPage() {
 
       {/* ── 8. Compliance Timeline ─────────────────────────────────────────── */}
       {timelineEvents.length > 0 && (
-        <Card className="border-0 shadow-sm bg-white rounded-none">
+        <Card className="shadow-sm bg-white border border-slate-200/80">
           <CardContent className="p-6">
-            <h3 className="text-base font-thin text-[#0e274e] mb-6">Compliance Timeline</h3>
+            <h3 className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/50 mb-6">Compliance Timeline</h3>
             <div className="space-y-4">
               {timelineEvents.slice(0, 12).map((event, i) => {
                 const daysUntil = Math.ceil((event.date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
@@ -1227,10 +1238,10 @@ export default async function DashboardPage() {
 
       {/* ── 9. Recent Activity Feed ────────────────────────────────────────── */}
       {recentActivity.length > 0 && (
-        <Card className="border-0 shadow-sm bg-white rounded-none">
+        <Card className="shadow-sm bg-white border border-slate-200/80">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-base font-thin text-[#0e274e]">Recent Activity</h3>
+              <h3 className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/50">Recent Activity</h3>
               <Link href="/dashboard/activity" className="text-xs font-thin text-[#0175a2] hover:underline">
                 View all <ArrowRight className="w-3 h-3 inline ml-1" />
               </Link>
@@ -1272,11 +1283,11 @@ export default async function DashboardPage() {
       )}
 
       {/* ── 10. Export Audit CTA ──────────────────────────────────────────── */}
-      <Card className="border-0 shadow-sm bg-white rounded-none">
+      <Card className="shadow-sm bg-white border border-slate-200/80">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-thin text-[#0e274e] mb-1">Audit Package</h3>
+              <h3 className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/50 mb-1">Audit Package</h3>
               <p className="text-sm text-gray-500 font-thin">
                 Your audit package is {complianceScore >= 60 ? 'ready' : 'not ready'}. Last exported: never.
               </p>

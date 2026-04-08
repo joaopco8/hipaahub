@@ -97,25 +97,17 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-geologica), sans-serif;
-    font-weight: 100;
+    font-weight: 300;
     font-feature-settings:
       'rlig' 1,
       'calt' 1;
   }
   html {
     font-family: var(--font-geologica), sans-serif;
-    font-weight: 100;
+    font-weight: 300;
   }
   
-  /* Force thin typography for all text elements */
-  h1, h2, h3, h4, h5, h6, p, span, a, li, button, input, textarea, select, label, div {
-    font-family: var(--font-geologica), sans-serif;
-    font-weight: 100;
-    text-transform: none;
-    letter-spacing: normal;
-  }
-  
-  /* Ensure font-thin class uses weight 100 */
+  /* Ensure font-thin class uses weight 100 (used by landing page) */
   .font-thin {
     font-weight: 100 !important;
   }

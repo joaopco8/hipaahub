@@ -121,7 +121,7 @@ export default function SidebarLayout({
       {/* Right Content Area */}
       <div className="flex flex-1 flex-col overflow-hidden h-full relative">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-8 shadow-sm shrink-0 z-10">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-8 shrink-0 z-10">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileOpen(true)}
@@ -130,12 +130,13 @@ export default function SidebarLayout({
             >
               <Menu className="h-6 w-6" />
             </button>
-            <h1 className="text-2xl font-extralight text-[#0e274e] hidden sm:block">
-              Welcome
-            </h1>
-            <span className="text-sm text-gray-400 font-light hidden sm:block border-l border-gray-300 pl-4 ml-4">
-              {organization?.name || organization?.legal_name || 'Organization'} Workspace
-            </span>
+            <div className="hidden sm:flex items-center gap-3">
+              <span className="text-sm font-medium text-[#0e274e]">
+                {organization?.name || organization?.legal_name || 'Organization'}
+              </span>
+              <span className="text-gray-300 text-sm">·</span>
+              <span className="text-xs font-light text-gray-400 tracking-wide">HIPAA Compliance Dashboard</span>
+            </div>
             {/* Mobile: org name */}
             <span className="text-sm text-[#0e274e] font-light sm:hidden truncate max-w-[160px]">
               {organization?.name || organization?.legal_name || 'HIPAA Hub'}

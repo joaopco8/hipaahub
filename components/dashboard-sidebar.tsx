@@ -67,7 +67,7 @@ const Sidebar = ({ navConfig, theme = 'blue', planTier = 'unknown' }: SidebarPro
           {gi > 0 && group === 'primary' && (
             <div className="mx-4 my-3">
               <div className="border-t border-white/20" />
-              <p className="text-[9px] font-semibold tracking-widest text-white/35 uppercase px-2 pt-2.5 pb-0.5">
+              <p className="text-[9px] font-semibold tracking-widest text-white/50 uppercase px-2 pt-2.5 pb-0.5">
                 {GROUP_LABELS['primary']}
               </p>
             </div>
@@ -75,7 +75,7 @@ const Sidebar = ({ navConfig, theme = 'blue', planTier = 'unknown' }: SidebarPro
           {gi > 0 && group !== 'primary' && group === 'compliance' && (
             <div className="mx-4 my-3">
               <div className="border-t border-white/20" />
-              <p className="text-[9px] font-semibold tracking-widest text-white/35 uppercase px-2 pt-2.5 pb-0.5">
+              <p className="text-[9px] font-semibold tracking-widest text-white/50 uppercase px-2 pt-2.5 pb-0.5">
                 {GROUP_LABELS['compliance']}
               </p>
             </div>
