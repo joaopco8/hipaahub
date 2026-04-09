@@ -635,120 +635,213 @@ export default async function DashboardPage() {
       {/* ── 1c. Onboarding Checklist (new users, score < 40) ─────────────── */}
       {showOnboarding && <OnboardingChecklist items={onboardingItems} />}
 
-      {/* ── 2. Compliance Score Gauge ─────────────────────────────────────── */}
-      <Card className="shadow-sm bg-white border border-slate-200/80">
+      {/* ── 2. Compliance Score ───────────────────────────────────────────── */}
+      <Card className="shadow-sm bg-white border border-slate-200/80 overflow-hidden">
+        {/* Header bar */}
+        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-100 bg-slate-50/60">
+          <p className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/50">Compliance Score</p>
+          <div className="flex items-center gap-4 text-xs text-slate-400 font-thin">
+            <span>Last updated {lastUpdated.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            <span className="text-slate-300">·</span>
+            <span>Next review {nextReviewDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+        </div>
+
         <CardContent className="p-6 md:p-8">
-          <p className="text-xs font-semibold tracking-widest uppercase text-[#0e274e]/40 mb-6">Compliance Score</p>
-          <div className="grid md:grid-cols-[auto_1fr] gap-8 md:gap-10 items-center">
-            {/* Gauge Circle */}
-            <div className="flex flex-col items-center justify-center">
-              <div className="relative w-48 h-48 md:w-64 md:h-64">
+          <div className="grid md:grid-cols-[220px_1fr] gap-8 md:gap-10 items-start">
+
+            {/* Gauge + overall status */}
+            <div className="flex flex-col items-center gap-3">
+              <div className="relative w-44 h-44">
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 200 200">
-                  <circle cx="100" cy="100" r="85" stroke="#f3f5f9" strokeWidth="20" fill="none" />
+                  <circle cx="100" cy="100" r="82" stroke="#f0f2f6" strokeWidth="16" fill="none" />
                   <circle
-                    cx="100"
-                    cy="100"
-                    r="85"
+                    cx="100" cy="100" r="82"
                     stroke={scoreColor}
-                    strokeWidth="20"
+                    strokeWidth="16"
                     fill="none"
-                    strokeDasharray={`${2 * Math.PI * 85}`}
-                    strokeDashoffset={`${2 * Math.PI * 85 * (1 - complianceScore / 100)}`}
+                    strokeDasharray={`${2 * Math.PI * 82}`}
+                    strokeDashoffset={`${2 * Math.PI * 82 * (1 - complianceScore / 100)}`}
                     strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-5xl md:text-6xl font-thin text-[#0e274e]" style={{ color: scoreColor }}>
-                    {complianceScore}
-                  </span>
-                  <span className="text-sm md:text-base font-thin text-gray-500 mt-1" style={{ color: scoreColor }}>
-                    {scoreLabel}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Score Breakdown */}
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-thin text-[#565656]">Documentation</span>
-                  <span className="text-sm font-thin text-[#0e274e]">{documentationScore} / 25 pts</span>
-                </div>
-                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full transition-all"
-                    style={{ 
-                      width: `${(documentationScore / 25) * 100}%`,
-                      backgroundColor: documentationScore >= 20 ? '#1ad07a' : documentationScore >= 10 ? '#fbab18' : '#e2231a'
-                    }}
-                  />
+                  <span className="text-5xl font-light" style={{ color: scoreColor }}>{complianceScore}</span>
+                  <span className="text-xs font-semibold tracking-wider uppercase mt-0.5" style={{ color: scoreColor }}>{scoreLabel}</span>
                 </div>
               </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-thin text-[#565656]">Risk Management</span>
-                  <span className="text-sm font-thin text-[#0e274e]">{riskManagementScore} / 25 pts</span>
-                </div>
-                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full transition-all"
-                    style={{ 
-                      width: `${(riskManagementScore / 25) * 100}%`,
-                      backgroundColor: riskManagementScore >= 20 ? '#1ad07a' : riskManagementScore >= 10 ? '#fbab18' : '#e2231a'
-                    }}
-                  />
-                </div>
+              {/* Status pill */}
+              <div
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium"
+                style={{
+                  backgroundColor: scoreTier === 'high' ? '#dcfce7' : scoreTier === 'medium' ? '#fef3c7' : '#fee2e2',
+                  color: scoreTier === 'high' ? '#15803d' : scoreTier === 'medium' ? '#92400e' : '#991b1b',
+                }}
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: scoreColor }}
+                />
+                {scoreTier === 'high' ? 'Fully Protected' : scoreTier === 'medium' ? 'Partially Protected' : 'At Risk'}
               </div>
 
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-thin text-[#565656]">Training</span>
-                  <span className="text-sm font-thin text-[#0e274e]">{trainingScore} / 25 pts</span>
-                </div>
-                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full transition-all"
-                    style={{ 
-                      width: `${(trainingScore / 25) * 100}%`,
-                      backgroundColor: trainingScore >= 20 ? '#1ad07a' : trainingScore >= 10 ? '#fbab18' : '#e2231a'
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-thin text-[#565656]">Incident & Vendor Control</span>
-                  <span className="text-sm font-thin text-[#0e274e]">{incidentVendorScore} / 25 pts</span>
-                </div>
-                <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full transition-all"
-                    style={{
-                      width: `${(incidentVendorScore / 25) * 100}%`,
-                      backgroundColor: incidentVendorScore >= 20 ? '#1ad07a' : incidentVendorScore >= 10 ? '#fbab18' : '#e2231a'
-                    }}
-                  />
-                </div>
-              </div>
-
-              {!hasActiveBRP && (
-                <div className="flex items-center gap-2 bg-red-50 border border-red-200 px-3 py-2 mt-1">
-                  <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                  <span className="text-xs text-red-700 font-thin">
-                    No breach response plan on file — required by HIPAA.{' '}
-                    <a href="/dashboard/breach-notifications/response-plan" className="underline hover:text-red-900">Create plan →</a>
-                    {' '}<span className="font-medium">(-10 pts)</span>
-                  </span>
-                </div>
-              )}
-
-              <p className="text-xs text-gray-500 font-thin mt-4 pt-4 border-t border-gray-100">
+              <p className="text-xs text-slate-400 text-center leading-relaxed font-thin px-1">
                 {getScoreContext()}
               </p>
             </div>
+
+            {/* Category cards grid */}
+            <div className="space-y-3">
+              {/* Row 1 */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Documentation */}
+                {(() => {
+                  const pct = documentationScore / 25;
+                  const status = documentationScore >= 20 ? 'Compliant' : documentationScore >= 10 ? 'Partial' : 'At Risk';
+                  const color = documentationScore >= 20 ? '#1ad07a' : documentationScore >= 10 ? '#fbab18' : '#e2231a';
+                  const bg = documentationScore >= 20 ? '#f0fdf4' : documentationScore >= 10 ? '#fffbeb' : '#fff1f2';
+                  const textColor = documentationScore >= 20 ? '#15803d' : documentationScore >= 10 ? '#92400e' : '#9f1239';
+                  return (
+                    <div className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3 hover:border-slate-300 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center">
+                            <FileText className="w-3.5 h-3.5 text-slate-500" />
+                          </div>
+                          <span className="text-xs font-medium text-slate-700">Documentation</span>
+                        </div>
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: bg, color: textColor }}>{status}</span>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xl font-light text-[#0e274e]">{documentationScore}</span>
+                          <span className="text-xs text-slate-400 font-thin">/ 25 pts</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all" style={{ width: `${pct * 100}%`, backgroundColor: color }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Risk Management */}
+                {(() => {
+                  const pct = riskManagementScore / 25;
+                  const status = riskManagementScore >= 20 ? 'Compliant' : riskManagementScore >= 10 ? 'Partial' : 'At Risk';
+                  const color = riskManagementScore >= 20 ? '#1ad07a' : riskManagementScore >= 10 ? '#fbab18' : '#e2231a';
+                  const bg = riskManagementScore >= 20 ? '#f0fdf4' : riskManagementScore >= 10 ? '#fffbeb' : '#fff1f2';
+                  const textColor = riskManagementScore >= 20 ? '#15803d' : riskManagementScore >= 10 ? '#92400e' : '#9f1239';
+                  return (
+                    <div className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3 hover:border-slate-300 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center">
+                            <Shield className="w-3.5 h-3.5 text-slate-500" />
+                          </div>
+                          <span className="text-xs font-medium text-slate-700">Risk Management</span>
+                        </div>
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: bg, color: textColor }}>{status}</span>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xl font-light text-[#0e274e]">{riskManagementScore}</span>
+                          <span className="text-xs text-slate-400 font-thin">/ 25 pts</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all" style={{ width: `${pct * 100}%`, backgroundColor: color }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Row 2 */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* Training */}
+                {(() => {
+                  const pct = trainingScore / 25;
+                  const status = trainingScore >= 20 ? 'Compliant' : trainingScore >= 10 ? 'Partial' : 'At Risk';
+                  const color = trainingScore >= 20 ? '#1ad07a' : trainingScore >= 10 ? '#fbab18' : '#e2231a';
+                  const bg = trainingScore >= 20 ? '#f0fdf4' : trainingScore >= 10 ? '#fffbeb' : '#fff1f2';
+                  const textColor = trainingScore >= 20 ? '#15803d' : trainingScore >= 10 ? '#92400e' : '#9f1239';
+                  return (
+                    <div className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3 hover:border-slate-300 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center">
+                            <GraduationCap className="w-3.5 h-3.5 text-slate-500" />
+                          </div>
+                          <span className="text-xs font-medium text-slate-700">Training</span>
+                        </div>
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: bg, color: textColor }}>{status}</span>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xl font-light text-[#0e274e]">{trainingScore}</span>
+                          <span className="text-xs text-slate-400 font-thin">/ 25 pts</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all" style={{ width: `${pct * 100}%`, backgroundColor: color }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Incident & Vendor Control */}
+                {(() => {
+                  const pct = incidentVendorScore / 25;
+                  const status = incidentVendorScore >= 20 ? 'Compliant' : incidentVendorScore >= 10 ? 'Partial' : 'At Risk';
+                  const color = incidentVendorScore >= 20 ? '#1ad07a' : incidentVendorScore >= 10 ? '#fbab18' : '#e2231a';
+                  const bg = incidentVendorScore >= 20 ? '#f0fdf4' : incidentVendorScore >= 10 ? '#fffbeb' : '#fff1f2';
+                  const textColor = incidentVendorScore >= 20 ? '#15803d' : incidentVendorScore >= 10 ? '#92400e' : '#9f1239';
+                  return (
+                    <div className="border border-slate-200 rounded-lg p-4 flex flex-col gap-3 hover:border-slate-300 transition-colors">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-md bg-slate-100 flex items-center justify-center">
+                            <Package className="w-3.5 h-3.5 text-slate-500" />
+                          </div>
+                          <span className="text-xs font-medium text-slate-700">Incident & Vendor Control</span>
+                        </div>
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: bg, color: textColor }}>{status}</span>
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xl font-light text-[#0e274e]">{incidentVendorScore}</span>
+                          <span className="text-xs text-slate-400 font-thin">/ 25 pts</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all" style={{ width: `${pct * 100}%`, backgroundColor: color }} />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* BRP penalty banner */}
+              {!hasActiveBRP && (
+                <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
+                    <span className="text-xs text-red-700">
+                      No breach response plan on file — required by HIPAA.
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="text-xs font-semibold text-red-600 bg-red-100 px-2 py-0.5 rounded-full">−10 pts</span>
+                    <a href="/dashboard/breach-notifications/response-plan" className="text-xs font-medium text-red-700 underline hover:text-red-900 whitespace-nowrap">
+                      Create plan →
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+
           </div>
         </CardContent>
       </Card>

@@ -156,6 +156,48 @@ export async function deactivateEmployee(id: string): Promise<void> {
   return updateEmployee(id, { is_active: false });
 }
 
+export async function reactivateEmployee(id: string): Promise<void> {
+  return updateEmployee(id, { is_active: true });
+}
+
+export async function getInactiveEmployeesWithAssignments(): Promise<EmployeeWithAssignments[]> {
+  const supabase = createClient();
+  const user = await getUser(supabase);
+  if (!user) throw new Error('Unauthorized');
+  const orgId = await getOrgId(user.id);
+  if (!orgId) return [];
+
+  const { data: employees, error: empError } = await (supabase as any)
+    .from('employees')
+    .select('*')
+    .eq('org_id', orgId)
+    .eq('is_active', false)
+    .order('last_name');
+  if (empError) throw new Error(empError.message);
+
+  const { data: assignments } = await (supabase as any)
+    .from('training_assignments')
+    .select('*, module:training_modules(*), certificate:training_certificates(id)')
+    .eq('org_id', orgId);
+
+  const assignMap: Record<string, TrainingAssignment[]> = {};
+  for (const a of (assignments ?? []) as TrainingAssignment[]) {
+    if (!assignMap[a.employee_id]) assignMap[a.employee_id] = [];
+    assignMap[a.employee_id].push(a);
+  }
+
+  return (employees ?? []).map((emp: Employee) => {
+    const empAssignments = assignMap[emp.id] ?? [];
+    const total = empAssignments.length;
+    const completed = empAssignments.filter((a) => a.status === 'completed').length;
+    return {
+      ...emp,
+      assignments: empAssignments,
+      compliance_pct: total ? Math.round((completed / total) * 100) : 100,
+    };
+  });
+}
+
 export async function bulkImportEmployees(
   rows: { first_name: string; last_name: string; email: string; role_group: RoleGroup }[]
 ): Promise<{ created: number; errors: string[] }> {
@@ -339,7 +381,7 @@ export async function markAssignmentComplete(assignmentId: string): Promise<void
   const now = new Date();
 
   // Capture IP from request headers
-  const headersList = headers();
+  const headersList = await headers();
   const completionIp =
     headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
     headersList.get('x-real-ip') ||
