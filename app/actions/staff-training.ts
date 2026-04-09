@@ -121,7 +121,7 @@ export async function createEmployee(payload: {
 
   const { data, error } = await (supabase as any)
     .from('employees')
-    .insert({ ...payload, org_id: orgId, created_by: user.id })
+    .insert({ ...payload, hire_date: payload.hire_date || null, org_id: orgId, created_by: user.id })
     .select()
     .single();
   if (error) throw new Error(error.message);
@@ -214,7 +214,7 @@ export async function bulkImportEmployees(
     try {
       const { data, error } = await (supabase as any)
         .from('employees')
-        .insert({ ...row, org_id: orgId, created_by: user.id })
+        .insert({ ...row, hire_date: (row as any).hire_date || null, org_id: orgId, created_by: user.id })
         .select()
         .single();
       if (error) {
