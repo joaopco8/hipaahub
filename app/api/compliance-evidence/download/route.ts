@@ -67,10 +67,6 @@ export async function GET(request: NextRequest) {
 
     // If that fails, try with admin client to verify file exists
     if (urlError && (urlError.message?.includes('not found') || urlError.message?.includes('Object not found'))) {
-      console.log('Regular client failed, trying with admin client to verify file...', { 
-        originalPath: fileUrl,
-        error: urlError.message 
-      });
 
       // Use admin client to check if file exists (bypasses RLS)
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -95,13 +91,6 @@ export async function GET(request: NextRequest) {
 
         if (listError) {
           console.error('Error listing files:', listError);
-        } else {
-          console.log('Files found in directory:', {
-            directory,
-            fileName,
-            foundFiles: files?.map(f => f.name),
-            exactMatch: files?.some(f => f.name === fileName)
-          });
         }
 
         // Try to generate signed URL with admin client
@@ -116,7 +105,6 @@ export async function GET(request: NextRequest) {
           // Try removing duplicate 'evidence' prefix if exists
           if (pathParts[1] === 'evidence' && pathParts.length > 2) {
             const alternativePath = pathParts.slice(2).join('/');
-            console.log('Trying alternative path (removed duplicate evidence):', alternativePath);
             ({ data: urlData, error: urlError } = await supabaseAdmin.storage
               .from(bucket)
               .createSignedUrl(alternativePath, 3600));

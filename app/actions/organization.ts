@@ -93,16 +93,6 @@ export async function updateOrganization(data: OrganizationFormData) {
   // Use RPC function to bypass schema cache issues
   // SECURITY: Do NOT send user_id - the RPC function uses auth.uid() internally
   
-  // Debug: Log the incoming data
-  console.log('📝 Organization update data received:', {
-    ein: data.ein,
-    npi: data.npi,
-    clia_certificate_number: data.clia_certificate_number,
-    medicare_provider_number: data.medicare_provider_number,
-    performs_laboratory_tests: data.performs_laboratory_tests,
-    serves_medicare_patients: data.serves_medicare_patients
-  });
-  
   const jsonData = {
     name: data.legal_name, // Keep name for backward compatibility
     legal_name: data.legal_name,
@@ -210,7 +200,6 @@ export async function getOrganizationData() {
   }
 
   if (!organization) {
-    console.log('No organization found for user:', user.id);
     return null;
   }
 

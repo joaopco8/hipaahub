@@ -93,7 +93,6 @@ export default function OnboardingPage() {
           <Link
             href="/onboarding/organization"
             onClick={(e) => {
-              console.log('Link clicked!');
               handleGetStarted(e);
             }}
             className="inline-flex items-center justify-center whitespace-nowrap rounded-none text-sm font-bold h-11 px-8 bg-[#00bceb] text-white hover:bg-[#00bceb]/90 transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00bceb] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-[1.01] active:scale-[0.98] cursor-pointer no-underline"

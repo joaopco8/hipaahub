@@ -156,7 +156,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  console.log(`Trial reminders: sent ${emailsSent} emails (checked ${orgs?.length ?? 0} orgs)`);
   return NextResponse.json({ ok: true, emails_sent: emailsSent });
 }
 

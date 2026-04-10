@@ -14,24 +14,16 @@ export default function ExpectationPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    console.log('ExpectationPage: useEffect started');
-    
     // Timeout fallback - show page after 3 seconds even if auth check is stuck
     const timeoutFallback = setTimeout(() => {
-      console.warn('ExpectationPage: Auth check timeout - showing page anyway');
       setIsCheckingAuth(false);
       setIsAuthenticated(true);
     }, 3000);
 
     const checkAuth = async () => {
       try {
-        console.log('ExpectationPage: Starting auth check...');
-        console.log('ExpectationPage: Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'SET' : 'NOT SET');
-        console.log('ExpectationPage: Supabase Key:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'SET' : 'NOT SET');
-        
         const supabase = createClient();
-        console.log('ExpectationPage: Supabase client created');
-        
+
         // Add timeout to getUser call
         const authPromise = supabase.auth.getUser();
         const timeoutPromise = new Promise<{ data: { user: null }, error: { message: string } }>((_, reject) => 
@@ -45,7 +37,6 @@ export default function ExpectationPage() {
             timeoutPromise
           ]);
         } catch (timeoutError) {
-          console.warn('ExpectationPage: Auth check timed out, showing page anyway');
           clearTimeout(timeoutFallback);
           setIsCheckingAuth(false);
           setIsAuthenticated(true);
@@ -69,7 +60,6 @@ export default function ExpectationPage() {
         }
         
         if (!user) {
-          console.log('ExpectationPage: User not authenticated');
           // Show page first, then redirect
           setIsAuthenticated(true);
           setIsCheckingAuth(false);
@@ -79,13 +69,11 @@ export default function ExpectationPage() {
           return;
         }
         
-        console.log('ExpectationPage: User authenticated:', user.id);
         setIsAuthenticated(true);
         setIsCheckingAuth(false);
-        
+
         // Auto-advance after 3 seconds
         const timer = setTimeout(() => {
-          console.log('ExpectationPage: Auto-advancing to onboarding');
           router.push('/onboarding');
         }, 3000);
 

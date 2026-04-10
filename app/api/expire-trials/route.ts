@@ -116,7 +116,6 @@ export async function POST(request: NextRequest) {
     expired++;
   }
 
-  console.log(`Expired ${expired} trials at ${now}`);
   return NextResponse.json({ ok: true, expired });
 }
 

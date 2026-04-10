@@ -52,19 +52,16 @@ const relevantEvents = new Set([
 ]);
 
 export async function POST(req: Request) {
-  console.log('Received a request');
-  
   // Rate limiting for webhook (IP-based)
   const { stripeWebhookLimiter, getRateLimitIdentifier, createRateLimitResponse } = await import('@/lib/rate-limit');
   const forwardedFor = req.headers.get('x-forwarded-for');
   const realIp = req.headers.get('x-real-ip');
   const ip = forwardedFor?.split(',')[0] || realIp || 'unknown';
   const identifier = `ip:${ip}`;
-  
+
   const { success, limit, remaining, reset } = await stripeWebhookLimiter.limit(identifier);
-  
+
   if (!success) {
-    console.warn(`Rate limit exceeded for Stripe webhook from IP ${ip}`);
     return createRateLimitResponse(limit, remaining, reset);
   }
 
@@ -75,19 +72,15 @@ export async function POST(req: Request) {
 
   try {
     if (!sig || !webhookSecret) {
-      console.log('Webhook secret not found');
       return new Response('Webhook secret not found.', { status: 400 });
     }
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-    console.log(`🔔  Webhook received: ${event.type}`);
   } catch (err: any) {
-    console.log(`❌ Error message: ${err.message}`);
+    console.error(`Stripe webhook signature error: ${err.message}`);
     return new Response(`Webhook Error: ${err.message}`, { status: 400 });
   }
 
   if (relevantEvents.has(event.type)) {
-    console.log(`✅ Processing relevant event: ${event.type}`);
-    
     // Lazy load admin functions only when needed (at runtime, not during build)
     const {
       upsertProductRecord,
@@ -97,53 +90,39 @@ export async function POST(req: Request) {
       deletePriceRecord,
       activateOrgSubscription,
     } = await getAdminFunctions();
-    
+
     try {
       switch (event.type) {
         case 'product.created':
         case 'product.updated':
-          console.log(`Handling product event: ${event.type}`);
           await upsertProductRecord(event.data.object as Stripe.Product);
-          console.log(`Product event handled: ${event.type}`);
           break;
         case 'price.created':
         case 'price.updated':
-          console.log(`Handling price event: ${event.type}`);
           await upsertPriceRecord(event.data.object as Stripe.Price);
-          console.log(`Price event handled: ${event.type}`);
           break;
         case 'price.deleted':
-          console.log(`Handling price deleted event`);
           await deletePriceRecord(event.data.object as Stripe.Price);
-          console.log(`Price deleted event handled`);
           break;
         case 'product.deleted':
-          console.log(`Handling product deleted event`);
           await deleteProductRecord(event.data.object as Stripe.Product);
-          console.log(`Product deleted event handled`);
           break;
         case 'customer.subscription.created':
         case 'customer.subscription.updated':
         case 'customer.subscription.deleted':
-          console.log(`Handling subscription event: ${event.type}`);
           const subscription = event.data.object as Stripe.Subscription;
           await manageSubscriptionStatusChange(
             subscription.id,
             subscription.customer as string,
             event.type === 'customer.subscription.created'
           );
-          console.log(`Subscription event handled: ${event.type}`);
           break;
         case 'checkout.session.completed':
-          console.log('✅ Handling checkout session completed event');
           const checkoutSession = event.data.object as Stripe.Checkout.Session;
-          console.log('Checkout session customer:', checkoutSession.customer);
-          console.log('Checkout session mode:', checkoutSession.mode);
 
           if (checkoutSession.mode === 'subscription') {
             const subscriptionId = checkoutSession.subscription;
             if (subscriptionId && checkoutSession.customer) {
-              console.log('Processing subscription:', subscriptionId, 'for customer:', checkoutSession.customer);
               await manageSubscriptionStatusChange(
                 subscriptionId as string,
                 checkoutSession.customer as string,
@@ -174,37 +153,25 @@ export async function POST(req: Request) {
               } catch (activateErr) {
                 console.error('activateOrgSubscription error:', activateErr);
               }
-
-              console.log('✅ Subscription created/updated successfully');
             } else {
-              console.error('❌ Missing subscription ID or customer ID in checkout session');
+              console.error('Missing subscription ID or customer ID in checkout session');
             }
-          } else {
-            console.log('⚠️  Checkout session is not a subscription (mode:', checkoutSession.mode, ')');
           }
-          console.log('✅ Checkout session completed event handled');
           break;
         case 'invoice.payment_succeeded':
         case 'invoice.paid':
           const invoice = event.data.object as Stripe.Invoice;
-          console.log('✅ Handling invoice payment event:', event.type);
-          console.log('Invoice ID:', invoice.id);
-          console.log('Invoice subscription:', invoice.subscription);
-          console.log('Invoice customer:', invoice.customer);
-          console.log('Invoice billing reason:', invoice.billing_reason);
 
           // If invoice has a subscription, ensure it's synced to database
           if (invoice.subscription && invoice.customer) {
             const subscriptionId = invoice.subscription as string;
             const customerId = invoice.customer as string;
 
-            console.log('Processing subscription from invoice:', subscriptionId, 'for customer:', customerId);
             await manageSubscriptionStatusChange(
               subscriptionId,
               customerId,
               invoice.billing_reason === 'subscription_create' || invoice.billing_reason === 'subscription_cycle'
             );
-            console.log('✅ Subscription synced from invoice payment');
 
             // Also activate org subscription to keep organizations table in sync.
             // This handles cases where checkout.session.completed failed or the
@@ -227,35 +194,23 @@ export async function POST(req: Request) {
                 const priceId = stripeSub.items.data[0]?.price?.id;
                 const planTier = priceId ? getPlanTierFromPriceId(priceId) : 'solo';
                 await activateOrgSubscription(customerRow.id, planTier);
-                console.log('✅ Org subscription activated from invoice payment');
               }
             } catch (activateErr) {
-              console.error('⚠️ activateOrgSubscription from invoice error (non-fatal):', activateErr);
+              console.error('activateOrgSubscription from invoice error (non-fatal):', activateErr);
             }
-          } else {
-            console.log('⚠️  Invoice does not have subscription or customer ID');
           }
           break;
         default:
-          console.log('Unhandled relevant event type!');
           throw new Error('Unhandled relevant event!');
       }
     } catch (error) {
-      console.log(`Error handling event: ${event.type}`, error);
+      console.error(`Error handling Stripe event ${event.type}:`, error);
       return new Response(
         'Webhook handler failed. View your Next.js function logs.',
-        {
-          status: 400
-        }
+        { status: 400 }
       );
     }
-  } else {
-    // Event not in relevantEvents - this is OK, we just log it
-    console.log(`ℹ️  Ignoring unsupported event type: ${event.type}`);
-    return new Response(JSON.stringify({ received: true, ignored: true }), {
-      status: 200
-    });
   }
-  console.log('Event processed successfully');
+
   return new Response(JSON.stringify({ received: true }));
 }

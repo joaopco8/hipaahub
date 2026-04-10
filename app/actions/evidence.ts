@@ -90,7 +90,7 @@ export async function getAllEvidenceDocuments(): Promise<EvidenceDocument[]> {
             downloadUrl = urlData.signedUrl;
           }
         } catch (error) {
-          console.warn('Failed to generate signed URL for', storagePath, error);
+          // Silent fail - signed URL generation is non-blocking
         }
 
         documents.push({
@@ -125,7 +125,7 @@ export async function getAllEvidenceDocuments(): Promise<EvidenceDocument[]> {
             downloadUrl = urlData.signedUrl;
           }
         } catch (error) {
-          console.warn('Failed to generate signed URL for', storagePath, error);
+          // Silent fail - signed URL generation is non-blocking
         }
 
         documents.push({

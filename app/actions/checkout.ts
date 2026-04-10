@@ -235,7 +235,6 @@ export async function initiateCheckout(priceId?: string): Promise<CheckoutResult
       // checkoutWithStripe fetches the price from Stripe API using the ID anyway,
       // so this is safe — Stripe will validate and reject invalid IDs.
       if (!selectedPrice) {
-        console.warn(`Price ${priceId} not found in DB products, using it directly from Stripe.`);
         selectedPrice = { id: priceId, currency: 'usd', active: true } as any;
       }
     }
@@ -332,12 +331,6 @@ export async function initiateCheckout(priceId?: string): Promise<CheckoutResult
       console.error('initiateCheckout: No sessionId returned from checkoutWithStripe');
       return { type: 'error', message: 'Failed to create checkout session. Please try again.' };
     }
-
-    console.log('initiateCheckout: Checkout session created successfully', {
-      sessionId,
-      hasSessionUrl: !!sessionUrl,
-      sessionUrl: sessionUrl ? sessionUrl.substring(0, 50) + '...' : 'N/A'
-    });
 
     // Return checkout session ID and URL for client-side redirect
     return { type: 'checkout', sessionId, sessionUrl };

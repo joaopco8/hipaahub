@@ -51,11 +51,6 @@ function replaceRemainingPlaceholders(
   const remainingPlaceholders = (processed.match(/\{\{([A-Z_]+)\}\}/g) || [])
     .map(p => p.replace(/[{}]/g, ''));
   
-  console.log('🔧 Replacing remaining placeholders:', {
-    found: remainingPlaceholders,
-    defaults: Object.keys(placeholderDefaults),
-  });
-  
   // Replace placeholders that weren't filled - use global flag and replace ALL occurrences
   for (const [placeholder, defaultValue] of Object.entries(placeholderDefaults)) {
     // Escape special regex characters in placeholder name
@@ -94,13 +89,11 @@ function cleanupPlaceholders(template: string): string {
 }
 
 export async function POST(request: NextRequest) {
-  console.log('🚀 ========== DOCUMENT GENERATION API CALLED ==========');
   try {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      console.log('❌ No user found');
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -113,17 +106,11 @@ export async function POST(request: NextRequest) {
     const { success, limit, remaining, reset } = await documentGenerationLimiter.limit(identifier);
 
     if (!success) {
-      console.warn(`Rate limit exceeded for user ${user.id}`);
       return createRateLimitResponse(limit, remaining, reset);
     }
 
     const body = await request.json();
     const { documentType, answers, evidenceData } = body;
-    
-    console.log('📥 Request received:', {
-      documentType,
-      answersCount: Object.keys(answers || {}).length,
-    });
 
     if (!documentType || !answers) {
       return NextResponse.json(
@@ -149,20 +136,12 @@ export async function POST(request: NextRequest) {
     // Load evidence data if not provided
     let finalEvidenceData = evidenceData;
     if (!finalEvidenceData || Object.keys(finalEvidenceData).length === 0) {
-      console.log('🔍 Loading evidence from database...');
-      
       // Get risk assessment ID
       const { data: assessment, error: assessmentError } = await supabase
         .from('onboarding_risk_assessments' as any)
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle();
-
-      console.log('📋 Risk Assessment:', { 
-        found: !!assessment, 
-        id: assessment?.id, 
-        error: assessmentError 
-      });
 
       // Load evidence records - try multiple strategies
       let evidenceRecords;
@@ -174,12 +153,6 @@ export async function POST(request: NextRequest) {
           .select('question_id, evidence_data, uploaded_at, uploaded_by, uploaded_ip')
           .eq('risk_assessment_id', assessment.id)
           .eq('organization_id', organization.id);
-
-        console.log('📦 Evidence with risk_assessment_id:', {
-          count: evidenceWithId?.length || 0,
-          error: errorWithId,
-          assessmentId: assessment.id
-        });
 
         if (evidenceWithId && evidenceWithId.length > 0) {
           evidenceRecords = evidenceWithId;
@@ -194,11 +167,6 @@ export async function POST(request: NextRequest) {
           .eq('user_id', user.id)
           .eq('organization_id', organization.id);
 
-        console.log('📦 Evidence by user_id and organization_id:', {
-          count: evidenceByUser?.length || 0,
-          error: errorByUser
-        });
-
         if (evidenceByUser && evidenceByUser.length > 0) {
           evidenceRecords = evidenceByUser;
         }
@@ -211,29 +179,16 @@ export async function POST(request: NextRequest) {
           .select('question_id, evidence_data, uploaded_at, uploaded_by, uploaded_ip')
           .eq('user_id', user.id);
 
-        console.log('📦 Evidence by user_id only:', {
-          count: evidenceByUserOnly?.length || 0,
-          error: errorByUserOnly
-        });
-
         if (evidenceByUserOnly && evidenceByUserOnly.length > 0) {
           evidenceRecords = evidenceByUserOnly;
         }
       }
 
       if (evidenceRecords && evidenceRecords.length > 0) {
-          console.log(`✅ Found ${evidenceRecords.length} evidence records`);
           finalEvidenceData = {};
           for (const record of evidenceRecords) {
             const evidence = record.evidence_data as any;
             const files: Array<{ file_id: string; file_name: string; uploaded_at: string; storage_path?: string; download_url?: string }> = [];
-            
-            console.log(`📄 Processing evidence for question ${record.question_id}:`, {
-              hasDocuments: !!evidence?.documents,
-              hasScreenshots: !!evidence?.screenshots,
-              documentsCount: evidence?.documents?.length || 0,
-              screenshotsCount: evidence?.screenshots?.length || 0
-            });
 
             // Extract files from evidence_data
             if (evidence?.documents) {
@@ -251,7 +206,7 @@ export async function POST(request: NextRequest) {
                       downloadUrl = urlData.signedUrl;
                     }
                   } catch (error) {
-                    console.warn('Failed to generate signed URL for', storagePath, error);
+                    // Silent fail - URL generation is non-blocking
                   }
                 }
                 
@@ -279,7 +234,7 @@ export async function POST(request: NextRequest) {
                       downloadUrl = urlData.signedUrl;
                     }
                   } catch (error) {
-                    console.warn('Failed to generate signed URL for', storagePath, error);
+                    // Silent fail - URL generation is non-blocking
                   }
                 }
                 
@@ -299,55 +254,15 @@ export async function POST(request: NextRequest) {
               timestamp: record.uploaded_at || new Date().toISOString(),
               ip_address: record.uploaded_ip || 'unknown'
             };
-            
-            console.log(`✅ Added evidence for question ${record.question_id}:`, {
-              filesCount: files.length,
-              fileNames: files.map(f => f.file_name)
-            });
           }
-          
-          console.log(`📦 Final evidence data loaded:`, {
-            questionsWithEvidence: Object.keys(finalEvidenceData).length,
-            totalFiles: Object.values(finalEvidenceData).reduce((sum: number, ev: any) => sum + (ev.files?.length || 0), 0)
-          });
-        } else {
-          console.log('⚠️ No evidence records found in database');
         }
-    } else {
-      console.log('📥 Using provided evidence data');
     }
 
     // Convert answers to QuestionAnswer format
     const questionAnswers = convertToQuestionAnswers(answers, finalEvidenceData);
-    
-    console.log('📊 Document Generation Debug:', {
-      answersCount: Object.keys(answers).length,
-      questionAnswersCount: questionAnswers.length,
-      evidenceDataQuestions: Object.keys(finalEvidenceData).length,
-      questionAnswersWithEvidence: questionAnswers.filter(qa => qa.evidence_files.length > 0).length,
-      sampleAnswers: Object.keys(answers).slice(0, 5),
-      sampleQuestionAnswers: questionAnswers.slice(0, 3).map(qa => ({
-        question_id: qa.question_id,
-        compliance_status: qa.compliance_status,
-        risk_level: qa.risk_level,
-        evidenceFilesCount: qa.evidence_files.length
-      })),
-    });
 
     // Generate document fields
     const documents = generateDocumentFields(questionAnswers);
-    
-    console.log('📄 Generated Documents:', {
-      documentCount: documents.size,
-      documentNames: Array.from(documents.keys()),
-      masterPolicyFields: documents.get('MasterPolicy')?.fields ? Object.keys(documents.get('MasterPolicy')!.fields) : [],
-      masterPolicyFieldValues: documents.get('MasterPolicy')?.fields ? 
-        Object.entries(documents.get('MasterPolicy')!.fields).map(([k, v]) => ({ 
-          field: k, 
-          value: v.value.substring(0, 100) + '...',
-          status: v.compliance_status 
-        })) : [],
-    });
 
     // Get organization data for template
     const orgData: OrganizationData = {
@@ -460,7 +375,6 @@ export async function POST(request: NextRequest) {
 
     documentData = documents.get(documentKey);
 
-    // Get or create document data
     if (!documentData) {
       // Try alternative document names
       const alternatives = documentType === 'master-policy' 
@@ -486,43 +400,16 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    console.log('📋 Document Data for', documentType, ':', {
-      documentName: documentData.document_name,
-      fieldCount: Object.keys(documentData.fields).length,
-      fields: Object.keys(documentData.fields),
-    });
-
     // Load evidence from Evidence Center for this document (before document processing)
-    console.log('📦 Loading evidence from Evidence Center for document:', policyId);
-    console.log('📋 Document type:', documentType);
-    console.log('📋 Policy ID:', policyId);
     let evidenceFromCenter = await getEvidenceByDocumentId(policyId);
-    console.log('📊 Evidence found:', {
-      count: evidenceFromCenter?.length || 0,
-      evidence: evidenceFromCenter?.map(e => ({
-        id: e.id,
-        title: e.title,
-        related_document_ids: e.related_document_ids,
-        file_name: e.file_name,
-        status: e.status
-      })) || []
-    });
 
     // Inject document fields into template
     let finalDocument = injectDocumentFields(template, documentData);
-    
-    console.log('🔍 After injectDocumentFields:', {
-      hasSecurityPosture: finalDocument.includes('{{SECURITY_POSTURE}}'),
-      hasSRAStatement: finalDocument.includes('{{SRA_STATEMENT}}'),
-      remainingPlaceholders: (finalDocument.match(/\{\{([A-Z_]+)\}\}/g) || []).slice(0, 10),
-    });
-    
+
     // Always process evidence, even if empty, to replace placeholders
     const evidenceDownloadUrls: Record<string, string> = {};
     
     if (evidenceFromCenter && evidenceFromCenter.length > 0) {
-      console.log(`✅ Found ${evidenceFromCenter.length} evidence items from Evidence Center`);
-      
       // Generate signed URLs for evidence files
       for (const evidence of evidenceFromCenter) {
         if (evidence.file_url) {
@@ -535,24 +422,20 @@ export async function POST(request: NextRequest) {
               evidenceDownloadUrls[evidence.id] = urlData.signedUrl;
             }
           } catch (error) {
-            console.warn('Failed to generate signed URL for evidence', evidence.id, error);
+            // Silent fail - URL generation is non-blocking
           }
         }
       }
       
       // Inject evidence references into document
       finalDocument = injectEvidenceReferences(finalDocument, evidenceFromCenter, evidenceDownloadUrls);
-      
+
       // Generate evidence statements for specific controls
       if (evidenceFromCenter.some(ev => ev.evidence_type === 'security_risk_analysis')) {
         const sraEvidence = evidenceFromCenter.filter(ev => ev.evidence_type === 'security_risk_analysis');
         const sraStatement = generateEvidenceStatement(sraEvidence, 'The organization\'s Security Risk Analysis is documented and on file:');
         finalDocument = finalDocument.replace(/\{\{SRA_EVIDENCE_STATEMENT\}\}/g, sraStatement);
       }
-      
-      console.log('✅ Evidence injected from Evidence Center');
-    } else {
-      console.log('ℹ️ No evidence found in Evidence Center for this document');
     }
     
     // Always generate evidence list (even if empty) to replace AUDIT_EVIDENCE_LIST placeholder
@@ -562,12 +445,6 @@ export async function POST(request: NextRequest) {
     // Replace any remaining placeholders with default values if no data was generated
     // This ensures placeholders don't remain empty in the final document
     finalDocument = replaceRemainingPlaceholders(finalDocument, documentData);
-    
-    console.log('✅ After replaceRemainingPlaceholders:', {
-      hasSecurityPosture: finalDocument.includes('{{SECURITY_POSTURE}}'),
-      hasSRAStatement: finalDocument.includes('{{SRA_STATEMENT}}'),
-      remainingPlaceholders: (finalDocument.match(/\{\{([A-Z_]+)\}\}/g) || []).slice(0, 10),
-    });
 
     // Process template with organization data
     finalDocument = processDocumentTemplate(finalDocument, orgData);
@@ -594,8 +471,6 @@ export async function POST(request: NextRequest) {
     }
 
     // AGGRESSIVE FINAL CLEANUP - Remove ALL remaining placeholders BEFORE HTML formatting
-    console.log('🧹 Starting aggressive placeholder cleanup...');
-    
     // First, try to replace known placeholders with defaults
     const knownPlaceholders: Record<string, string> = {
       'SECURITY_POSTURE': 'The organization has designated a Security Officer responsible for implementing and maintaining security policies and procedures.',
@@ -605,17 +480,9 @@ export async function POST(request: NextRequest) {
       'INCIDENT_DEFENSIBILITY': 'Incident response procedures are documented in the Incident Response & Breach Notification Policy (POL-007).',
     };
     
-    // Count placeholders before cleanup
-    const beforeCleanup = (finalDocument.match(/\{\{[^}]+\}\}/g) || []);
-    console.log('🔍 Placeholders BEFORE cleanup:', beforeCleanup.length, beforeCleanup.slice(0, 5));
-    
     for (const [key, value] of Object.entries(knownPlaceholders)) {
       const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
-      const matches = finalDocument.match(regex);
-      if (matches && matches.length > 0) {
-        console.log(`✅ Replacing ${matches.length} occurrence(s) of {{${key}}}`);
-        finalDocument = finalDocument.replace(regex, value);
-      }
+      finalDocument = finalDocument.replace(regex, value);
     }
     
     // Then remove ANY remaining {{...}} placeholders (safety net)
@@ -625,21 +492,11 @@ export async function POST(request: NextRequest) {
     finalDocument = cleanupPlaceholders(finalDocument);
     finalDocument = cleanupPlaceholders(finalDocument); // Second pass
     
-    // Final verification - if any placeholders still exist, log and remove them
+    // Final verification - if any placeholders still exist, remove them
     const remainingPlaceholders = (finalDocument.match(/\{\{[^}]+\}\}/g) || []);
     if (remainingPlaceholders.length > 0) {
-      console.error('❌ CRITICAL: Placeholders still found after all cleanup:', remainingPlaceholders);
-      // Nuclear option - remove everything that looks like a placeholder
       finalDocument = finalDocument.replace(/\{\{[^}]+\}\}/g, '');
     }
-    
-    const afterCleanup = (finalDocument.match(/\{\{[^}]+\}\}/g) || []);
-    console.log('🎯 Final document check AFTER cleanup:', {
-      hasSecurityPosture: finalDocument.includes('{{SECURITY_POSTURE}}'),
-      hasSRAStatement: finalDocument.includes('{{SRA_STATEMENT}}'),
-      remainingPlaceholders: afterCleanup.length,
-      remaining: afterCleanup.slice(0, 5),
-    });
 
     // Build formatted HTML for A4/PDF consumption
     // IMPORTANT: finalDocument is already cleaned, but add one more safety pass in formatter
@@ -649,7 +506,6 @@ export async function POST(request: NextRequest) {
       
       // Final safety check on HTML - remove any placeholders that might have escaped
       if (formattedDocument.includes('{{')) {
-        console.warn('⚠️ Found placeholders in HTML, removing...');
         formattedDocument = formattedDocument.replace(/\{\{[^}]+\}\}/g, '');
       }
     } catch (err) {
@@ -663,12 +519,6 @@ export async function POST(request: NextRequest) {
     // This is what gets returned as 'document' field
     const cleanedFinalDocument = finalDocument.replace(/\{\{[^}]+\}\}/g, '');
     
-    console.log('📤 Returning response:', {
-      documentLength: cleanedFinalDocument.length,
-      formattedDocumentExists: !!formattedDocument,
-      anyPlaceholdersInFinal: (cleanedFinalDocument.match(/\{\{[^}]+\}\}/g) || []).length,
-    });
-
     return NextResponse.json({
       success: true,
       document: cleanedFinalDocument, // Always return cleaned version

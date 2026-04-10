@@ -168,7 +168,6 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
   // Update state when initialData changes (e.g., after data is loaded)
   useEffect(() => {
     if (initialData) {
-      console.log('OrganizationForm: initialData received', initialData);
       setEmployeeCount(initialData.employee_count || 1);
       setPracticeTypePrimary(initialData.practice_type_primary || initialData.type || 'medical');
       // Country is always US for HIPAA
@@ -220,8 +219,6 @@ export function OrganizationForm({ initialData }: OrganizationFormProps) {
       setPrimaryContactName(initialData.primary_contact_name || '');
       setComplianceContactEmail(initialData.compliance_contact_email || '');
       setComplianceContactPhone(initialData.compliance_contact_phone || '');
-    } else {
-      console.log('OrganizationForm: No initialData provided');
     }
   }, [initialData]);
 

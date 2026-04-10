@@ -13,13 +13,9 @@ export default function PricingSection() {
   const handleGetStarted = async () => {
     setIsLoading(true);
     try {
-      console.log('PricingSection: Get Started clicked');
       const result = await initiateCheckout();
-      
-      console.log('PricingSection: Result type:', result.type);
-      
+
       if (result.type === 'redirect') {
-        console.log('PricingSection: Redirecting to:', result.path);
         window.location.href = result.path;
       } else if (result.type === 'checkout') {
         // Always prefer sessionUrl — stripe.redirectToCheckout is deprecated and unreliable

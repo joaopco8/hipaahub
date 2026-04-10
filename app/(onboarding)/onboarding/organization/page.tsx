@@ -152,7 +152,7 @@ export default function OrganizationPage() {
         timestamp: new Date().toISOString()
       }));
     } catch (error) {
-      console.warn('Failed to save to localStorage:', error);
+      // Ignore localStorage write errors
     }
   };
 
@@ -170,7 +170,7 @@ export default function OrganizationPage() {
         }
       }
     } catch (error) {
-      console.warn('Failed to load from localStorage:', error);
+      // Ignore localStorage read errors
     }
     return null;
   };
@@ -263,8 +263,6 @@ export default function OrganizationPage() {
       if (result.success) {
         // Clear localStorage after successful Supabase save
         localStorage.removeItem('hipaa_org_form_draft');
-      } else {
-        console.warn('Auto-save to Supabase failed, but data saved to localStorage:', result.error);
       }
     } catch (error) {
       console.error('Failed to auto-save organization data:', error);

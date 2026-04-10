@@ -426,9 +426,6 @@ export async function saveOrganization(data: OrganizationData) {
 
   // Use RPC function with SECURITY DEFINER to bypass RLS
   // This function uses auth.uid() internally for security
-  console.log('🔄 Saving organization via RPC function...');
-  console.log('📦 Data being sent:', JSON.stringify(jsonData, null, 2));
-  
   // Note: RPC function exists but may not be in TypeScript types yet
   const { data: result, error: rpcError } = await (supabase as any)
     .rpc('upsert_organization_jsonb', {
@@ -448,8 +445,6 @@ export async function saveOrganization(data: OrganizationData) {
     console.error('❌ Invalid result from RPC:', result);
     throw new Error('Falha ao salvar organização: Resultado inválido retornado');
   }
-  
-  console.log('✅ Organization saved successfully via RPC:', organization.id);
   
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/organization');
@@ -474,7 +469,6 @@ export async function autoSaveRiskAssessmentAnswers(answers: Record<string, stri
 
   // If no organization exists yet, we can't save (user needs to complete organization step first)
   if (orgError || !organization) {
-    console.warn('Cannot auto-save: organization not found. User should complete organization step first.');
     return { success: false, error: 'Organization not found. Please complete organization setup first.' };
   }
   
@@ -725,7 +719,6 @@ export async function saveRiskAssessment(data: RiskAssessmentData) {
       .eq('user_id', user.id);
   } catch (err) {
     // Ignore errors if table doesn't exist
-    console.log('Note: action_items table may not exist, skipping cleanup');
   }
 
   // Verificar se já existe uma risk assessment para este usuário
@@ -813,7 +806,7 @@ export async function saveRiskAssessment(data: RiskAssessmentData) {
         assessed_at: new Date().toISOString(),
       });
   } catch (histErr) {
-    console.warn('Failed to save assessment history (non-blocking):', histErr);
+    // Non-blocking: assessment history save failure does not affect the result
   }
 
   revalidatePath('/dashboard');

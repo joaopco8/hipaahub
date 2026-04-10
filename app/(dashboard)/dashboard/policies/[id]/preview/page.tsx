@@ -141,44 +141,26 @@ export default async function DocumentPreviewPage({
   const complianceState = await getComplianceState();
 
   // Load evidence from Evidence Center for this document
-  console.log('📦 Loading evidence from Evidence Center for document:', document.policyId);
   let evidenceFromCenter = await getEvidenceByDocumentId(document.policyId);
-  console.log('📊 Evidence found:', {
-    count: evidenceFromCenter?.length || 0,
-    evidence: evidenceFromCenter?.map(e => ({
-      id: e.id,
-      title: e.title,
-      related_document_ids: e.related_document_ids,
-      file_name: e.file_name,
-      status: e.status
-    })) || []
-  });
 
   // Generate signed URLs for evidence files
   const evidenceDownloadUrls: Record<string, string> = {};
   if (evidenceFromCenter && evidenceFromCenter.length > 0) {
-    console.log(`✅ Found ${evidenceFromCenter.length} evidence items from Evidence Center`);
-    
     for (const evidence of evidenceFromCenter) {
       if (evidence.file_url) {
         try {
           const { data: urlData, error: urlError } = await supabase.storage
             .from(evidence.storage_bucket || 'evidence')
             .createSignedUrl(evidence.file_url, 3600); // 1 hour expiry
-          
+
           if (!urlError && urlData?.signedUrl) {
             evidenceDownloadUrls[evidence.id] = urlData.signedUrl;
-            console.log(`✅ Generated signed URL for evidence ${evidence.id}: ${evidence.title}`);
-          } else {
-            console.warn(`⚠️ Failed to generate signed URL for evidence ${evidence.id}:`, urlError);
           }
         } catch (error) {
-          console.warn('Failed to generate signed URL for evidence', evidence.id, error);
+          console.error('Failed to generate signed URL for evidence', evidence.id, error);
         }
       }
     }
-  } else {
-    console.log('ℹ️ No evidence found in Evidence Center for this document');
   }
 
   // Process template with organization data and compliance state
@@ -195,11 +177,6 @@ export default async function DocumentPreviewPage({
 
   // Generate evidence list for AUDIT_EVIDENCE_LIST placeholder
   const evidenceList = generateEvidenceListForDocument(evidenceFromCenter || [], evidenceDownloadUrls);
-  console.log('📋 Generated evidence list:', {
-    evidenceCount: evidenceFromCenter?.length || 0,
-    listLength: evidenceList.length,
-    preview: evidenceList.substring(0, 200)
-  });
 
   // AGGRESSIVE CLEANUP - Remove ALL remaining placeholders
   // Known placeholders that should have defaults if not filled

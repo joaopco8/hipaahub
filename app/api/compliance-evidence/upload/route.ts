@@ -30,7 +30,7 @@ async function extractTextFromFile(buffer: Buffer, mimeType: string): Promise<st
       return buffer.toString('utf-8').substring(0, 100000);
     }
   } catch (e) {
-    console.warn('Text extraction failed:', e);
+    // Text extraction is non-blocking; failures are silent
   }
   return '';
 }
@@ -57,7 +57,6 @@ export async function POST(request: NextRequest) {
     const { success, limit, remaining, reset } = await complianceEvidenceUploadLimiter.limit(identifier);
 
     if (!success) {
-      console.warn(`Rate limit exceeded for user ${user.id}`);
       return createRateLimitResponse(limit, remaining, reset);
     }
 

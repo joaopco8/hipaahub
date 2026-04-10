@@ -61,8 +61,6 @@ export function OnboardingLayout({
       e.stopPropagation();
     }
     
-    console.log('Back button clicked, pathname:', pathname); // Debug
-    
     if (onBack) {
       onBack();
     } else {
@@ -70,7 +68,6 @@ export function OnboardingLayout({
       const previousRoute = ROUTE_BACK_MAP[pathname || ''];
       
       if (previousRoute) {
-        console.log('Navigating to:', previousRoute); // Debug
         router.push(previousRoute);
         previousStep();
       } else if (pathname === '/onboarding') {
@@ -96,7 +93,6 @@ export function OnboardingLayout({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              console.log('Back button onClick triggered');
               handleBack(e);
             }}
             className={!showBackButton ? 'invisible' : 'cursor-pointer rounded-none border-gray-300 text-gray-600 font-light hover:text-[#0e274e]'}

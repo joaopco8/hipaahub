@@ -10,7 +10,6 @@ export async function GET(request: NextRequest) {
   const { success, limit, remaining, reset } = await authLimiter.limit(identifier);
 
   if (!success) {
-    console.warn(`Rate limit exceeded for auth callback from IP ${identifier}`);
     return createRateLimitResponse(limit, remaining, reset);
   }
 

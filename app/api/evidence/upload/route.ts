@@ -33,7 +33,6 @@ export async function POST(request: NextRequest) {
     const { success, limit, remaining, reset } = await evidenceUploadLimiter.limit(identifier);
 
     if (!success) {
-      console.warn(`Rate limit exceeded for user ${user.id}`);
       return createRateLimitResponse(limit, remaining, reset);
     }
 

@@ -261,16 +261,6 @@ export async function createComplianceEvidence(
     return { success: false, error: 'Organization not found' };
   }
 
-  // Log what we're about to save
-  console.log('💾 Creating evidence with:', {
-    title: input.title,
-    evidence_type: input.evidence_type,
-    related_document_ids: input.related_document_ids,
-    organization_id: organization.id,
-    file_name: input.file_name,
-    file_url: input.file_url
-  });
-
   // Insert evidence
   const { data: evidence, error } = await supabase
     .from('compliance_evidence')
@@ -316,12 +306,6 @@ export async function createComplianceEvidence(
     return { success: false, error: error.message };
   }
 
-  console.log('✅ Evidence created successfully:', {
-    evidence_id: evidence.id,
-    related_document_ids: evidence.related_document_ids,
-    title: input.title
-  });
-
   // Create mappings if provided
   if (evidence && input.related_question_ids && input.related_question_ids.length > 0) {
     const questionMappings = input.related_question_ids.map((qId, index) => ({
@@ -349,9 +333,6 @@ export async function createComplianceEvidence(
     
     if (mappingError) {
       console.error('Error creating document mappings:', mappingError);
-    } else {
-      console.log(`✅ Created ${documentMappings.length} document mappings for evidence ${evidence.id}`);
-      console.log('Mapped documents:', input.related_document_ids);
     }
   }
 
@@ -459,12 +440,10 @@ export async function deleteComplianceEvidence(
 export async function getEvidenceByDocumentId(
   documentId: string
 ): Promise<ComplianceEvidence[]> {
-  console.log('🔍 getEvidenceByDocumentId called with documentId:', documentId);
   const supabase = createClient() as any; // Note: compliance_evidence table exists but may not be in TypeScript types yet
   const user = await getUser(supabase);
 
   if (!user) {
-    console.log('❌ No user found in getEvidenceByDocumentId');
     return [];
   }
 
@@ -476,11 +455,8 @@ export async function getEvidenceByDocumentId(
     .maybeSingle();
 
   if (!organization) {
-    console.log('❌ No organization found in getEvidenceByDocumentId');
     return [];
   }
-
-  console.log('✅ Organization found:', organization.id);
 
   // Method 1: Get evidence from mapping table (legacy)
   const { data: mappings, error: mappingError } = await supabase
@@ -493,7 +469,6 @@ export async function getEvidenceByDocumentId(
   }
 
   const mappedEvidenceIds = mappings?.map((m: any) => m.evidence_id) || [];
-  console.log(`📋 Found ${mappedEvidenceIds.length} evidence IDs from mapping table for document ${documentId}`);
 
   // Method 2: Get evidence where documentId is in related_document_ids array
   // Try both .contains() and manual filtering as fallback
@@ -509,7 +484,7 @@ export async function getEvidenceByDocumentId(
     .eq('status', 'VALID');
 
   if (directError) {
-    console.warn('⚠️ .contains() query failed, trying manual filter:', directError.message);
+    // .contains() query failed, manual filter below will be used
   }
 
   // Always do manual filtering as well to ensure we catch everything
@@ -529,33 +504,11 @@ export async function getEvidenceByDocumentId(
       return ev.related_document_ids.includes(documentId);
     });
     
-    console.log(`📊 Manual filter found ${manuallyFiltered.length} evidence items with documentId ${documentId}`);
-    if (manuallyFiltered.length > 0) {
-      console.log('Evidence titles (manual):', manuallyFiltered.map((e: any) => e.title));
-      console.log('Evidence related_document_ids (manual):', manuallyFiltered.map((e: any) => e.related_document_ids));
-    }
-    
     // Use manual filter result (more reliable)
     directEvidence = manuallyFiltered;
   } else if (!directError && directEvidenceData) {
     // Use .contains() result if it worked
     directEvidence = directEvidenceData || [];
-    console.log(`✅ Found ${directEvidence.length} evidence items with .contains() query`);
-    if (directEvidence.length > 0) {
-      console.log('Evidence titles (.contains):', directEvidence.map(e => e.title));
-      console.log('Evidence related_document_ids (.contains):', directEvidence.map(e => e.related_document_ids));
-    }
-  }
-  
-  if (directEvidence.length === 0) {
-    console.log(`⚠️ No evidence found for document ${documentId}. Checking all evidence in organization...`);
-    if (allEvidence) {
-      console.log(`Total evidence in organization: ${allEvidence.length}`);
-      console.log('Sample evidence related_document_ids:', allEvidence.slice(0, 3).map((e: any) => ({
-        title: e.title,
-        related_document_ids: e.related_document_ids
-      })));
-    }
   }
 
   // Combine both methods
@@ -601,11 +554,6 @@ export async function getEvidenceByDocumentId(
     const dateB = new Date(b.upload_date).getTime();
     return dateB - dateA;
   });
-
-  console.log(`📊 Final evidence count for document ${documentId}: ${uniqueEvidence.length}`);
-  if (uniqueEvidence.length > 0) {
-    console.log('Final evidence titles:', uniqueEvidence.map(e => e.title));
-  }
 
   return uniqueEvidence;
 }

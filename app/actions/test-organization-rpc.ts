@@ -28,7 +28,6 @@ interface TestResult {
 export async function testOrganizationRPC(): Promise<TestResult> {
   const logs: string[] = [];
   const log = (msg: string) => {
-    console.log(`[TEST] ${msg}`);
     logs.push(`[${new Date().toISOString()}] ${msg}`);
   };
 

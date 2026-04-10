@@ -27,9 +27,9 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // const {
-  //   data: { user },
-  // } = await supabase.auth.getUser()
+  // Required: refreshes the session cookie on every request so it doesn't expire.
+  // Do not remove — without this call, the session will not be refreshed.
+  await supabase.auth.getUser()
 
   return supabaseResponse
 }

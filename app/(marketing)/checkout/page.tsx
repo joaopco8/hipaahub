@@ -41,7 +41,6 @@ export default function CheckoutPage() {
     const urlParams = new URLSearchParams(window.location.search);
     const errorParam = urlParams.get('error');
     if (errorParam) {
-      console.log('CheckoutPage: Error found in URL:', errorParam);
       setError(decodeURIComponent(errorParam));
       setIsLoading(false);
     }
@@ -68,35 +67,24 @@ export default function CheckoutPage() {
 
     const startCheckout = async () => {
       try {
-        console.log('CheckoutPage: Starting checkout process...');
-
         // Recover the plan the user selected before they were sent to auth
         const pendingPriceId = getStoredPriceId();
 
         // If no plan is stored, send the user to the plan selection screen
         if (!pendingPriceId) {
-          console.log('CheckoutPage: No priceId found – redirecting to /select-plan');
           setHasRedirected(true);
           window.location.href = '/select-plan';
           return;
         }
 
-        console.log('CheckoutPage: Pending price ID:', pendingPriceId);
-        
         // Add a small delay to ensure auth state is ready after OAuth redirect
         await new Promise(resolve => setTimeout(resolve, 800));
         
         const result = await initiateCheckout(pendingPriceId);
-        
-        console.log('CheckoutPage: Result received:', result.type);
-        
+
         if (result.type === 'redirect') {
-          // User needs to be redirected (not authenticated or already has subscription)
-          console.log('CheckoutPage: Redirecting to:', result.path);
-          
           // Prevent redirect loops - if redirecting back to checkout, show error instead
           if (result.path === '/checkout' || result.path.startsWith('/checkout?')) {
-            console.error('CheckoutPage: Redirect loop detected! Redirecting to home instead.');
             clearStoredPriceId();
             setError('Unable to proceed with checkout. Please try again from the home page.');
             setIsLoading(false);
@@ -120,31 +108,20 @@ export default function CheckoutPage() {
         } else if (result.type === 'checkout') {
           // User can proceed to checkout — clear the stored price selection
           clearStoredPriceId();
-          console.log('CheckoutPage: Proceeding to Stripe checkout...', {
-            sessionId: result.sessionId,
-            hasSessionUrl: !!result.sessionUrl,
-            sessionUrl: result.sessionUrl
-          });
-          
+
           // PRIORITY: Always use sessionUrl if available (most reliable)
           if (result.sessionUrl) {
-            console.log('CheckoutPage: Using sessionUrl for direct redirect:', result.sessionUrl);
             setHasRedirected(true);
             window.location.href = result.sessionUrl;
             return; // Exit early, redirect is happening
           }
           
           // Fallback: Try Stripe.js if sessionUrl is not available
-          console.log('CheckoutPage: sessionUrl not available, trying Stripe.js...');
           setHasRedirected(true);
-          
+
           try {
-            console.log('CheckoutPage: Attempting to load Stripe.js...');
             const stripe = await getStripe();
-            console.log('CheckoutPage: Stripe.js loaded:', !!stripe);
-            
             if (stripe) {
-              console.log('CheckoutPage: Redirecting via Stripe.js with sessionId:', result.sessionId);
               const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: result.sessionId });
               if (stripeError) {
                 console.error('CheckoutPage: Stripe redirect error:', stripeError);
@@ -153,7 +130,6 @@ export default function CheckoutPage() {
                 setHasRedirected(false);
               }
             } else {
-              console.error('CheckoutPage: Stripe.js returned null');
               setError('Unable to redirect to checkout. Please try again or contact support.');
               setIsLoading(false);
               setHasRedirected(false);
