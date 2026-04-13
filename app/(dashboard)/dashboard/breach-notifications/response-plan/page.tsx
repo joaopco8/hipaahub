@@ -227,7 +227,7 @@ export default function ResponsePlanPage() {
         ...plan,
         organization_id: orgId,
         plan_status: 'active',
-        activated_by: user.email || user.id,
+        activated_by: session.user.email || session.user.id,
         activated_at: now.toISOString(),
         next_review_date: reviewDate.toISOString().split('T')[0],
         updated_at: now.toISOString(),
@@ -256,7 +256,7 @@ export default function ResponsePlanPage() {
       setPlan(prev => ({
         ...prev,
         plan_status: 'active',
-        activated_by: user.email || user.id,
+        activated_by: session.user.email || session.user.id,
         activated_at: now.toISOString(),
         next_review_date: reviewDate.toISOString().split('T')[0],
       }));
