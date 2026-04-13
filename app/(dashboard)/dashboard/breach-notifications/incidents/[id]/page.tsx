@@ -95,25 +95,31 @@ export default function IncidentDetailPage() {
   const [showOCRModal,     setShowOCRModal]     = useState(false);
   const [showPatientModal, setShowPatientModal] = useState(false);
 
-  useEffect(() => { loadData(); }, [incidentId]);
+  useEffect(() => {
+    let cancelled = false;
+    const timeoutId = setTimeout(() => { if (!cancelled) setLoading(false); }, 8000);
+    loadData().finally(() => { clearTimeout(timeoutId); });
+    return () => { cancelled = true; clearTimeout(timeoutId); };
+  }, [incidentId]);
 
   async function loadData() {
     try {
       const supabase = createClient();
 
-      const [incidentRes, userRes] = await Promise.all([
+      const [incidentRes, sessionRes] = await Promise.all([
         (supabase as any).from('incident_logs').select('*').eq('id', incidentId).single(),
-        supabase.auth.getUser(),
+        supabase.auth.getSession(),
       ]);
 
       if (incidentRes.error) throw incidentRes.error;
       setIncident(incidentRes.data);
 
-      if (userRes.data?.user) {
+      const user = sessionRes.data?.session?.user;
+      if (user) {
         const { data: orgData } = await (supabase as any)
           .from('organizations')
           .select('*')
-          .eq('user_id', userRes.data.user.id)
+          .eq('user_id', user.id)
           .maybeSingle();
         if (orgData) setOrg(orgData);
       }

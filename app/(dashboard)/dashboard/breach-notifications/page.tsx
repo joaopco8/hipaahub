@@ -128,15 +128,25 @@ export default function BreachNotificationsPage() {
   });
 
   useEffect(() => {
+    let cancelled = false;
+
+    // Safety timeout: if loading hasn't resolved in 8s, force it to false
+    const timeoutId = setTimeout(() => {
+      if (!cancelled) setLoading(false);
+    }, 8000);
+
     async function loadOrganization() {
       try {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-          setLoading(false);
+        // Use getSession() (reads from local storage, no network round-trip)
+        // to avoid hanging when the auth server is slow or unreachable.
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session?.user) {
           return;
         }
+
+        const user = session.user;
 
         const { data: orgData, error } = await supabase
           .from('organizations')
@@ -146,11 +156,10 @@ export default function BreachNotificationsPage() {
 
         if (error) {
           console.error('Error loading organization:', error);
-          setLoading(false);
           return;
         }
 
-        if (orgData) {
+        if (orgData && !cancelled) {
           setOrganization(orgData as OrganizationData);
           setFormData(prev => ({
             ...prev,
@@ -167,10 +176,17 @@ export default function BreachNotificationsPage() {
       } catch (error) {
         console.error('Error loading organization:', error);
       } finally {
-        setLoading(false);
+        clearTimeout(timeoutId);
+        if (!cancelled) setLoading(false);
       }
     }
+
     loadOrganization();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const handlePHITypeToggle = (type: string) => {
@@ -284,8 +300,9 @@ export default function BreachNotificationsPage() {
 
       // Save to Supabase
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
+
       if (user && organization) {
         setIsSaving(true);
         // Get organization ID from Supabase

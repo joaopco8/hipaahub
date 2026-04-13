@@ -145,8 +145,41 @@ export async function completeV2Assessment(
       console.error('[completeV2Assessment] history insert error:', historyError);
     }
 
+    // Generate and save action items from the completed assessment
+    try {
+      const { generateActionItems } = await import('@/lib/generate-action-items');
+      const actionItems = generateActionItems(answers);
+
+      if (actionItems.length > 0) {
+        // Replace any existing action items for this user
+        await (supabase as any).from('action_items').delete().eq('user_id', user.id);
+
+        const itemsToInsert = actionItems.map(item => ({
+          user_id: user.id,
+          organization_id: org.id,
+          item_key: item.itemKey,
+          title: item.title,
+          description: item.description,
+          priority: item.priority,
+          category: item.category,
+          status: 'pending',
+        }));
+
+        const { error: insertError } = await (supabase as any)
+          .from('action_items')
+          .insert(itemsToInsert);
+
+        if (insertError) {
+          console.error('[completeV2Assessment] action items insert error:', insertError);
+        }
+      }
+    } catch (err) {
+      console.error('[completeV2Assessment] action items generation error:', err);
+    }
+
     revalidatePath('/dashboard/risk-assessment');
     revalidatePath('/dashboard');
+    revalidatePath('/dashboard/action-items');
 
     return { success: true };
   } catch (err) {

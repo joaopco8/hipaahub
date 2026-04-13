@@ -196,7 +196,12 @@ export default function IncidentsPage() {
   const [form, setForm] = useState<IncidentForm>(DEFAULT_FORM);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => { loadIncidents(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+    const timeoutId = setTimeout(() => { if (!cancelled) setLoading(false); }, 8000);
+    loadIncidents().finally(() => { clearTimeout(timeoutId); });
+    return () => { cancelled = true; clearTimeout(timeoutId); };
+  }, []);
 
   // Auto-compute overall risk whenever factors change
   useEffect(() => {
@@ -210,7 +215,8 @@ export default function IncidentsPage() {
   async function loadIncidents() {
     try {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) { router.push('/signin'); return; }
       const { data: org } = await supabase.from('organizations').select('id').eq('user_id', user.id).single();
       if (!org) { setLoading(false); return; }
@@ -269,7 +275,8 @@ export default function IncidentsPage() {
     setSaving(true);
     try {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) return;
       const { data: org } = await supabase.from('organizations').select('id').eq('user_id', user.id).single();
       if (!org) return;

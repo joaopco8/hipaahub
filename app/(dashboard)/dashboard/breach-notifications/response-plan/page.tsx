@@ -118,12 +118,18 @@ export default function ResponsePlanPage() {
   const [activating, setActivating] = useState(false);
   const [userName, setUserName] = useState('');
 
-  useEffect(() => { loadPlan(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+    const timeoutId = setTimeout(() => { if (!cancelled) setLoading(false); }, 8000);
+    loadPlan().finally(() => { clearTimeout(timeoutId); });
+    return () => { cancelled = true; clearTimeout(timeoutId); };
+  }, []);
 
   async function loadPlan() {
     try {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { session } } = await supabase.auth.getSession();
+      const user = session?.user;
       if (!user) return;
 
       const { data: org } = await supabase.from('organizations').select('id, name').eq('user_id', user.id).single();
@@ -174,7 +180,8 @@ export default function ResponsePlanPage() {
 
   async function getOrgId(): Promise<string | null> {
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) return null;
     const { data: org } = await supabase.from('organizations').select('id').eq('user_id', user.id).single();
     return org?.id ?? null;
@@ -206,8 +213,8 @@ export default function ResponsePlanPage() {
     setActivating(true);
     try {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return;
       const orgId = await getOrgId();
       if (!orgId) return;
 

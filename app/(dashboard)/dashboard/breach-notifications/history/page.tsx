@@ -33,15 +33,17 @@ export default function BreachNotificationsHistoryPage() {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    const timeoutId = setTimeout(() => { if (!cancelled) setLoading(false); }, 8000);
+
     async function loadNotifications() {
       try {
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) {
-          setLoading(false);
-          return;
-        }
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session?.user) return;
+
+        const user = session.user;
 
         // Get user's organization
         const { data: orgData } = await supabase
@@ -50,10 +52,7 @@ export default function BreachNotificationsHistoryPage() {
           .eq('user_id', user.id)
           .single();
 
-        if (!orgData) {
-          setLoading(false);
-          return;
-        }
+        if (!orgData) return;
 
         // Get breach notifications
         const { data, error } = await (supabase as any)
@@ -64,16 +63,23 @@ export default function BreachNotificationsHistoryPage() {
 
         if (error) {
           console.error('Error loading notifications:', error);
-        } else {
+        } else if (!cancelled) {
           setNotifications(data || []);
         }
       } catch (error) {
         console.error('Error loading notifications:', error);
       } finally {
-        setLoading(false);
+        clearTimeout(timeoutId);
+        if (!cancelled) setLoading(false);
       }
     }
+
     loadNotifications();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const handleDownload = async (notification: BreachNotification, type: 'patient' | 'hhs' | 'media') => {
