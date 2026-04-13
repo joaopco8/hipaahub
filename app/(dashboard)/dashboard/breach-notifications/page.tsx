@@ -84,6 +84,7 @@ export default function BreachNotificationsPage() {
   const router = useRouter();
   const [organization, setOrganization] = useState<OrganizationData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [orgQueryDone, setOrgQueryDone] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -130,16 +131,9 @@ export default function BreachNotificationsPage() {
   useEffect(() => {
     let cancelled = false;
 
-    // Safety timeout: if loading hasn't resolved in 8s, force it to false
-    const timeoutId = setTimeout(() => {
-      if (!cancelled) setLoading(false);
-    }, 8000);
-
     async function loadOrganization() {
       try {
         const supabase = createClient();
-        // Use getSession() (reads from local storage, no network round-trip)
-        // to avoid hanging when the auth server is slow or unreachable.
         const { data: { session } } = await supabase.auth.getSession();
 
         if (!session?.user) {
@@ -176,8 +170,10 @@ export default function BreachNotificationsPage() {
       } catch (error) {
         console.error('Error loading organization:', error);
       } finally {
-        clearTimeout(timeoutId);
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setOrgQueryDone(true);
+          setLoading(false);
+        }
       }
     }
 
@@ -185,7 +181,6 @@ export default function BreachNotificationsPage() {
 
     return () => {
       cancelled = true;
-      clearTimeout(timeoutId);
     };
   }, []);
 
@@ -433,7 +428,7 @@ export default function BreachNotificationsPage() {
     URL.revokeObjectURL(url);
   };
 
-  if (loading) return <div className="text-center py-12 text-[#565656] font-light">Loading...</div>;
+  if (loading || !orgQueryDone) return <div className="text-center py-12 text-[#565656] font-light">Loading...</div>;
 
   if (!organization) {
     return (
@@ -444,7 +439,11 @@ export default function BreachNotificationsPage() {
         <BreachNavigation />
         <Alert>
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription className="font-light">Organization data not found. Please complete your profile.</AlertDescription>
+          <AlertDescription className="font-light">
+            Organization profile not found. Please{' '}
+            <a href="/dashboard/settings" className="underline font-medium">complete your profile</a>
+            {' '}before using breach notifications.
+          </AlertDescription>
         </Alert>
       </div>
     );
