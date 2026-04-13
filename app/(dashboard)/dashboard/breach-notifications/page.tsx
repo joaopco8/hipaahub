@@ -24,7 +24,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   Loader2,
-  Link as LinkIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -232,6 +231,8 @@ function buildBreachDetails(form: FormState): BreachDetails {
 export default function BreachNotificationsPage() {
   const [org, setOrg] = useState<OrganizationData | null>(null);
   const [orgLoading, setOrgLoading] = useState(true);
+  const [orgQueryDone, setOrgQueryDone] = useState(false);
+  const [orgTimedOut, setOrgTimedOut] = useState(false);
   const [form, setForm] = useState<FormState>(defaultForm());
   const [letters, setLetters] = useState<GeneratedLetters | null>(null);
   const [generating, setGenerating] = useState(false);
@@ -243,11 +244,20 @@ export default function BreachNotificationsPage() {
   // Load org data – only the fields needed for letter generation
   useEffect(() => {
     let active = true;
+
+    // Safety net: if auth/db takes >6s, unblock the UI and show a retry state
+    const timeoutId = setTimeout(() => {
+      if (active) {
+        setOrgTimedOut(true);
+        setOrgLoading(false);
+      }
+    }, 6000);
+
     async function load() {
       try {
         const supabase = createClient();
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) return;
+        if (!session?.user || !active) return;
 
         const { data, error: qErr } = await supabase
           .from('organizations')
@@ -268,11 +278,15 @@ export default function BreachNotificationsPage() {
           setForm(defaultForm(data as unknown as OrganizationData));
         }
       } finally {
-        if (active) setOrgLoading(false);
+        clearTimeout(timeoutId);
+        if (active) {
+          setOrgQueryDone(true);
+          setOrgLoading(false);
+        }
       }
     }
     load();
-    return () => { active = false; };
+    return () => { active = false; clearTimeout(timeoutId); };
   }, []);
 
   // Generic setter
@@ -410,16 +424,37 @@ export default function BreachNotificationsPage() {
 
   // ─── Render states ─────────────────────────────────────────────────────────
 
+  // Still loading (query in progress, timeout not yet fired)
   if (orgLoading) {
     return (
       <div className="flex items-center justify-center py-24 gap-3">
         <Loader2 className="h-5 w-5 animate-spin text-[#0e274e]" />
-        <span className="text-[#565656] font-light">Loading organization data...</span>
+        <span className="text-[#565656] font-light">Loading...</span>
       </div>
     );
   }
 
-  if (!org) {
+  // Timeout fired but query never completed — show retry
+  if (orgTimedOut && !org) {
+    return (
+      <div className="flex w-full flex-col gap-6">
+        <h2 className="text-2xl font-light text-[#0e274e]">Breach Notifications</h2>
+        <BreachNavigation />
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="font-light">
+            Connection is taking too long.{' '}
+            <button onClick={() => window.location.reload()} className="underline font-medium">
+              Click here to reload
+            </button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  // Query completed but no org record found
+  if (orgQueryDone && !org) {
     return (
       <div className="flex w-full flex-col gap-6">
         <h2 className="text-2xl font-light text-[#0e274e]">Breach Notifications</h2>
@@ -434,6 +469,16 @@ export default function BreachNotificationsPage() {
             to use breach notifications.
           </AlertDescription>
         </Alert>
+      </div>
+    );
+  }
+
+  // Still waiting for query (shouldn't reach here, but guard anyway)
+  if (!org) {
+    return (
+      <div className="flex items-center justify-center py-24 gap-3">
+        <Loader2 className="h-5 w-5 animate-spin text-[#0e274e]" />
+        <span className="text-[#565656] font-light">Loading...</span>
       </div>
     );
   }
