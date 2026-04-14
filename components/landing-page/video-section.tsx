@@ -12,7 +12,7 @@ interface VideoSectionProps {
 }
 
 export default function VideoSection({
-  videoId = 'Ir9bUDr4Op4',
+  videoId = 'oU0XDLvfgco',
   title = 'See How HIPAA Hub Works in 3 Minutes',
   description = 'Watch a quick demo to see how HIPAA Hub helps clinics achieve and maintain HIPAA compliance without the stress.',
 }: VideoSectionProps) {

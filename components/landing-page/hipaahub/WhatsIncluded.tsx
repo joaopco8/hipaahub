@@ -40,7 +40,7 @@ const WhatsIncluded: React.FC<{ onDemoClick?: () => void; onAssessmentClick?: ()
         >
           <iframe
             className="w-full h-full"
-            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_HERE"
+            src="https://www.youtube.com/embed/oU0XDLvfgco?rel=0&modestbranding=1"
             title="HIPAA Hub Platform Demo"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen

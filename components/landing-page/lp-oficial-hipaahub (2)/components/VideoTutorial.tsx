@@ -38,7 +38,7 @@ const VideoTutorial: React.FC = () => {
                   {/* Replace 'YOUR_YOUTUBE_ID' with the actual ID */}
                   <iframe 
                     className="absolute inset-0 w-full h-full"
-                    src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                    src="https://www.youtube.com/embed/oU0XDLvfgco?rel=0&modestbranding=1" 
                     title="HIPAA Hub Tutorial"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
